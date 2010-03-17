@@ -51,14 +51,15 @@ define epuck position
 (
 	# actual size
 	size [0.07 0.07 0.12]
+	color "DarkGreen"
 	
 	# estimated mass in KG
 	mass 0.5
 	
 	#Defining the shape of an epuck
 	bitmap "bitmaps/circle.png"
-	gui_outline 1
-	show_blocks 0
+	gui_outline 0
+	#show_blocks 0
 
 	# differential steering model
 	drive "diff"

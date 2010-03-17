@@ -43,7 +43,7 @@ Interacts with a simulated e-puck robot using Player commands.
 This is a base class for the more specific SimulatedRobot and RealRobot classes, this class uses virtual functions so that polymorphism can be used.
 <br>
 Upon initialisation this class will create a thread using POSIX which reads in the sensor data from the robot. 
-This allows multiple instances of EPuck to function in parrallel and read in their sensor data with no effort from the programmer.
+This allows multiple instances of EPuck to function in parallel and read in their sensor data with no effort from the programmer.
 */
 class EPuck
 {
@@ -54,10 +54,12 @@ class EPuck
 		
 		//player object member variables
 		PlayerCc::PlayerClient		*epuck;
+		PlayerCc::PlayerClient		*simulation;
 
 		PlayerCc::Position2dProxy	*p2dProxy;
 		PlayerCc::SonarProxy		*sonarProxy;
 		PlayerCc::BlobfinderProxy	*blobProxy;
+		PlayerCc::SimulationProxy	*simProxy;
 		//robot also supports power, aio and blinkenlight proxies
 		//as far as I can tell, stage does not support these
 
@@ -83,6 +85,10 @@ class EPuck
 		virtual void setMotors(double forward, double turnrate);
 		virtual void setDifferentialMotors(double left, double right);
 
+		// LED methods
+		virtual void setAllLEDSOn(void);
+		virtual void setAllLEDSOff(void);
+		virtual void setLED(int index, int state);
 
 	
 	protected:

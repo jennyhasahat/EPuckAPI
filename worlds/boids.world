@@ -22,14 +22,14 @@ floorplan
 
 epuck
 (
-	color "green"
+	#color "green"
 	pose [0 0 0 0]
 	name "robot1"
 )
 
 epuck
 (
-	color "red"
+	#color "red"
 	pose [0 -0.5 0 0]
 	name "robot2"
 )

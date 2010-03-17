@@ -16,14 +16,17 @@ The EPuck object does this because using threads makes the player/stage simulati
 EPuck::EPuck(int robotPort, char* robotName)
 {	
 	port = robotPort;
-	strncpy(name, robotName, strlen(robotName+1));
+	strcpy(name, robotName);
 	
 	try
 	{
 		epuck = new PlayerCc::PlayerClient("localhost", port);
+		simulation = new PlayerCc::PlayerClient("localhost", 6664);
+
 		p2dProxy = new PlayerCc::Position2dProxy(epuck, 0);
 		sonarProxy = new PlayerCc::SonarProxy(epuck, 0);
 		blobProxy = new PlayerCc::BlobfinderProxy(epuck, 0);
+		simProxy = new PlayerCc::SimulationProxy(simulation, 0);
 	}
 	catch (PlayerCc::PlayerError e)
 	{
@@ -34,9 +37,8 @@ EPuck::EPuck(int robotPort, char* robotName)
 #if THREADED
 	pthread_create(&readSensorsThread, 0, EPuck::startReadSensorThread, this);
 #endif
-				
-	printf("%s created\n", robotName);
-	
+
+
 	return;
 }
 
@@ -187,6 +189,8 @@ Blob EPuck::getBlob(int index)
 	USE ACTUATORS
 */
 
+//*************************** MOTORS *****************************
+
 /**
 Sets the wheel speeds of the epuck's motors, requires a forward speed and a turnrate. Values are given in metres per second and radians per second.
 @param forward speed at which the robot moves forward in metres/sec
@@ -260,6 +264,47 @@ void EPuck::setDifferentialMotors(double left, double right)
 	setMotors(newspeed, newturnrate);
 	return;
 }
+
+//******************************* LED FLASHING *************************************
+
+/**
+ * Sets all the robot LEDs into the ON state
+ * */
+void EPuck::setAllLEDSOn(void)
+{
+	uint32_t red = 0xffff0000;
+	uint32_t colour = 0;
+
+	simProxy->SetProperty(name, "_mp_color", &red, sizeof(red));
+	simProxy->GetProperty(name, "_mp_color", &colour, sizeof(colour));
+	//simProxy->SetPose2d(name, 0, 0, 0);
+	printf("%s lights on, robot is colour %x\n", name, colour);
+
+	return;
+}
+
+/**
+ * Sets all the robot LEDs into the OFF state
+ * */
+void EPuck::setAllLEDSOff(void)
+{
+	uint32_t darkGreen = 0xff006400;
+	simProxy->SetProperty(name, "_mp_color", &darkGreen, sizeof(darkGreen));
+	return;
+}
+
+/**
+ * Sets the specified LED into the specified state.
+ * @param index The index of the LED to change.
+ * @param the state to set that LED to. 1 indicates on anything else indicates off.
+ * */
+void EPuck::setLED(int index, int state)
+{
+	if(state == 1) setAllLEDSOn();
+	else setAllLEDSOff();
+	return;
+}
+
 
 /*====================================================================
 			PRIVATE FUNCTIONS
