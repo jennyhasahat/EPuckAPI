@@ -44,6 +44,7 @@ This is a base class for the more specific SimulatedRobot and RealRobot classes,
 <br>
 Upon initialisation this class will create a thread using POSIX which reads in the sensor data from the robot. 
 This allows multiple instances of EPuck to function in parallel and read in their sensor data with no effort from the programmer.
+Any interaction with the robot must be done through this class to localise the use of Player syntax.
 */
 class EPuck
 {
@@ -64,8 +65,9 @@ class EPuck
 		//as far as I can tell, stage does not support these
 
 	
-		EPuck(int robotPort, char* robotName);
 		EPuck(char* robotName);
+		EPuck(int robotPort, char* robotName);
+		EPuck(int robotPort, char* robotName, int simulationPort);
 		~EPuck(void);
 		
 		void readSensors(void);
@@ -103,6 +105,9 @@ class EPuck
 		reinterpret_cast<EPuck *>(obj)->readSensorsThreaded();
 		return NULL;
 	}
+
+	private:
+		virtual void initialise(int robotPort, char* robotName, int simulationPort);
 
 #endif
 	

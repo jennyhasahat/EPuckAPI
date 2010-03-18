@@ -5,40 +5,37 @@
 ====================================================================*/
 
 /**
-Interacts with a simulated e-puck robot using Player commands.
-This is a base class for the more specific SimulatedRobot and RealRobot classes, this class uses virtual functions so that polymorphism can be used.
-<br>
-Before each call to a sensor or actuator the sensor readings are updated. The usual player thing to do is have the sensors update every fraction of a second regardless of whether a reading is actually needed. 
-The EPuck object does this because using threads makes the player/stage simulation very choppy. Threads may work in the normal robot but it's doubtful.
+ * Creates an instance of the EPuck class.
+ * Calls {@link EPuck#EPuck(int robotPort, char* robotName, int simulationPort) EPuck(int robotPort, char* robotName, int simulationPort)}
+ * using default simulation port 6664 and default robot port 6665.
+ * @param name the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
+ * */
+EPuck::EPuck(char* robotName)
+{
+	initialise(6665, robotName, 6664);
+}
+
+/**
+ * Creates an instance of the EPuck class.
+ * Calls {@link EPuck#EPuck(int robotPort, char* robotName, int simulationPort) EPuck(int robotPort, char* robotName, int simulationPort)}
+ * using default simulation port 6664.
+ * @param port the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
+ * @param name the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
+ * */
+EPuck::EPuck(int robotPort, char* robotName)
+{
+	initialise(robotPort, robotName, 6664);
+}
+
+/**
+Creates and instance of the EPuck class.
 @param port the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
 @param name the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
+@param simulationPort the port on which the simulation is running. Get this from the .cfg file of your simulation.
 */
-EPuck::EPuck(int robotPort, char* robotName)
+EPuck::EPuck(int robotPort, char* robotName, int simulationPort)
 {	
-	port = robotPort;
-	strcpy(name, robotName);
-	
-	try
-	{
-		epuck = new PlayerCc::PlayerClient("localhost", port);
-		simulation = new PlayerCc::PlayerClient("localhost", 6664);
-
-		p2dProxy = new PlayerCc::Position2dProxy(epuck, 0);
-		sonarProxy = new PlayerCc::SonarProxy(epuck, 0);
-		blobProxy = new PlayerCc::BlobfinderProxy(epuck, 0);
-		simProxy = new PlayerCc::SimulationProxy(simulation, 0);
-	}
-	catch (PlayerCc::PlayerError e)
-	{
-		std::cerr << e << std::endl;
-		return;
-	}
-	
-#if THREADED
-	pthread_create(&readSensorsThread, 0, EPuck::startReadSensorThread, this);
-#endif
-
-
+	initialise(robotPort, robotName, simulationPort);
 	return;
 }
 
@@ -269,32 +266,37 @@ void EPuck::setDifferentialMotors(double left, double right)
 
 /**
  * Sets all the robot LEDs into the ON state
+ * <br>
+ * <b>WARNING: This function doesn't actually work in simulation due to a Player/Stage bug.</b>
  * */
 void EPuck::setAllLEDSOn(void)
 {
 	uint32_t red = 0xffff0000;
-	uint32_t colour = 0;
+	char colour[]="_mp_color";
 
-	simProxy->SetProperty(name, "_mp_color", &red, sizeof(red));
-	simProxy->GetProperty(name, "_mp_color", &colour, sizeof(colour));
-	//simProxy->SetPose2d(name, 0, 0, 0);
-	printf("%s lights on, robot is colour %x\n", name, colour);
+	simProxy->SetProperty(name, colour, &red, sizeof(red));
 
 	return;
 }
 
 /**
  * Sets all the robot LEDs into the OFF state
+ * <br>
+ * <b>WARNING: This function doesn't actually work in simulation due to a Player/Stage bug.</b>
  * */
 void EPuck::setAllLEDSOff(void)
 {
 	uint32_t darkGreen = 0xff006400;
-	simProxy->SetProperty(name, "_mp_color", &darkGreen, sizeof(darkGreen));
+	char colour[]="_mp_color";
+
+	simProxy->SetProperty(name, colour, &darkGreen, sizeof(darkGreen));
 	return;
 }
 
 /**
  * Sets the specified LED into the specified state.
+ *  * <br>
+ * <b>WARNING: This function doesn't actually work in simulation due to a Player/Stage bug.</b>
  * @param index The index of the LED to change.
  * @param the state to set that LED to. 1 indicates on anything else indicates off.
  * */
@@ -309,6 +311,40 @@ void EPuck::setLED(int index, int state)
 /*====================================================================
 			PRIVATE FUNCTIONS
 ====================================================================*/
+
+
+/**
+ * Because constructors can't call other constructors, this is a common method that the overloaded constructors can call which will initialise the robot.
+ * @param port the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
+ * @param name the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
+ * @param simulationPort the port on which the simulation is running. Get this from the .cfg file of your simulation.
+ * */
+void EPuck::initialise(int robotPort, char* robotName, int simulationPort)
+{
+	port = robotPort;
+	strcpy(name, robotName);
+
+	try
+	{
+		epuck = new PlayerCc::PlayerClient("localhost", port);
+		simulation = new PlayerCc::PlayerClient("localhost", simulationPort);
+
+		p2dProxy = new PlayerCc::Position2dProxy(epuck, 0);
+		sonarProxy = new PlayerCc::SonarProxy(epuck, 0);
+		blobProxy = new PlayerCc::BlobfinderProxy(epuck, 0);
+		simProxy = new PlayerCc::SimulationProxy(simulation, 0);
+	}
+	catch (PlayerCc::PlayerError e)
+	{
+		std::cerr << e << std::endl;
+		return;
+	}
+
+#if THREADED
+	pthread_create(&readSensorsThread, 0, EPuck::startReadSensorThread, this);
+#endif
+
+}
 
 
 #if THREADED

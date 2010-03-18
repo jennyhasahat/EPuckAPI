@@ -34,25 +34,5 @@ epuck
 	name "robot2"
 )
 
-define carton model
-(
-	# a carton is retangular
-	# so make a square shape and use size[]
-	
-	block
-	(
-		points 4
-		point[3] [0 0]
-		point[2] [0 1]
-		point[1] [1 1]
-		point[0] [1 0]
-	)
-	
-	# average carton size is ~ 20cm x 10cm x 5cm
-	size [0.1 0.2 0.05]
-	
-	color "DarkBlue"
-	gripper_return 1
-)
 
-carton(pose [-1.5 -1.5 0 0])
+

@@ -1,4 +1,4 @@
-# epuck.inc
+# epuck-mine.inc
 # rough model of the epuck robots
 
 #ranger sensors
