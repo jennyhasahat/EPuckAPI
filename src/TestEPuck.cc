@@ -8,15 +8,13 @@ Runs through functions in EPuck class and prints responses to standard output.
 int main(void)
 {
 	char testbot1Name[] = "robot1";
-	EPuck *testbot1;
 	char testbot2Name[] = "robot2";
+	EPuck *testbot1;
 	EPuck *testbot2;
 	
-	testbot1 = new EPuck(6665, testbot1Name);
+	testbot1 = new EPuck(testbot1Name);
 	testbot2 = new EPuck(6666, testbot2Name);
 	
-
-	int i=0;
 	while(true)
 	{
 
