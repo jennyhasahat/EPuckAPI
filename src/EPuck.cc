@@ -272,7 +272,7 @@ void EPuck::setDifferentialMotors(double left, double right)
 void EPuck::setAllLEDSOn(void)
 {
 	uint32_t red = 0xffff0000;
-	char colour[]="_mp_color";
+	char colour[]="MP_COLOR";
 
 	simProxy->SetProperty(name, colour, &red, sizeof(red));
 
@@ -287,7 +287,7 @@ void EPuck::setAllLEDSOn(void)
 void EPuck::setAllLEDSOff(void)
 {
 	uint32_t darkGreen = 0xff006400;
-	char colour[]="_mp_color";
+	char colour[]="MP_COLOR";
 
 	simProxy->SetProperty(name, colour, &darkGreen, sizeof(darkGreen));
 	return;
