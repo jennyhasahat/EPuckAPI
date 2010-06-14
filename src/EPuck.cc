@@ -307,6 +307,14 @@ void EPuck::setLED(int index, int state)
 	return;
 }
 
+//******************************* AUDIO *************************************
+
+int EPuck::playTone(int tone, double duration)
+{
+
+	return 0;
+}
+
 
 /*====================================================================
 			PRIVATE FUNCTIONS

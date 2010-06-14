@@ -92,6 +92,9 @@ class EPuck
 		virtual void setAllLEDSOff(void);
 		virtual void setLED(int index, int state);
 
+		//audio methods
+		virtual int playTone(int tone, double duration);
+
 	
 	protected:
 		double irReadings[8];
