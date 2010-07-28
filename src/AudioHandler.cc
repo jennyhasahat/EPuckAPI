@@ -7,12 +7,13 @@
 
 #include "AudioHandler.h"
 
-AudioHandler::AudioHandler(PlayerCc::BlackBoardProxy *bbp, PlayerCc::SimulationProxy *sim, int nobots)
+AudioHandler::AudioHandler(BlackBoardProxy *bbp, SimulationProxy *sim, int nobots, char *name)
 {
 	//initialise member variables
 	blackBProxy = bbp;
 	simProxy = sim;
 	numberRobots = nobots;
+	strncpy()
 
 	//create array for sound data
 	allsounds = new player_blackboard_entry_t[numberRobots];

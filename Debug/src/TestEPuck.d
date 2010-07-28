@@ -1,5 +1,5 @@
 src/TestEPuck.d src/TestEPuck.o: ../src/TestEPuck.cc \
-  ../src/../include/EPuck.h \
+  /n/staff/jowen/player/EPuckAPI/include/EPuck.h \
   /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/playerc++.h \
   /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc/playerc.h \
   /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/playerconfig.h \
@@ -15,9 +15,10 @@ src/TestEPuck.d src/TestEPuck.o: ../src/TestEPuck.cc \
   /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/playerclient.h \
   /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/playerc++config.h \
   /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/playererror.h \
-  /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/clientproxy.h
+  /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/clientproxy.h \
+  /n/staff/jowen/player/EPuckAPI/include/AudioHandler.h
 
-../src/../include/EPuck.h:
+/n/staff/jowen/player/EPuckAPI/include/EPuck.h:
 
 /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/playerc++.h:
 
@@ -50,3 +51,5 @@ src/TestEPuck.d src/TestEPuck.o: ../src/TestEPuck.cc \
 /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/playererror.h:
 
 /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/clientproxy.h:
+
+/n/staff/jowen/player/EPuckAPI/include/AudioHandler.h:

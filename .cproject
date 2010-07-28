@@ -27,6 +27,7 @@
 <option id="gnu.cpp.compiler.option.other.other.164698950" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 `pkg-config --cflags playerc++`" valueType="string"/>
 <option id="gnu.cpp.compiler.option.include.paths.956779464" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="/usr/local/include/player-3.0/libplayerc++"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/EPuckAPI/include}&quot;"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1262584357" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 </tool>
@@ -50,7 +51,7 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
-<entry excluding="test/worlds|helpful files|worlds" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+<entry excluding="test/testAPI.cc|test/worlds|helpful files|worlds" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 </sourceEntries>
 </configuration>
 </storageModule>
@@ -360,7 +361,7 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
-<entry excluding="test/worlds|helpful files" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+<entry excluding="test/testAPI.cc|test/worlds|helpful files" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 </sourceEntries>
 </configuration>
 </storageModule>

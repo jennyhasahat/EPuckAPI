@@ -14,7 +14,8 @@ src/EPuck.d src/EPuck.o: ../src/EPuck.cc ../src/../include/EPuck.h \
   /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/playerclient.h \
   /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/playerc++config.h \
   /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/playererror.h \
-  /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/clientproxy.h
+  /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/clientproxy.h \
+  ../src/../include/AudioHandler.h
 
 ../src/../include/EPuck.h:
 
@@ -49,3 +50,5 @@ src/EPuck.d src/EPuck.o: ../src/EPuck.cc ../src/../include/EPuck.h \
 /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/playererror.h:
 
 /usr/local/pkg/player-3.0.0-i686-1/include/player-3.0/libplayerc++/clientproxy.h:
+
+../src/../include/AudioHandler.h:

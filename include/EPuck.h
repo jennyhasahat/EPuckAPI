@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <stdint.h>
 #include "libplayerc++/playerc++.h"
+#include "AudioHandler.h"
 
 #define THREADED 1
 
@@ -51,7 +52,7 @@ class EPuck
 	public:
 		//member variables
 		int port; 
-		char name[64];
+		char name[32];
 		
 		//player object member variables
 		PlayerCc::PlayerClient		*epuck;
@@ -62,6 +63,10 @@ class EPuck
 		PlayerCc::BlobfinderProxy	*blobProxy;		//camera
 		PlayerCc::SimulationProxy	*simProxy;		//leds
 		PlayerCc::BlackBoardProxy	*blackProxy;	//audio
+
+		//audio stuff
+		AudioHandler *handler;
+		bool audioInitialised;
 
 		//robot also supports power, aio and blinkenlight proxies
 		//as far as I can tell, stage does not support these
@@ -95,6 +100,7 @@ class EPuck
 		virtual void setLED(int index, int state);
 
 		//audio methods
+		virtual int initaliseAudio(int numRobots);
 		virtual int playTone(int tone, double duration);
 		virtual int listenToTones(void);
 

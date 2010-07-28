@@ -309,6 +309,15 @@ void EPuck::setLED(int index, int state)
 
 //******************************* AUDIO *************************************
 
+/**
+ * Initialises the audio drivers so that we can use audio signals in stage.
+ * @param numRobots the number of robots in the entire simulation.
+ * */
+int EPuck::initaliseAudio(int numRobots)
+{
+	return 0;
+}
+
 int EPuck::playTone(int tone, double duration)
 {
 
@@ -335,8 +344,11 @@ int EPuck::listenToTones(void)
  * */
 void EPuck::initialise(int robotPort, char* robotName, int simulationPort)
 {
+	//initialise member variables
 	port = robotPort;
 	strcpy(name, robotName);
+
+	audioInitialised = false;
 
 	try
 	{
