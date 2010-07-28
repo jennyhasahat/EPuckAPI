@@ -44,20 +44,80 @@ define epuck_cam blobfinder
 		size [0.001 0.001 0.001]
 )
 
-
+define soundboard model
+(
+	size [0.02 0.07 0.02]
+	block
+	(
+		points 4
+		point[0] [0 0]
+		point[1] [0 0.07]
+		point[2] [-0.01 0.07]
+		point[3] [-0.01 0]
+		z [0 0.01]
+		color "green"
+	)
+	block
+	(
+		points 4
+		point[0] [-0.005 0.01]
+		point[1] [0.005 0.01]
+		point[2] [0.005 0.02]
+		point[3] [-0.005 0.02]
+		z [0.005 0.015]
+		color "black"
+	)
+	block
+	(
+		points 4
+		point[0] [-0.005 0.03]
+		point[1] [0.005 0.03]
+		point[2] [0.005 0.04]
+		point[3] [-0.005 0.04]
+		z [0.005 0.015]
+		color "black"
+	)
+	block
+	(
+		points 4
+		point[0] [-0.005 0.05]
+		point[1] [0.005 0.05]
+		point[2] [0.005 0.06]
+		point[3] [-0.005 0.06]
+		z [0.005 0.015]
+		color "black"
+	)
+	
+)
 
 # epuck base
 define epuck position
 (
 	# actual size
-	size [0.07 0.07 0.12]
+	size [0.07 0.07 0.045]
 	color "DarkGreen"
 	
 	# estimated mass in KG
 	mass 0.5
 	
 	#Defining the shape of an epuck
-	bitmap "bitmaps/circle.png"
+	block
+	(
+		points 8
+		point[0] [1 0]
+		point[1] [0.7071 0.7071]
+		point[2] [0 1]
+		point[3] [-0.7071 0.7071]
+		point[4] [-1 0]
+		point[5] [-0.7071 -0.7071]
+		point[6] [0 -1]
+		point[7] [0.7071 -0.7071]
+		z [0 1]
+	)
+	
+	soundboard(pose [0.03 0 0 0])
+	
+	#bitmap "bitmaps/circle.png"
 	gui_outline 0
 	#show_blocks 0
 

@@ -267,7 +267,7 @@ void EPuck::setDifferentialMotors(double left, double right)
 /**
  * Sets all the robot LEDs into the ON state
  * <br>
- * <b>WARNING: This function doesn't actually work in simulation due to a Player/Stage bug.</b>
+ * @warning This function doesn't actually work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.
  * */
 void EPuck::setAllLEDSOn(void)
 {
@@ -315,6 +315,12 @@ int EPuck::playTone(int tone, double duration)
 	return 0;
 }
 
+int EPuck::listenToTones(void)
+{
+
+	return 0;
+}
+
 
 /*====================================================================
 			PRIVATE FUNCTIONS
@@ -341,6 +347,7 @@ void EPuck::initialise(int robotPort, char* robotName, int simulationPort)
 		sonarProxy = new PlayerCc::SonarProxy(epuck, 0);
 		blobProxy = new PlayerCc::BlobfinderProxy(epuck, 0);
 		simProxy = new PlayerCc::SimulationProxy(simulation, 0);
+		blackProxy = new PlayerCc::BlackBoardProxy(simulation, 0);
 	}
 	catch (PlayerCc::PlayerError e)
 	{

@@ -57,10 +57,12 @@ class EPuck
 		PlayerCc::PlayerClient		*epuck;
 		PlayerCc::PlayerClient		*simulation;
 
-		PlayerCc::Position2dProxy	*p2dProxy;
-		PlayerCc::SonarProxy		*sonarProxy;
-		PlayerCc::BlobfinderProxy	*blobProxy;
-		PlayerCc::SimulationProxy	*simProxy;
+		PlayerCc::Position2dProxy	*p2dProxy;		//motors
+		PlayerCc::SonarProxy		*sonarProxy;	//rangers
+		PlayerCc::BlobfinderProxy	*blobProxy;		//camera
+		PlayerCc::SimulationProxy	*simProxy;		//leds
+		PlayerCc::BlackBoardProxy	*blackProxy;	//audio
+
 		//robot also supports power, aio and blinkenlight proxies
 		//as far as I can tell, stage does not support these
 
@@ -94,6 +96,7 @@ class EPuck
 
 		//audio methods
 		virtual int playTone(int tone, double duration);
+		virtual int listenToTones(void);
 
 	
 	protected:

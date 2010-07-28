@@ -16,7 +16,7 @@ window
 floorplan
 (
 	bitmap "bitmaps/rink2.png"
-	size [2 2 2]	
+	size [2 2 0.5]	
 	name "cave"
 )
 
