@@ -49,6 +49,17 @@ EPuck::~EPuck(void)
 #if THREADED
 	pthread_detach(readSensorsThread);
 #endif
+
+	//free the items in memory
+	//this is probably unnecessary
+	delete	p2dProxy;		//motors
+	delete	sonarProxy;	//rangers
+	delete	blobProxy;		//camera
+	delete	simProxy;		//leds
+	delete	epuck;
+	delete	simulation;
+	delete	handler;
+
 	return;
 }
 
@@ -312,22 +323,48 @@ void EPuck::setLED(int index, int state)
 /**
  * Initialises the audio drivers so that we can use audio signals in stage.
  * @param numRobots the number of robots in the entire simulation.
+ * @returns 0 if audio has just been initialised, 1 if it was already initialised.
  * */
 int EPuck::initaliseAudio(int numRobots)
 {
-	return 0;
+	if(!audioInitialised)
+	{
+		handler = new AudioHandler(simulation, simProxy, numRobots, name);
+		//handler = new AudioHandler(blackProxy, simProxy, numRobots, name);
+		audioInitialised = true;
+		printf("Initialised audio for robot %s.\n", name);
+		return 0;
+	}
+	return 1;
 }
 
-int EPuck::playTone(int tone, double duration)
+/**
+ * Get this Epuck to play a tone of the desired frequency and duration.
+ * @param frequency frequency of tone to play in Hz
+ * @param duration duration of the tone in milliseconds
+ * @returns 0 if successful 1 if unsucessful
+ */
+int EPuck::playTone(int frequency, double duration)
 {
+	if(audioInitialised)
+	{
+		return 0;
+	}
 
-	return 0;
+	printf("Unsuccessful epuck %s playTone() request. Audio not initialised.\n", name);
+	return -1;
 }
+
 
 int EPuck::listenToTones(void)
 {
+	if(audioInitialised)
+	{
+		return 0;
+	}
 
-	return 0;
+	printf("Unsuccessful epuck %s listenToTones() request. Audio not initialised.\n", name);
+	return -1;
 }
 
 
@@ -347,7 +384,6 @@ void EPuck::initialise(int robotPort, char* robotName, int simulationPort)
 	//initialise member variables
 	port = robotPort;
 	strcpy(name, robotName);
-
 	audioInitialised = false;
 
 	try

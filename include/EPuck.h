@@ -101,7 +101,7 @@ class EPuck
 
 		//audio methods
 		virtual int initaliseAudio(int numRobots);
-		virtual int playTone(int tone, double duration);
+		virtual int playTone(int frequency, double duration);
 		virtual int listenToTones(void);
 
 	

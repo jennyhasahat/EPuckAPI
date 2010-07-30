@@ -15,17 +15,25 @@ int main(void)
 	testbot1 = new EPuck(testbot1Name);
 	testbot2 = new EPuck(6666, testbot2Name);
 	
-	while(true)
+	printf("initialising robot1 audio\n");
+	testbot1->initaliseAudio(2);
+	printf("initialising robot2 audio\n");
+	testbot2->initaliseAudio(2);
+	printf("finished initialising audio\n");
+	sleep(1);
+
+/*	while(true)
 	{
 
 		testbot1->setDifferentialMotors(0.25, 0.3); //turns right
 		testbot2->setDifferentialMotors(0.3, 0.25); //turns left
 
-		printf("turning on %s leds\n", testbot1Name);
-		testbot1->setAllLEDSOn();
+		printf("testbot 1 going to play a tone f:2000 d:1\n");
+		testbot1->playTone(2000, 1);
+		printf("tone info sent\n");
 
 		usleep(100);
 	}
-	
+*/
 	return 0;
 }
