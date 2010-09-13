@@ -65,8 +65,8 @@ class EPuck
 		PlayerCc::BlackBoardProxy	*blackProxy;	//audio
 
 		//audio stuff
-		AudioHandler *handler;
-		bool audioInitialised;
+		static AudioHandler *handler;
+		static bool audioInitialised;
 
 		//robot also supports power, aio and blinkenlight proxies
 		//as far as I can tell, stage does not support these

@@ -323,13 +323,13 @@ void EPuck::setLED(int index, int state)
 /**
  * Initialises the audio drivers so that we can use audio signals in stage.
  * @param numRobots the number of robots in the entire simulation.
- * @returns 0 if audio has just been initialised, 1 if it was already initialised.
+ * @returns 0 if audio has just been initialised, 1 if it is already initialised.
  * */
 int EPuck::initaliseAudio(int numRobots)
 {
 	if(!audioInitialised)
 	{
-		handler = new AudioHandler(simulation, simProxy, numRobots, name);
+		handler = new AudioHandler(simulation, simProxy, numRobots);
 		//handler = new AudioHandler(blackProxy, simProxy, numRobots, name);
 		audioInitialised = true;
 		printf("Initialised audio for robot %s.\n", name);

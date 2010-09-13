@@ -7,60 +7,178 @@
 
 #include "AudioHandler.h"
 
-AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, int nobots, char *name)
-//AudioHandler::AudioHandler(BlackBoardProxy *bbp, SimulationProxy *sim, int nobots, char *name)
+/**
+ * Creates the audiohandler object and builds an array to store the sound data for each robot.
+ * @param simulationClient the PlayerClient object which handles the simulation.
+ * @param simProxy the simulationProxy attached to the playerclient handling this simulation.
+ * @param nobots the number of robots in the simulation.
+ * */
+AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, int nobots)
 {
-	// group name to send driver. Needs to be parameter nobots in a string format
-	char group[8];
-	// data returned from driver
-	player_blackboard_entry_t packet, *p2;
+	int i;
 
-	//initialise member variables
-	blackBProxy = new BlackBoardProxy(simulationClient, 0);
-	//blackBProxy = bbp;
 	simProxy = sim;
 	numberRobots = nobots;
-	strncpy(robotName, name, 32);
 
-	sprintf(group, "%d", nobots);
-	packet.key = robotName;
-	packet.group = group;
-	packet.type = 0;
+	environment = new AudioData[numberRobots];
 
-	printf("handler sending %s and %s to blackboard driver\n", robotName, group);
-	p2 = blackBProxy->GetEntry(robotName, group);
-	printf("handler recieved data packet back\n");
+	//create an array of strings for the robot names
+	robotNames = new char*[numberRobots];
 
-	allsounds = (player_blackboard_entry_t**)p2->group;
-	mysounds = (player_blackboard_entry_t*)p2->data;
+	//robotNames = (char**)calloc(numberRobots, sizeof(char*));
+	for(i=0;i<numberRobots;i++)
+	{
+		robotNames[i] = new char[32];
+		//robotNames[i] = (char*)calloc(maxKeyNameLength, sizeof(char));
+	}
 
-	printf("driver sent data all %x and this %x\n", allsounds, mysounds);
+
+
+	printf("Audio handler initialised?\n");
+	return;
 }
 
 AudioHandler::~AudioHandler()
 {
-	delete[] allsounds;
+	int i;
+
+	delete[] environment;
+
+	for(i=0;i<numberRobots;i++)
+	{
+		delete[] robotNames[i];
+	}
+	delete[] robotNames;
+
+	return;
 }
 
-
-void AudioHandler::playTone(int freq, double duration)
+/**
+ * Searches list of robots and indexes to find an empty index.
+ * If the robot is already assigned an index it returns this instead.
+ * @param name name of the robot that it is trying to find a slot for.
+ * @returns index the index to store that robot's data in.
+ * */
+int AudioHandler::initialiseEPuck(char *name)
 {
-	double x, y, dummy;
+	int i;
 
-	simProxy->GetPose2d(robotName, x, y, dummy);
+	//scroll through ALL keys until you find an entry matching the provided key name
+	// if none is found then give the first empty key in our list.
+	for(i=0;i<numberRobots;i++)
+	{
+		//	printf("%d) about to compare \"%s\" and \"%s\"\n", i, recieved.key, allkeys[i]);
+		//if the given key and the current one match then stop searching
+		if(!strncmp(name, robotNames[i], strlen(name)))
+		{
+			return i;
+		}
 
-	//create packet of data to send
-	player_blackboard_entry_t packet;
+		//if key we're looking at is empty then we've reached the end of the list of filled slots and should allocate this slot
+		if(strlen(robotNames[i]) == 0)
+		{
+			//fill slot with this robot
+			strncpy(robotNames[i], name, 32);
+			return i;
+		}
+	}
 
-	//populate packet with data
-	/* Key is robot name
-	 * data count is frequency
-	 * timestamp sec is time that the request was sent
-	 * timestamp usec is duration in milliseconds
-	 */
-	packet.key = robotName;
-	packet.key_count = strlen(robotName);
-	packet.data_count = freq;
-
-
+	return -1;
 }
+
+/**
+ * Puts a tone of the desired frequency and duration into the audio environment.
+ * @param id the index of the robot which wants to put info in the environment
+ * @param freq the frequency of the tone in Hz
+ * @param duration the length of the tone in milliseconds
+ * */
+void AudioHandler::playTone(int id, int freq, double duration)
+{
+	char name[32];
+
+	environment[id].frequency = freq;
+	//get robot's name
+	strcpy(name, robotNames[id]);
+	//get robot's position
+	simProxy->GetPose2d(name, &environment[id].x, &environment[id].y, &environment[id].yaw);
+
+
+
+			/**time that the tone started playing*/
+			time_t start;
+			/**Length of the tone in milliseconds*/
+			double duration;
+			/**Time that the tone will stop playing*/
+			time_t end;
+
+	//save timestamp clock() is more accurate than time(NULL).
+	environment[id].start = (clock()*1000)/CLOCKS_PER_SEC;
+	environment[id].duration = duration;
+	environment[id].end = environment[id].start + (CLOCKS_PER_SEC*(duration/1000));
+
+	printf("tone start: %f, end: %f\n", environment[id].start, environment[id].end);
+	return;
+}
+
+
+
+//==================================================================================================
+//							PRIVATE FUNCTIONS
+//==================================================================================================
+
+/** Private test function to print all of the sound environment data to stdout.
+ * */
+void AudioHandler::dumpData(void)
+{
+	int i;
+
+	for(i=0;i<numberRobots;i++)
+	{
+		printf("Robot number %d, named %s\n", i, robotNames[i]);
+		printf("\tfrequency %d Hz\n", environment[i].frequency);
+		printf("\tx: %f, y: %f, yaw: %f\n", environment[i].x, environment[i].y, environment[i].yaw);
+		printf("\tstart time: %f\n\tend time: %f\n", environment[i].start, environment[i].end);
+		printf("\tduration: %f msecs.\n", environment[i].duration);
+	}
+	return;
+}
+
+
+
+
+/**
+ * Searches list of robots and indexes to find an empty index.
+ * If the robot is already assigned an index it returns this instead.
+ * @param name name of the robot that it is trying to find a slot for.
+ * @returns index the index to store that robot's data in.
+ * */
+/*
+int AudioHandler::findRobotSlot(char *name)
+{
+	int i;
+
+	//scroll through ALL keys until you find an entry matching the provided key name
+	// if none is found then give the first empty key in our list.
+	for(i=0;i<numberRobots;i++)
+	{
+		//	printf("%d) about to compare \"%s\" and \"%s\"\n", i, recieved.key, allkeys[i]);
+		//if the given key and the current one match then stop searching
+		if(!strncmp(name, robotNames[i], strlen(name)))
+		{
+			return i;
+		}
+
+		//if key we're looking at is empty then we've reached the end of the list of filled slots and should allocate this slot
+		if(strlen(robotNames[i]) == 0)
+		{
+			//fill slot with this robot
+			strncpy(robotNames[i], name, 32);
+			return i;
+		}
+	}
+
+	return -1;
+}
+*/
+
+
