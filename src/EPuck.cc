@@ -58,7 +58,7 @@ EPuck::~EPuck(void)
 	delete	simProxy;		//leds
 	delete	epuck;
 	delete	simulation;
-	delete	handler;
+//	delete	handler;
 
 	return;
 }
@@ -322,27 +322,26 @@ void EPuck::setLED(int index, int state)
 
 /**
  * Initialises the audio drivers so that we can use audio signals in stage.
- * @param numRobots the number of robots in the entire simulation.
- * @returns 0 if audio has just been initialised, 1 if it is already initialised.
+ * @param nobots the number of robots in the simulation
+ * @returns success. 0 if audio handler is initialised, -1 if already initialised.
  * */
-int EPuck::initaliseAudio(int numRobots)
+int EPuck::initaliseAudio(int nobots)
 {
 	if(!audioInitialised)
 	{
-		handler = new AudioHandler(simulation, simProxy, numRobots);
-		//handler = new AudioHandler(blackProxy, simProxy, numRobots, name);
-		audioInitialised = true;
-		printf("Initialised audio for robot %s.\n", name);
+		handler = AudioHandler::GetAudioHandler(simulation, simProxy, nobots);
+		audioInitialised = TRUE;
 		return 0;
 	}
-	return 1;
+
+	return -1;
 }
 
 /**
  * Get this Epuck to play a tone of the desired frequency and duration.
  * @param frequency frequency of tone to play in Hz
  * @param duration duration of the tone in milliseconds
- * @returns 0 if successful 1 if unsucessful
+ * @returns 0 if successful -1 if unsuccessful
  */
 int EPuck::playTone(int frequency, double duration)
 {

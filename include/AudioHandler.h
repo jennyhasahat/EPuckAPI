@@ -1,9 +1,11 @@
 /**
  * AudioHandler stores the audio environment data in the simulation.
  * It provides interfaces for storing audio information and for accessing audio information.
- * AudioHandler is not meant to be user-facing and should be accessed through the EPuck class. However, because it contains
+ * AudioHandler is not meant to be user-facing and should be accessed through the EPuck class.
  *
  * The AudioHandler code is not intended to be user facing, the user interacts with it through the EPuck API.
+ *
+ * AudioHandler uses the Singleton design pattern, so there can only ever be one instance of it. Constructor is called using the Instance() method.
  *
  * @date 26/07/2010
  * @author Jennifer Owen
@@ -15,6 +17,9 @@
 #include <stdio.h>
 #include <time.h>
 #include "libplayerc++/playerc++.h"
+
+#define SAMPLE_RATE		16000
+#define FFT_BLOCK_SIZE	128
 
 using namespace PlayerCc;
 
@@ -48,8 +53,8 @@ public:
 	//member variables
 	char** robotNames;
 	int numberRobots; //number of robots in whole simulation
+	double FFTLowerBounds[FFT_BLOCK_SIZE/2];
 	AudioData *environment;
-	//bool initialised;
 
 
 	//player stuff
@@ -57,13 +62,24 @@ public:
 
 	//function prototypes
 
-	AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, int nobots);
+	//singleton thing...
+	static AudioHandler* GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, int nobots);
+
 	virtual ~AudioHandler();
 
+	//methods.
 	void playTone(int id, int freq, double duration);
 	int initialiseEPuck(char* robotname);
+	int testInitialisation(void);
+
+protected:
+	//protected so it can be a singleton
+	AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, int nobots);
 
 private:
+	//singleton reference to only instance of audiohandler.
+	static AudioHandler* _instance;
+
 	int findRobotSlot(char *name);
 	void dumpData(void);
 

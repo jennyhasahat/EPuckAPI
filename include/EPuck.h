@@ -65,8 +65,8 @@ class EPuck
 		PlayerCc::BlackBoardProxy	*blackProxy;	//audio
 
 		//audio stuff
-		static AudioHandler *handler;
-		static bool audioInitialised;
+		AudioHandler *handler;
+		bool audioInitialised;
 
 		//robot also supports power, aio and blinkenlight proxies
 		//as far as I can tell, stage does not support these
@@ -80,29 +80,29 @@ class EPuck
 		void readSensors(void);
 		
 		// IR methods
-		virtual double* getIRReadings(void);
-		virtual double getIRReading(int index);
-		virtual int getNumberOfIRs(void);
+		double* getIRReadings(void);
+		double getIRReading(int index);
+		int getNumberOfIRs(void);
 
 		// Blobfinder methods
-		virtual int getCameraWidth(void);
-		virtual int getCameraHeight(void);
-		virtual int getNumberBlobs(void);
-		virtual Blob getBlob(int index);
+		int getCameraWidth(void);
+		int getCameraHeight(void);
+		int getNumberBlobs(void);
+		Blob getBlob(int index);
 
 		// motor control methods
-		virtual void setMotors(double forward, double turnrate);
-		virtual void setDifferentialMotors(double left, double right);
+		void setMotors(double forward, double turnrate);
+		void setDifferentialMotors(double left, double right);
 
 		// LED methods
-		virtual void setAllLEDSOn(void);
-		virtual void setAllLEDSOff(void);
-		virtual void setLED(int index, int state);
+		void setAllLEDSOn(void);
+		void setAllLEDSOff(void);
+		void setLED(int index, int state);
 
 		//audio methods
-		virtual int initaliseAudio(int numRobots);
-		virtual int playTone(int frequency, double duration);
-		virtual int listenToTones(void);
+		int initaliseAudio(int nobots);
+		int playTone(int frequency, double duration);
+		int listenToTones(void);
 
 	
 	protected:
@@ -118,10 +118,10 @@ class EPuck
 		return NULL;
 	}
 
-	private:
-		virtual void initialise(int robotPort, char* robotName, int simulationPort);
-
 #endif
+
+	private:
+			virtual void initialise(int robotPort, char* robotName, int simulationPort);
 	
 		
 
