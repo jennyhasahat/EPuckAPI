@@ -31,17 +31,15 @@ public:
 
 	/** AudioData stores information about a tone in the environment. Each object represents a tone being played.
 	 * */
-	class AudioData
+	class AudioBin
 	{
 	public:
-		/**frequency of the tone*/
-		int frequency;
-		/**x coordinate of robot playing tone*/
+		/**frequency bin lower bound*/
+		double lowerFrequencyBound;
+		/**apparent x coordinate of tone*/
 		double x;
-		/**y coordinate of robot playing tone*/
+		/**apparent y coordinate of tone*/
 		double y;
-		/**yaw of robot playing tone*/
-		double yaw;
 		/**time that the tone started playing*/
 		clock_t start;
 		/**Length of the tone in milliseconds*/
@@ -51,14 +49,12 @@ public:
 	};
 
 	//member variables
-	char** robotNames;
 	int numberRobots; //number of robots in whole simulation
-	double FFTLowerBounds[FFT_BLOCK_SIZE/2];
-	AudioData *environment;
-
+	AudioBin *environment;
 
 	//player stuff
 	SimulationProxy	*simProxy;
+	PlayerClient *simClient;
 
 	//function prototypes
 

@@ -36,22 +36,17 @@ AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim,
 {
 	int i;
 
+	simClient = simulationClient;
 	simProxy = sim;
 	numberRobots = nobots;
 
-	environment = new AudioData[numberRobots];
+	environment = new AudioBin[FFT_BLOCK_SIZE/2];
 
-	//create an array of strings for the robot names
-	robotNames = new char*[numberRobots];
-
-	//robotNames = (char**)calloc(numberRobots, sizeof(char*));
-	for(i=0;i<numberRobots;i++)
+	//make array of frequency bins depending on FFT settings.
+	for(i=0; i<FFT_BLOCK_SIZE/2; i++)
 	{
-		robotNames[i] = new char[32];
-		//robotNames[i] = (char*)calloc(maxKeyNameLength, sizeof(char));
+		environment[i].lowerFrequencyBound = (i*SAMPLE_RATE)/FFT_BLOCK_SIZE;
 	}
-
-
 
 	printf("Audio handler initialised?\n");
 	return;
@@ -59,15 +54,7 @@ AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim,
 
 AudioHandler::~AudioHandler()
 {
-	int i;
 
-	delete[] environment;
-
-	for(i=0;i<numberRobots;i++)
-	{
-		delete[] robotNames[i];
-	}
-	delete[] robotNames;
 
 	return;
 }
@@ -80,7 +67,7 @@ AudioHandler::~AudioHandler()
  * */
 int AudioHandler::initialiseEPuck(char *name)
 {
-	int i;
+/*	int i;
 
 	//scroll through ALL keys until you find an entry matching the provided key name
 	// if none is found then give the first empty key in our list.
@@ -103,6 +90,7 @@ int AudioHandler::initialiseEPuck(char *name)
 	}
 
 	return -1;
+	*/
 }
 
 /**
@@ -113,20 +101,7 @@ int AudioHandler::initialiseEPuck(char *name)
  * */
 void AudioHandler::playTone(int id, int freq, double duration)
 {
-	char name[32];
 
-	environment[id].frequency = freq;
-	//get robot's name
-	strcpy(name, robotNames[id]);
-	//get robot's position
-	simProxy->GetPose2d(name, environment[id].x, environment[id].y, environment[id].yaw);
-
-	//save timestamp clock() is more accurate than time(NULL).
-	environment[id].start = (clock()*1000)/CLOCKS_PER_SEC;
-	environment[id].duration = duration;
-	environment[id].end = environment[id].start + (CLOCKS_PER_SEC*(duration/1000));
-
-	printf("tone start: %f, end: %f\n", environment[id].start, environment[id].end);
 	return;
 }
 
@@ -141,9 +116,11 @@ int AudioHandler::testInitialisation(void)
 	printf("The FFT lower bounds are:\n");
 	for(i=0; i<FFT_BLOCK_SIZE/2; i++)
 	{
-		printf("%f ", FFTLowerBounds[i]);
+		printf("%f ", environment[i].lowerFrequencyBound);
 	}
-	return numberRobots;
+	printf("\nthere are %d robots\n", numberRobots);
+
+	return 0;
 }
 
 
@@ -157,14 +134,16 @@ void AudioHandler::dumpData(void)
 {
 	int i;
 
-	for(i=0;i<numberRobots;i++)
+	printf("AudioHandler stored data:\n");
+	for(i=0; i<FFT_BLOCK_SIZE/2; i++)
 	{
-		printf("Robot number %d, named %s\n", i, robotNames[i]);
-		printf("\tfrequency %d Hz\n", environment[i].frequency);
-		printf("\tx: %f, y: %f, yaw: %f\n", environment[i].x, environment[i].y, environment[i].yaw);
-		printf("\tstart time: %f\n\tend time: %f\n", environment[i].start, environment[i].end);
-		printf("\tduration: %f msecs.\n", environment[i].duration);
+		printf("frequency bin %f\n", environment[i].lowerFrequencyBound);
+		printf("\tapparent pose x: %f y: %f\n", environment[i].x, environment[i].y);
+		printf("\tstart time %f, end time %f\n", environment[i].start, environment[i].end);
+		printf("\tduration: %f\n", environment[i].duration);
 	}
+
+
 	return;
 }
 

@@ -347,6 +347,7 @@ int EPuck::playTone(int frequency, double duration)
 {
 	if(audioInitialised)
 	{
+		handler->testInitialisation();
 		return 0;
 	}
 

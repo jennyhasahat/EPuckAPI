@@ -22,6 +22,9 @@ int main(void)
 	printf("finished initialising audio\n");
 	sleep(1);
 
+	testbot1->playTone(500, 250);
+	testbot2->playTone(400, 250);
+
 /*	while(true)
 	{
 
