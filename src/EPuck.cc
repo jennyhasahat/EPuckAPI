@@ -329,7 +329,7 @@ int EPuck::initaliseAudio(int nobots)
 {
 	if(!audioInitialised)
 	{
-		handler = AudioHandler::GetAudioHandler(simulation, simProxy, nobots);
+		handler = AudioHandler::GetAudioHandler(simulation, simProxy);
 		audioInitialised = TRUE;
 		return 0;
 	}
@@ -347,7 +347,7 @@ int EPuck::playTone(int frequency, double duration)
 {
 	if(audioInitialised)
 	{
-		handler->testInitialisation();
+		handler->playTone(frequency, duration);
 		return 0;
 	}
 

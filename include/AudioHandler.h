@@ -59,18 +59,17 @@ public:
 	//function prototypes
 
 	//singleton thing...
-	static AudioHandler* GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, int nobots);
+	static AudioHandler* GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim);
 
 	virtual ~AudioHandler();
 
 	//methods.
-	void playTone(int id, int freq, double duration);
-	int initialiseEPuck(char* robotname);
+	void playTone(int freq, double duration);
 	int testInitialisation(void);
 
 protected:
 	//protected so it can be a singleton
-	AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, int nobots);
+	AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim);
 
 private:
 	//singleton reference to only instance of audiohandler.

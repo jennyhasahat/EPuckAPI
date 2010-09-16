@@ -15,13 +15,12 @@ AudioHandler* AudioHandler::_instance = 0;
  * Function that allows AudioHandler to be a singleton. Use this to construct the AudioHandler object.
  * @param simulationClient the PlayerClient object which handles the simulation.
  * @param simProxy the simulationProxy attached to the playerclient handling this simulation.
- * @param nobots the number of robots in the simulation.
  * */
-AudioHandler* AudioHandler::GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, int nobots)
+AudioHandler* AudioHandler::GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim)
 {
 	if(_instance == 0)
 	{
-		_instance = new AudioHandler(simulationClient, sim, nobots);
+		_instance = new AudioHandler(simulationClient, sim);
 	}
 	return _instance;
 }
@@ -30,15 +29,13 @@ AudioHandler* AudioHandler::GetAudioHandler(PlayerClient *simulationClient, Simu
  * Creates the audiohandler object and builds an array to store the sound data for each robot.
  * @param simulationClient the PlayerClient object which handles the simulation.
  * @param simProxy the simulationProxy attached to the playerclient handling this simulation.
- * @param nobots the number of robots in the simulation.
  * */
-AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, int nobots)
+AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim)
 {
 	int i;
 
 	simClient = simulationClient;
 	simProxy = sim;
-	numberRobots = nobots;
 
 	environment = new AudioBin[FFT_BLOCK_SIZE/2];
 
@@ -54,43 +51,9 @@ AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim,
 
 AudioHandler::~AudioHandler()
 {
-
+	delete[] environment;
 
 	return;
-}
-
-/**
- * Searches list of robots and indexes to find an empty index.
- * If the robot is already assigned an index it returns this instead.
- * @param name name of the robot that it is trying to find a slot for.
- * @returns index the index to store that robot's data in.
- * */
-int AudioHandler::initialiseEPuck(char *name)
-{
-/*	int i;
-
-	//scroll through ALL keys until you find an entry matching the provided key name
-	// if none is found then give the first empty key in our list.
-	for(i=0;i<numberRobots;i++)
-	{
-		//	printf("%d) about to compare \"%s\" and \"%s\"\n", i, recieved.key, allkeys[i]);
-		//if the given key and the current one match then stop searching
-		if(!strncmp(name, robotNames[i], strlen(name)))
-		{
-			return i;
-		}
-
-		//if key we're looking at is empty then we've reached the end of the list of filled slots and should allocate this slot
-		if(strlen(robotNames[i]) == 0)
-		{
-			//fill slot with this robot
-			strncpy(robotNames[i], name, 32);
-			return i;
-		}
-	}
-
-	return -1;
-	*/
 }
 
 /**
@@ -99,9 +62,9 @@ int AudioHandler::initialiseEPuck(char *name)
  * @param freq the frequency of the tone in Hz
  * @param duration the length of the tone in milliseconds
  * */
-void AudioHandler::playTone(int id, int freq, double duration)
+void AudioHandler::playTone(int freq, double duration)
 {
-
+	testInitialisation();
 	return;
 }
 
