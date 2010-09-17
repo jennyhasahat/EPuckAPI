@@ -29,7 +29,22 @@ class AudioHandler
 {
 public:
 
-	/** AudioData stores information about a tone in the environment. Each object represents a tone being played.
+	/**Represents a tone being played*/
+	class AudioTone
+	{
+	public:
+		/**The x coord of tone source*/
+		double x;
+		/**The y coord of tone source*/
+		double y;
+		/**Time that the tone will stop playing*/
+		clock_t end;
+		/**Audio tones are stored as a linked list in an audio bin, previous and next are ways of navigating the linked list*/
+		AudioTone *previous;
+		AudioTone *next;
+	};
+
+	/** AudioData stores information about a tone in the environment. Each object represents a frequency band containing tones being played.
 	 * */
 	class AudioBin
 	{
@@ -40,17 +55,20 @@ public:
 		double x;
 		/**apparent y coordinate of tone*/
 		double y;
-		/**time that the tone started playing*/
-		clock_t start;
-		/**Length of the tone in milliseconds*/
-		double duration;
-		/**Time that the tone will stop playing*/
-		clock_t end;
+		/**Linked list of tones currently in this bin*/
+		AudioTone *tones;
+
+		/**Updates list of tones in the bin so that ones which have finished playing are removed.
+		 * Also updates apparent sound sources
+		 * @param currentTime the current time of the simulation
+		 * @returns status 1 if entire list is now empty, 0 if a tone is removed but there are still tones in the AudioBin.*/
+		int updateList(clock_t currentTime);
 	};
 
+
 	//member variables
-	int numberRobots; //number of robots in whole simulation
 	AudioBin *environment;
+	double lowerFFTBounds[FFT_BLOCK_SIZE/2];
 
 	//player stuff
 	SimulationProxy	*simProxy;
