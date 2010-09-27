@@ -12,8 +12,11 @@
 		 * upon initialisation.
 		 * @param lowerfreq the lower frequency bound of this audio bin.
 		 * */
-AudioHandler::AudioBin::AudioBin(double lowerFreq)
+AudioHandler::AudioBin::AudioBin(double lowerFreq, AudioBin *prev, AudioBin *nxt)
 {
+	lowerFrequencyBound = lowerFreq;
+	next = nxt;
+	previous = prev;
 	tones = NULL;
 	return;
 }
@@ -50,6 +53,7 @@ int AudioHandler::AudioBin::updateList(clock_t currentTime)
 			if(removeTone(del)) return 1;
 		}
 	}
+	updatePosition();
 	return 0;
 }
 
@@ -84,9 +88,6 @@ void AudioHandler::AudioBin::addTone(double x, double y, clock_t endtime)
 		toneptr->next = newtone;
 	}
 
-	//if there is data in linked list already
-
-	printf("tone added to linked list");
 
 	return;
 }

@@ -106,6 +106,7 @@ class EPuck
 		int listenToTones(void);
 
 		void printTimes_TEST(void);
+		void dumpAudio_TEST(void);
 
 	
 	protected:

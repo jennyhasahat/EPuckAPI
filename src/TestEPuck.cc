@@ -21,14 +21,17 @@ int main(void)
 	testbot2->initaliseAudio(2);
 	printf("finished initialising audio\n");
 
-	testbot1->printTimes_TEST();
+/*	testbot1->printTimes_TEST();
 	sleep(5);
 	testbot1->printTimes_TEST();
+*/
 
 	testbot1->playTone(500, 250);
 	testbot1->playTone(0, 250);
 	testbot1->playTone(8500, 250);
 	testbot2->playTone(400, 250);
+
+	testbot2->dumpAudio_TEST();
 
 /*	while(true)
 	{

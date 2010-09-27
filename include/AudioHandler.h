@@ -66,8 +66,10 @@ public:
 		 * Creates a new AudioBin item. The AudioBin linked list uses the lower frequency bound as a key, so this must be given
 		 * upon initialisation.
 		 * @param lowerfreq the lower frequency bound of this audio bin.
+		 * @param prev the previous AudioBin in the Linked list the bins are stored in.
+		 * @param nxt the next AudioBin in the Linked list the bins are stored in.
 		 * */
-		AudioBin(double lowerFreq);
+		AudioBin(double lowerFreq, AudioBin *prev, AudioBin *nxt);
 
 		virtual ~AudioBin();
 
@@ -144,6 +146,10 @@ public:
 	 * */
 	int testInitialisation_TEST(void);
 
+	/** Test function to print all of the sound environment data to stdout.
+	 * */
+	void dumpData_TEST(void);
+
 protected:
 	//protected so it can be a singleton
 	/**
@@ -157,11 +163,18 @@ private:
 	//singleton reference to only instance of audiohandler.
 	static AudioHandler* _instance;
 
-	/** Private test function to print all of the sound environment data to stdout.
+
+	/**
+	 * AudioBins are stored in a linked list. This function appends a bin to the LL.
+	 * @param newbin AudioBin to add to LL.
 	 * */
-	void dumpData_TEST(void);
+	void addBin(AudioBin *newbin);
 
-
+	/**
+	 * Removes an AudioBin from the Linked list.
+	 * @param del AudioBin to remove from LL.
+	 * */
+	int removeBin(AudioBin *del);
 };
 
 

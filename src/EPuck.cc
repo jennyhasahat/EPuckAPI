@@ -377,6 +377,12 @@ void EPuck::printTimes_TEST(void)
 	return;
 }
 
+void EPuck::dumpAudio_TEST(void)
+{
+	handler->dumpData_TEST();
+	return;
+}
+
 /*====================================================================
 			PRIVATE FUNCTIONS
 ====================================================================*/
