@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <stdint.h>
+#include <time.h>
 #include "libplayerc++/playerc++.h"
 #include "AudioHandler.h"
 
@@ -104,6 +105,8 @@ class EPuck
 		int playTone(int frequency, double duration);
 		int listenToTones(void);
 
+		void printTimes_TEST(void);
+
 	
 	protected:
 		double irReadings[8];
@@ -122,6 +125,8 @@ class EPuck
 
 	private:
 			virtual void initialise(int robotPort, char* robotName, int simulationPort);
+
+
 	
 		
 

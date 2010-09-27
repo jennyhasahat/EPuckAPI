@@ -4,16 +4,19 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CC_SRCS += \
+../src/AudioBin.cc \
 ../src/AudioHandler.cc \
 ../src/EPuck.cc \
 ../src/TestEPuck.cc 
 
 OBJS += \
+./src/AudioBin.o \
 ./src/AudioHandler.o \
 ./src/EPuck.o \
 ./src/TestEPuck.o 
 
 CC_DEPS += \
+./src/AudioBin.d \
 ./src/AudioHandler.d \
 ./src/EPuck.d \
 ./src/TestEPuck.d 

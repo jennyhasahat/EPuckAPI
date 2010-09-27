@@ -347,7 +347,7 @@ int EPuck::playTone(int frequency, double duration)
 {
 	if(audioInitialised)
 	{
-		handler->playTone(frequency, duration);
+		handler->playTone(frequency, duration, name);
 		return 0;
 	}
 
@@ -367,6 +367,15 @@ int EPuck::listenToTones(void)
 	return -1;
 }
 
+void EPuck::printTimes_TEST(void)
+{
+	printf("current time(NULL) is %f\n", time(NULL));
+	printf("current data time is %f or even %d\n", simProxy->GetDataTime(), simProxy->GetDataTime());
+
+	printf("current elapsed time is %f or perhaps %d\n", simProxy->GetElapsedTime(), simProxy->GetElapsedTime());
+
+	return;
+}
 
 /*====================================================================
 			PRIVATE FUNCTIONS
@@ -426,6 +435,8 @@ void EPuck::readSensorsThreaded(void)
 	return;
 }
 #endif
+
+
 
 
 

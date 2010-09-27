@@ -8,14 +8,12 @@
 #include "AudioHandler.h"
 
 
+
+
 //I hope this statement doesn't have global scope... I don't think it does.
 AudioHandler* AudioHandler::_instance = 0;
 
-/**
- * Function that allows AudioHandler to be a singleton. Use this to construct the AudioHandler object.
- * @param simulationClient the PlayerClient object which handles the simulation.
- * @param simProxy the simulationProxy attached to the playerclient handling this simulation.
- * */
+
 AudioHandler* AudioHandler::GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim)
 {
 	if(_instance == 0)
@@ -25,29 +23,23 @@ AudioHandler* AudioHandler::GetAudioHandler(PlayerClient *simulationClient, Simu
 	return _instance;
 }
 
-/**
- * Creates the audiohandler object and builds an array to store the sound data for each robot.
- * @param simulationClient the PlayerClient object which handles the simulation.
- * @param simProxy the simulationProxy attached to the playerclient handling this simulation.
- * */
+
 AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim)
 {
 	int i;
 
 	simClient = simulationClient;
 	simProxy = sim;
-
-	environment = new AudioBin[FFT_BLOCK_SIZE/2];
+	environment = NULL;
 
 	//make array of frequency bins depending on FFT settings.
 	for(i=0; i<FFT_BLOCK_SIZE/2; i++)
 	{
 		lowerFFTBounds[i] = (i*SAMPLE_RATE)/FFT_BLOCK_SIZE;
-		//environment[i].lowerFrequencyBound = (i*SAMPLE_RATE)/FFT_BLOCK_SIZE;
 	}
 
-	printf("Audio handler initialised?\n");
-	testInitialisation();
+	testInitialisation_TEST();
+	printf("AudioHandler initialised\n");
 	return;
 }
 
@@ -58,34 +50,47 @@ AudioHandler::~AudioHandler()
 	return;
 }
 
-/**
- * Puts a tone of the desired frequency and duration into the audio environment.
- * @param freq the frequency of the tone in Hz
- * @param duration the length of the tone in milliseconds
- * */
-void AudioHandler::playTone(int freq, double duration)
+
+void AudioHandler::playTone(int freq, double duration, char* name)
 {
-	//find which bin to put the sound into
+	int whichbin;
+	//AudioBin current = environment;
+
+	//find FFT lower frequency bound for freq
+	for(whichbin=(FFT_BLOCK_SIZE/2)-1; whichbin>-1; whichbin--)
+	{
+		if(lowerFFTBounds[whichbin] <= freq) break;
+	}
+
+	//check linked list to see if there is an audio bin for this sound
+	//if there is no audio bin for the sound then make one
+
+	//add data to the audio bin entry
+
+
+
+
+	//if so, append this tone to the end of the tone list and update the list.
+	//if not, create a new audio bin and populate it with data from the epuck
 
 
 	return;
 }
 
 
-/**
- * test function to make sure the audio handler is initialised.
- * */
-int AudioHandler::testInitialisation(void)
+
+int AudioHandler::testInitialisation_TEST(void)
 {
 	int i;
 
 	printf("The FFT lower bounds are:\n");
 	for(i=0; i<FFT_BLOCK_SIZE/2; i++)
 	{
-		printf("%f ", environment[i].lowerFrequencyBound);
+		printf("%f ", lowerFFTBounds[i]);
 	}
+	printf("\n");
 
-	dumpData();
+	dumpData_TEST();
 
 	return 0;
 }
@@ -95,25 +100,31 @@ int AudioHandler::testInitialisation(void)
 //							PRIVATE FUNCTIONS
 //==================================================================================================
 
-/** Private test function to print all of the sound environment data to stdout.
- * */
-void AudioHandler::dumpData(void)
+
+void AudioHandler::dumpData_TEST(void)
 {
-	int i;
+	AudioBin *binptr = environment;
+	AudioBin::AudioTone *toneptr;
 
 	printf("AudioHandler stored data:\n");
-	for(i=0; i<FFT_BLOCK_SIZE/2; i++)
-	{
-		printf("frequency bin %f\n", environment[i].lowerFrequencyBound);
-		printf("\tapparent pose x: %f y: %f\n", environment[i].x, environment[i].y);
-		//printf("\tstart time %f, end time %f\n", environment[i].start, environment[i].end);
-	//	printf("\tduration: %f\n", environment[i].duration);
-	}
 
+	while(binptr != NULL)
+	{
+		printf("Bin lower bound is %f\n", binptr->lowerFrequencyBound);
+		printf("\tapparent x is %f\n", binptr->x);
+		printf("\tapparent y is %f\n", binptr->y);
+		printf("Stored tones:\n");
+		toneptr = binptr->tones;
+		while(toneptr != NULL)
+		{
+			printf("\t\tx: %f, y: %f, end: %f\n", toneptr->x, toneptr->y, toneptr->end);
+			toneptr = toneptr->next;
+		}
+		binptr = binptr->next;
+	}
 
 	return;
 }
-
 
 
 

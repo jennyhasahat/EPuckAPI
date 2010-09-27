@@ -20,10 +20,15 @@ int main(void)
 	printf("initialising robot2 audio\n");
 	testbot2->initaliseAudio(2);
 	printf("finished initialising audio\n");
-	sleep(1);
 
-	//testbot1->playTone(500, 250);
-	//testbot2->playTone(400, 250);
+	testbot1->printTimes_TEST();
+	sleep(5);
+	testbot1->printTimes_TEST();
+
+	testbot1->playTone(500, 250);
+	testbot1->playTone(0, 250);
+	testbot1->playTone(8500, 250);
+	testbot2->playTone(400, 250);
 
 /*	while(true)
 	{
