@@ -87,6 +87,22 @@ void EPuck::readSensors(void)
 	return;
 }
 
+/**
+ * Returns the simulated time of the experiment as a double. Simulated time should be used in preference of real time
+ * in case you ever want the simulation to be speeded up. Using real time on a speeded up simulation may mean that
+ * some processes are running much slower than others and will cause erratic and unexpected behaviour.
+ * @warning this function casts from uint64_t to double, which may or may not cause troubles. If your OS is 32-bit it will be fine. It hasn't been tested on a 64-bit OS.
+ * @returns sim simulated time in seconds.
+ * */
+double EPuck::getSimulationTime(void)
+{
+	uint64_t data;
+
+	simProxy->GetProperty(name, "simtime", &data, sizeof(data));
+
+	return (double)data;
+}
+
 //************INFRA-RED SENSORS*******************
 
 /**
@@ -278,7 +294,7 @@ void EPuck::setDifferentialMotors(double left, double right)
 /**
  * Sets all the robot LEDs into the ON state
  * <br>
- * @warning This function doesn't actually work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.
+ * @warning This function may not work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.
  * */
 void EPuck::setAllLEDSOn(void)
 {
@@ -293,7 +309,7 @@ void EPuck::setAllLEDSOn(void)
 /**
  * Sets all the robot LEDs into the OFF state
  * <br>
- * <b>WARNING: This function doesn't actually work in simulation due to a Player/Stage bug.</b>
+ * <b>WARNING: This function may not work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.</b>
  * */
 void EPuck::setAllLEDSOff(void)
 {
@@ -307,9 +323,9 @@ void EPuck::setAllLEDSOff(void)
 /**
  * Sets the specified LED into the specified state.
  *  * <br>
- * <b>WARNING: This function doesn't actually work in simulation due to a Player/Stage bug.</b>
+ * <b>WARNING: This function doesn't actually work in simulation. The entire robot can be either on or off.</b>
  * @param index The index of the LED to change.
- * @param the state to set that LED to. 1 indicates on anything else indicates off.
+ * @param the state to set that LED to. 1 indicates on, anything else indicates off.
  * */
 void EPuck::setLED(int index, int state)
 {
@@ -322,10 +338,9 @@ void EPuck::setLED(int index, int state)
 
 /**
  * Initialises the audio drivers so that we can use audio signals in stage.
- * @param nobots the number of robots in the simulation
  * @returns success. 0 if audio handler is initialised, -1 if already initialised.
  * */
-int EPuck::initaliseAudio(int nobots)
+int EPuck::initaliseAudio(void)
 {
 	if(!audioInitialised)
 	{
@@ -369,10 +384,8 @@ int EPuck::listenToTones(void)
 
 void EPuck::printTimes_TEST(void)
 {
-	printf("current time(NULL) is %f\n", time(NULL));
-	printf("current data time is %f or even %d\n", simProxy->GetDataTime(), simProxy->GetDataTime());
-
-	printf("current elapsed time is %f or perhaps %d\n", simProxy->GetElapsedTime(), simProxy->GetElapsedTime());
+	printf("current time(NULL) is %f\n", (double)time(NULL));
+	printf("current data time is %f\n", simProxy->GetDataTime());
 
 	return;
 }

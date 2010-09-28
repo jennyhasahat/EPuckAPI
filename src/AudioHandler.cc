@@ -38,7 +38,6 @@ AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim)
 		lowerFFTBounds[i] = (i*SAMPLE_RATE)/FFT_BLOCK_SIZE;
 	}
 
-	testInitialisation_TEST();
 	printf("AudioHandler initialised\n");
 	return;
 }
@@ -47,13 +46,14 @@ AudioHandler::~AudioHandler()
 {
 	//remove all bins in Linked list
 	AudioBin *ptr = environment;
+	AudioBin *prev;
 
-	while(ptr->next != NULL)
+	while(ptr != NULL)
 	{
+		prev = ptr;
 		ptr = ptr->next;
-		delete ptr->previous;
+		delete prev;
 	}
-	delete ptr;
 
 	return;
 }
@@ -72,10 +72,15 @@ void AudioHandler::playTone(int freq, double duration, char* name)
 		if(lowerFFTBounds[whichbin] <= freq) break;
 	}
 
+
 	//check linked list to see if there is an audio bin for this sound
 	while(current != NULL)
 	{
-		if(current->lowerFrequencyBound == lowerFFTBounds[whichbin]) break;
+		if(current->lowerFrequencyBound == lowerFFTBounds[whichbin])
+		{
+			//if existing bin is found then stop searching.
+			break;
+		}
 		last = current;
 		current = current->next;
 	}
@@ -84,6 +89,9 @@ void AudioHandler::playTone(int freq, double duration, char* name)
 	if(current == NULL)
 	{
 		current = new AudioBin(lowerFFTBounds[whichbin], last, NULL);
+		//if this is the first bin in the LL then point the Handler to it
+		if(environment == NULL)	environment = current;
+		else last->next = current;
 	}
 
 	//add data to the audio bin entry
@@ -91,7 +99,7 @@ void AudioHandler::playTone(int freq, double duration, char* name)
 	printf("robot is at x: %f, y: %f yaw: %f\n", x, y, yaw);
 
 	//todo fix the next line when clock stuff is sorted.
-	current->addTone(x, y, 500);
+	current->addTone(x, y, time(NULL));
 
 
 
@@ -103,22 +111,6 @@ void AudioHandler::playTone(int freq, double duration, char* name)
 }
 
 
-
-int AudioHandler::testInitialisation_TEST(void)
-{
-	int i;
-
-	printf("The FFT lower bounds are:\n");
-	for(i=0; i<FFT_BLOCK_SIZE/2; i++)
-	{
-		printf("%f ", lowerFFTBounds[i]);
-	}
-	printf("\n");
-
-	dumpData_TEST();
-
-	return 0;
-}
 
 
 //==================================================================================================
@@ -132,17 +124,22 @@ void AudioHandler::dumpData_TEST(void)
 	AudioBin::AudioTone *toneptr;
 
 	printf("AudioHandler stored data:\n");
-	printf("pointer is at %x\n", binptr);
+	if(binptr == NULL)
+	{
+		printf("\tno audio data\n");
+		return;
+	}
+
 	while(binptr != NULL)
 	{
-		printf("Bin lower bound is %f\n", binptr->lowerFrequencyBound);
+		printf("\nBin lower bound is %f\n", binptr->lowerFrequencyBound);
 		printf("\tapparent x is %f\n", binptr->x);
 		printf("\tapparent y is %f\n", binptr->y);
 		printf("Stored tones:\n");
 		toneptr = binptr->tones;
 		while(toneptr != NULL)
 		{
-			printf("\t\tx: %f, y: %f, end: %f\n", toneptr->x, toneptr->y, toneptr->end);
+			printf("\t\tx: %f, y: %f, end: %f\n", toneptr->tx, toneptr->ty, (double)toneptr->end);
 			toneptr = toneptr->next;
 		}
 		binptr = binptr->next;

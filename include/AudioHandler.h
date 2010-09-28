@@ -39,11 +39,11 @@ public:
 		typedef struct AudioTone
 		{
 			/**The x coord of tone source*/
-			double x;
+			double tx;
 			/**The y coord of tone source*/
-			double y;
+			double ty;
 			/**Time that the tone will stop playing*/
-			clock_t end;
+			time_t end;
 			/**Audio tones are stored as a linked list in an audio bin, previous and next are ways of navigating the linked list*/
 			AudioTone *next;
 			AudioTone *previous;
@@ -85,7 +85,7 @@ public:
 		 * @param y the y position of the robot playing the tone
 		 * @param endtime the system time at which the tone will end.
 		 * */
-		void addTone(double x, double y, clock_t endtime);
+		void addTone(double x, double y, time_t endtime);
 
 	private:
 		/**
@@ -141,10 +141,6 @@ public:
 	 * */
 	void playTone(int freq, double duration, char* name);
 
-	/**
-	 * test function to make sure the audio handler is initialised.
-	 * */
-	int testInitialisation_TEST(void);
 
 	/** Test function to print all of the sound environment data to stdout.
 	 * */

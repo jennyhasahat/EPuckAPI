@@ -9,42 +9,41 @@ int main(void)
 {
 	char testbot1Name[] = "robot1";
 	char testbot2Name[] = "robot2";
+	char testbot3Name[] = "robot3";
 	EPuck *testbot1;
 	EPuck *testbot2;
+	EPuck *testbot3;
 	
 	testbot1 = new EPuck(testbot1Name);
 	testbot2 = new EPuck(6666, testbot2Name);
+	testbot3 = new EPuck(6667, testbot3Name);
 	
-	printf("initialising robot1 audio\n");
-	testbot1->initaliseAudio(2);
-	printf("initialising robot2 audio\n");
-	testbot2->initaliseAudio(2);
-	printf("finished initialising audio\n");
+	testbot1->getSimulationTime();
 
-/*	testbot1->printTimes_TEST();
+	testbot1->initaliseAudio();
+	testbot2->initaliseAudio();
+	testbot3->initaliseAudio();
+
+	testbot1->getSimulationTime();
+	printf("sleeping\n");
 	sleep(5);
-	testbot1->printTimes_TEST();
-*/
+	//testbot1->getSimulationTime();
+
 
 	testbot1->playTone(500, 250);
-	testbot1->playTone(0, 250);
-	testbot1->playTone(8500, 250);
-	testbot2->playTone(400, 250);
+/*	testbot2->playTone(510, 250);
 
-	testbot2->dumpAudio_TEST();
-
-/*	while(true)
-	{
-
-		testbot1->setDifferentialMotors(0.25, 0.3); //turns right
-		testbot2->setDifferentialMotors(0.3, 0.25); //turns left
-
-		printf("testbot 1 going to play a tone f:2000 d:1\n");
-		testbot1->playTone(2000, 1);
-		printf("tone info sent\n");
-
-		usleep(100);
-	}
+	testbot1->playTone(350, 200);
+	testbot3->playTone(350, 200);
+sleep(2);
+	testbot2->playTone(900, 200);
+	testbot3->playTone(900, 200);
 */
+	testbot1->getSimulationTime();
+
+	//testbot2->dumpAudio_TEST();
+
+
+	printf("test finished now\n");
 	return 0;
 }

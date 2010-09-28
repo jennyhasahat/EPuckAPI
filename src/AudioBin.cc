@@ -25,13 +25,15 @@ AudioHandler::AudioBin::~AudioBin()
 {
 	//remove all tones in Linked list
 	AudioTone *ptr = tones;
+	AudioTone *prev;
 
-	while(ptr->next != NULL)
+	while(ptr != NULL)
 	{
+		prev = ptr;
 		ptr = ptr->next;
-		delete ptr->previous;
+		delete prev;
 	}
-	delete ptr;
+	return;
 }
 
 
@@ -57,14 +59,15 @@ int AudioHandler::AudioBin::updateList(clock_t currentTime)
 	return 0;
 }
 
-void AudioHandler::AudioBin::addTone(double x, double y, clock_t endtime)
+void AudioHandler::AudioBin::addTone(double x, double y, time_t endtime)
 {
 	//construct new audiotone from the supplied data
 	AudioTone* newtone = new AudioTone;
 
-	newtone->x = x;
-	newtone->y = y;
+	newtone->tx = x;
+	newtone->ty = y;
 	newtone->end = endtime;
+	printf("saved y as %f, and end as %f\n", newtone->ty, (double)newtone->end);
 	newtone->next = NULL;
 
 	//if there is no data in linked list then make this the first entry.
@@ -87,7 +90,8 @@ void AudioHandler::AudioBin::addTone(double x, double y, clock_t endtime)
 		newtone->previous = toneptr;
 		toneptr->next = newtone;
 	}
-
+	//update the bin's apparent x,y coordinates using the new data.
+	updatePosition();
 
 	return;
 }
@@ -133,20 +137,20 @@ void AudioHandler::AudioBin::updatePosition(void)
 {
 	//move through LL and sum all x, and y coordinates. Also count number of entries.
 	AudioTone *ptr;
-	double sumX = 0, sumY = 0;
+	double sumX = 0;
+	double sumY = 0;
 	int count = 0;
 
 	ptr = tones;
 	while(ptr != NULL)
 	{
-		sumX += ptr->x;
-		sumY += ptr->y;
+		sumX += ptr->tx;
+		sumY += ptr->ty;
 		count++;
 		ptr = ptr->next;
 	}
-
 	x = sumX/count;
-	y = sumX/count;
+	y = sumY/count;
 
 	return;
 }
