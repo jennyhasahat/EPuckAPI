@@ -92,15 +92,21 @@ void EPuck::readSensors(void)
  * in case you ever want the simulation to be speeded up. Using real time on a speeded up simulation may mean that
  * some processes are running much slower than others and will cause erratic and unexpected behaviour.
  * @warning this function casts from uint64_t to double, which may or may not cause troubles. If your OS is 32-bit it will be fine. It hasn't been tested on a 64-bit OS.
- * @returns sim simulated time in seconds.
+ * @returns sim simulated time in milliseconds.
+ * NOTE that the stage simulator uses a time step of 100ms so the returned value of this function will be a factor of 100.
  * */
 double EPuck::getSimulationTime(void)
 {
 	uint64_t data;
+	double time;
+	char flag[] = "simtime";
 
-	simProxy->GetProperty(name, "simtime", &data, sizeof(data));
+	simProxy->GetProperty(name, flag, &data, sizeof(data));
 
-	return (double)data;
+	time = (double)data;
+	time = time / 1000;
+
+	return time;
 }
 
 //************INFRA-RED SENSORS*******************
@@ -423,7 +429,6 @@ void EPuck::initialise(int robotPort, char* robotName, int simulationPort)
 		sonarProxy = new PlayerCc::SonarProxy(epuck, 0);
 		blobProxy = new PlayerCc::BlobfinderProxy(epuck, 0);
 		simProxy = new PlayerCc::SimulationProxy(simulation, 0);
-		blackProxy = new PlayerCc::BlackBoardProxy(simulation, 0);
 	}
 	catch (PlayerCc::PlayerError e)
 	{

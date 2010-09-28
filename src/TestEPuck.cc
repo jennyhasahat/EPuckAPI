@@ -18,13 +18,12 @@ int main(void)
 	testbot2 = new EPuck(6666, testbot2Name);
 	testbot3 = new EPuck(6667, testbot3Name);
 	
-	testbot1->getSimulationTime();
+	printf("getting simulation time %f\n", testbot1->getSimulationTime());
 
 	testbot1->initaliseAudio();
 	testbot2->initaliseAudio();
 	testbot3->initaliseAudio();
 
-	testbot1->getSimulationTime();
 	printf("sleeping\n");
 	sleep(5);
 	//testbot1->getSimulationTime();
@@ -39,8 +38,7 @@ sleep(2);
 	testbot2->playTone(900, 200);
 	testbot3->playTone(900, 200);
 */
-	testbot1->getSimulationTime();
-
+	printf("getting simulation time %f\n", testbot1->getSimulationTime());
 	//testbot2->dumpAudio_TEST();
 
 

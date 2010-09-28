@@ -63,7 +63,6 @@ class EPuck
 		PlayerCc::SonarProxy		*sonarProxy;	//rangers
 		PlayerCc::BlobfinderProxy	*blobProxy;		//camera
 		PlayerCc::SimulationProxy	*simProxy;		//leds
-		PlayerCc::BlackBoardProxy	*blackProxy;	//audio
 
 		//audio stuff
 		AudioHandler *handler;
