@@ -101,7 +101,6 @@ class EPuck
 		void setLED(int index, int state);
 
 		//audio methods
-		//todo do i actually need to tell it the number of robots?
 		int initaliseAudio(void);
 		int playTone(int frequency, double duration);
 		int listenToTones(void);

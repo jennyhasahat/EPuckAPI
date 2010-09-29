@@ -91,9 +91,9 @@ void EPuck::readSensors(void)
  * Returns the simulated time of the experiment as a double. Simulated time should be used in preference of real time
  * in case you ever want the simulation to be speeded up. Using real time on a speeded up simulation may mean that
  * some processes are running much slower than others and will cause erratic and unexpected behaviour.
+ * @warning this function requires the development version of Stage to be installed for it to work.
  * @warning this function casts from uint64_t to double, which may or may not cause troubles. If your OS is 32-bit it will be fine. It hasn't been tested on a 64-bit OS.
- * @returns sim simulated time in milliseconds.
- * NOTE that the stage simulator uses a time step of 100ms so the returned value of this function will be a factor of 100.
+ * @returns sim simulated time in milliseconds. NOTE that the stage simulator uses a time step of 100ms so the returned value of this function will be a factor of 100.
  * */
 double EPuck::getSimulationTime(void)
 {
@@ -350,7 +350,7 @@ int EPuck::initaliseAudio(void)
 {
 	if(!audioInitialised)
 	{
-		handler = AudioHandler::GetAudioHandler(simulation, simProxy);
+		handler = AudioHandler::GetAudioHandler(simulation, simProxy, name);
 		audioInitialised = TRUE;
 		return 0;
 	}

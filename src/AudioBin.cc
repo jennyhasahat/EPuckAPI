@@ -37,7 +37,7 @@ AudioHandler::AudioBin::~AudioBin()
 }
 
 
-int AudioHandler::AudioBin::updateList(clock_t currentTime)
+int AudioHandler::AudioBin::updateList(double currentTime)
 {
 	//move through LL and remove any entries with end times after the current time
 	AudioTone *ptr;
@@ -49,8 +49,10 @@ int AudioHandler::AudioBin::updateList(clock_t currentTime)
 
 		ptr = ptr->next;
 		//if tone should have finished
-		if(del->end >= currentTime)
+		if(del->end <= currentTime)
 		{
+			printf("\tdeleting a tone x: %f y:%f end: %f current %f\n",
+					del->tx, del->ty, del->end, currentTime);
 			//delete it and if LL is empty now return 1
 			if(removeTone(del)) return 1;
 		}
@@ -59,7 +61,7 @@ int AudioHandler::AudioBin::updateList(clock_t currentTime)
 	return 0;
 }
 
-void AudioHandler::AudioBin::addTone(double x, double y, time_t endtime)
+void AudioHandler::AudioBin::addTone(double x, double y, double endtime)
 {
 	//construct new audiotone from the supplied data
 	AudioTone* newtone = new AudioTone;
@@ -67,7 +69,6 @@ void AudioHandler::AudioBin::addTone(double x, double y, time_t endtime)
 	newtone->tx = x;
 	newtone->ty = y;
 	newtone->end = endtime;
-	printf("saved y as %f, and end as %f\n", newtone->ty, (double)newtone->end);
 	newtone->next = NULL;
 
 	//if there is no data in linked list then make this the first entry.

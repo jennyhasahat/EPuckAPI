@@ -14,23 +14,24 @@
 AudioHandler* AudioHandler::_instance = 0;
 
 
-AudioHandler* AudioHandler::GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim)
+AudioHandler* AudioHandler::GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, char* name)
 {
 	if(_instance == 0)
 	{
-		_instance = new AudioHandler(simulationClient, sim);
+		_instance = new AudioHandler(simulationClient, sim, name);
 	}
 	return _instance;
 }
 
 
-AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim)
+AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, char* name)
 {
 	int i;
 
 	simClient = simulationClient;
 	simProxy = sim;
 	environment = NULL;
+	strncpy(aRobotName, name, 32);
 
 	//make array of frequency bins depending on FFT settings.
 	for(i=0; i<FFT_BLOCK_SIZE/2; i++)
@@ -38,12 +39,17 @@ AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim)
 		lowerFFTBounds[i] = (i*SAMPLE_RATE)/FFT_BLOCK_SIZE;
 	}
 
+	pthread_create(&updateAudioBinListThread, 0, AudioHandler::startupdateAudioBinListThread, this);
+
 	printf("AudioHandler initialised\n");
 	return;
 }
 
 AudioHandler::~AudioHandler()
 {
+	//close thread
+	pthread_detach(updateAudioBinListThread);
+
 	//remove all bins in Linked list
 	AudioBin *ptr = environment;
 	AudioBin *prev;
@@ -62,7 +68,9 @@ AudioHandler::~AudioHandler()
 void AudioHandler::playTone(int freq, double duration, char* name)
 {
 	int whichbin;
-	double x, y, yaw;
+	char timeflag[] = "sim_time";
+
+	double x, y, yaw, currenttime;
 	AudioBin *current = environment;
 	AudioBin *last;
 
@@ -90,16 +98,21 @@ void AudioHandler::playTone(int freq, double duration, char* name)
 	{
 		current = new AudioBin(lowerFFTBounds[whichbin], last, NULL);
 		//if this is the first bin in the LL then point the Handler to it
-		if(environment == NULL)	environment = current;
+		if(environment == NULL)
+		{
+			environment = current;
+			current->previous = NULL;
+		}
 		else last->next = current;
 	}
 
 	//add data to the audio bin entry
 	simProxy->GetPose2d(name, x, y, yaw);
-	printf("robot is at x: %f, y: %f yaw: %f\n", x, y, yaw);
 
-	//todo fix the next line when clock stuff is sorted.
-	current->addTone(x, y, time(NULL));
+	//todo fix the next lines when clock stuff is sorted.
+	//simProxy->GetProperty(name, timeflag, &currenttime, sizeof(currenttime));
+	currenttime = (double)time(NULL);
+	current->addTone(x, y, currenttime+(duration/1000));
 
 
 
@@ -158,6 +171,8 @@ int AudioHandler::removeBin(AudioBin *del)
 	//case 2, tone is in the middle
 	//case 3 tone is at the end of the list
 
+	printf("deleting a bin %f\n", del->lowerFrequencyBound);
+
 	//if next is not null then update its previous pointer to this.previous
 	if(del->next != NULL) del->next->previous = del->previous;
 
@@ -167,9 +182,6 @@ int AudioHandler::removeBin(AudioBin *del)
 	//is this the first tone?
 	if(del->previous == NULL)
 	{
-		//update tones to point to first item in list
-		environment = del->next;
-
 		//is this the only tone?
 		if(del->next == NULL)
 		{
@@ -177,12 +189,56 @@ int AudioHandler::removeBin(AudioBin *del)
 			delete del;
 			return 1;
 		}
-	}
 
+		//update tones to point to first item in list
+		environment = del->next;
+	}
 	delete del;
 	return 0;
 }
 
+void AudioHandler::updateAudioBinListThreaded(void)
+{
+	printf("AudioHandler is threaded\n");
+	AudioBin *ptr = environment;
+	char simproxFlag[] = "sim_time";
+
+	while(true)
+	{
+		ptr = environment;
+		double currentTime;
+
+		//todo fix next lines when stage is updated
+		//simProxy->GetProperty(aRobotName, simproxFlag, currentTime, sizeof(currenttime));
+		currentTime = (double)time(NULL);
+		while(ptr != NULL)
+		{
+			//updateList(currentTime) returns 1 if list is now empty
+			if(ptr->updateList(currentTime))
+			{
+				//delete current bin
+				AudioBin *del = ptr;
+				//move ptr along one so that the place in the list isn't lost.
+				ptr = ptr->next;
+
+				//removeBin returns 1 if there are no more audiobins
+				if(removeBin(del))
+				{
+					environment = NULL;
+					printf("no more bins\n");
+				}
+
+				//already advanced the ptr so should skip rest of loop
+				continue;
+			}
+			ptr = ptr->next;
+		}
+		//sleep for 50ms. This is a lot but the sim only goes to a resolution of 100ms
+		usleep(50000);
+	}
+	pthread_exit(NULL);
+	return;
+}
 
 
 

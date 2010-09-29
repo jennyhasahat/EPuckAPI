@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <pthread.h>
 #include "libplayerc++/playerc++.h"
 
 #define SAMPLE_RATE		16000
@@ -43,7 +44,7 @@ public:
 			/**The y coord of tone source*/
 			double ty;
 			/**Time that the tone will stop playing*/
-			time_t end;
+			double end;
 			/**Audio tones are stored as a linked list in an audio bin, previous and next are ways of navigating the linked list*/
 			AudioTone *next;
 			AudioTone *previous;
@@ -77,15 +78,15 @@ public:
 		 * Also updates apparent sound sources
 		 * @param currentTime the current time of the simulation
 		 * @returns status 0 if a tone is removed but there are still tones in the AudioBin, 1 if entire list is now empty.*/
-		int updateList(clock_t currentTime);
+		int updateList(double currentTime);
 
 		/**
 		 * Adds an AudioTone into the AudioBin. Creates an AudioTone object, appends it to the linked list and updates itself.
 		 * @param x the x position of the robot playing the tone
 		 * @param y the y position of the robot playing the tone
-		 * @param endtime the system time at which the tone will end.
+		 * @param endtime the simulated time at which the tone will end.
 		 * */
-		void addTone(double x, double y, time_t endtime);
+		void addTone(double x, double y, double endtime);
 
 	private:
 		/**
@@ -100,6 +101,7 @@ public:
 		 * This method should be called whenever a new tone is added to the list, or whenever a tone is removed.
 		 * */
 		void updatePosition(void);
+
 	};
 
 
@@ -119,6 +121,7 @@ public:
 	//player stuff
 	SimulationProxy	*simProxy;
 	PlayerClient *simClient;
+	char aRobotName[32];
 
 	//function prototypes
 
@@ -127,8 +130,10 @@ public:
 	 * Function that allows AudioHandler to be a singleton. Use this to construct the AudioHandler object.
 	 * @param simulationClient the PlayerClient object which handles the simulation.
 	 * @param simProxy the simulationProxy attached to the playerclient handling this simulation.
+	 * @param name the name of the robot that initialises the AudioHandler.
+	 * This is used for accessing data from the simulation proxy, as you need the name of a model to get simulation time information.
 	 * */
-	static AudioHandler* GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim);
+	static AudioHandler* GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, char* name);
 
 	virtual ~AudioHandler();
 
@@ -152,12 +157,16 @@ protected:
 	 * Creates the audiohandler object and builds an array to store the sound data for each robot.
 	 * @param simulationClient the PlayerClient object which handles the simulation.
 	 * @param simProxy the simulationProxy attached to the playerclient handling this simulation.
+	 * @param name the name of the robot that initialises the AudioHandler.
+	 * This is used for accessing data from the simulation proxy, as you need the name of a model to get simulation time information.
 	 * */
-	AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim);
+	AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, char* name);
 
 private:
 	//singleton reference to only instance of audiohandler.
 	static AudioHandler* _instance;
+
+	pthread_t updateAudioBinListThread;
 
 
 	/**
@@ -171,6 +180,22 @@ private:
 	 * @param del AudioBin to remove from LL.
 	 * */
 	int removeBin(AudioBin *del);
+
+	/**
+	 * Updates the list of AudioBins so that tones which have finished playing are removed from data storage.
+	 * This function is intended to be threaded, so contains a loop which does not terminate.
+	 * */
+	void updateAudioBinListThreaded(void);
+
+	/**
+	 * Fancy function for kickstarting the thread that checks the AudioBins.
+	 * */
+	static void *startupdateAudioBinListThread(void *obj)
+	{
+		//All we do here is call the readSensorsThreaded() function
+		reinterpret_cast<AudioHandler *>(obj)->updateAudioBinListThreaded();
+		return NULL;
+	}
 };
 
 

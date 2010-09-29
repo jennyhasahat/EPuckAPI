@@ -18,11 +18,18 @@ int main(void)
 	testbot2 = new EPuck(6666, testbot2Name);
 	testbot3 = new EPuck(6667, testbot3Name);
 	
-	printf("getting simulation time %f\n", testbot1->getSimulationTime());
-
 	testbot1->initaliseAudio();
+
 	testbot2->initaliseAudio();
+
 	testbot3->initaliseAudio();
+printf("playing tones\n");
+	testbot1->playTone(520, 2500);
+	testbot2->dumpAudio_TEST();
+	testbot2->playTone(1525, 100);
+	testbot2->dumpAudio_TEST();
+	testbot3->playTone(530, 1500);
+	testbot2->dumpAudio_TEST();
 
 	printf("sleeping\n");
 	sleep(5);
@@ -30,16 +37,8 @@ int main(void)
 
 
 	testbot1->playTone(500, 250);
-/*	testbot2->playTone(510, 250);
-
-	testbot1->playTone(350, 200);
-	testbot3->playTone(350, 200);
-sleep(2);
-	testbot2->playTone(900, 200);
-	testbot3->playTone(900, 200);
-*/
-	printf("getting simulation time %f\n", testbot1->getSimulationTime());
-	//testbot2->dumpAudio_TEST();
+	testbot2->dumpAudio_TEST();
+	sleep(1);
 
 
 	printf("test finished now\n");
