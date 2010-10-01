@@ -1,9 +1,20 @@
 /**
  * AudioHandler stores the audio environment data in the simulation.
  * It provides interfaces for storing audio information and for accessing audio information.
- * AudioHandler is not meant to be user-facing and should be accessed through the EPuck class.
+ * A number of simplifications about sound have been made in this class for the purpose of creating a simulation:<p>
+ * <ul>
+ * <li>Sounds a combined linearly</li>
+ * <li>there is no interference between tones of different frequencies</li>
+ * <li>Sound decays linearly over distance at a rate of initial_level / distance_away_in_m </li>
+ * <li>All frequencies decay over distance at the same rate</li>
+ * <li>The environment has no reverberations to confuse the direction and level of a sound</li>
+ * <li>Robots don't move whilst making a sound</li>
+ * <li>All robots play a tone at the same volume</li>
+ * <li>Obstacles in the environment allow sound to pass through them as if they (the obstacles) were not there</li>
+ * </ul>
+ * AudioHandler is accessed by the EPuck class.
  *
- * The AudioHandler code is not intended to be user facing, the user interacts with it through the EPuck API.
+ * The AudioHandler code is not intended to be user facing, the user interacts with it using the EPuck API.
  *
  * AudioHandler uses the Singleton design pattern, so there can only ever be one instance of it. Constructor is called using the Instance() method.
  *
@@ -22,7 +33,7 @@
 #define SAMPLE_RATE		16000
 #define FFT_BLOCK_SIZE	128
 
-using namespace PlayerCc;
+//using namespace PlayerCc;
 
 
 
@@ -35,9 +46,8 @@ public:
 	class AudioBin
 	{
 	public:
-
 		/**Represents a tone being played*/
-		typedef struct AudioTone
+		typedef struct audio_tone_t
 		{
 			/**The x coord of tone source*/
 			double tx;
@@ -46,18 +56,18 @@ public:
 			/**Time that the tone will stop playing*/
 			double end;
 			/**Audio tones are stored as a linked list in an audio bin, previous and next are ways of navigating the linked list*/
-			AudioTone *next;
-			AudioTone *previous;
-		}AudioTone;
+			audio_tone_t *next;
+			audio_tone_t *previous;
+		}audio_tone_t;
 
 		/**frequency bin lower bound*/
 		double lowerFrequencyBound;
-		/**apparent x coordinate of tone, calculated by taking the mean of all the x values of currently playing AudioTone objects.*/
+		/**apparent x coordinate of tone, calculated by taking the mean of all the x values of currently playing audio_tone_t objects.*/
 		double x;
-		/**apparent y coordinate of tone, calculated by taking the mean of all the y values of currently playing AudioTone objects.*/
+		/**apparent y coordinate of tone, calculated by taking the mean of all the y values of currently playing audio_tone_t objects.*/
 		double y;
 		/**Linked list of tones currently in this bin*/
-		AudioTone *tones;
+		audio_tone_t *tones;
 
 		/**AudioBins are stored as a linked list by the handler so need to be able to navigate LL.*/
 		AudioBin *next;
@@ -81,7 +91,7 @@ public:
 		int updateList(double currentTime);
 
 		/**
-		 * Adds an AudioTone into the AudioBin. Creates an AudioTone object, appends it to the linked list and updates itself.
+		 * Adds an audio_tone_t into the AudioBin. Creates an audio_tone_t object, appends it to the linked list and updates itself.
 		 * @param x the x position of the robot playing the tone
 		 * @param y the y position of the robot playing the tone
 		 * @param endtime the simulated time at which the tone will end.
@@ -94,7 +104,7 @@ public:
 		 * @param *del address of the tone to delete.
 		 * @returns success 0 if tone is deleted, 1 if tone is deleted and the bin is now empty.
 		 * */
-		int removeTone(AudioTone *del);
+		int removeTone(audio_tone_t *del);
 
 		/**
 		 * Updates the apparent position of the audio tone.
@@ -105,8 +115,20 @@ public:
 	};
 
 
+	/**
+	 * This data structure is used to send audio data from the AudioHandler to the EPuck API
+	 * */
+	typedef struct audio_message
+	{
+		/**the frequency of the tone heard*/
+		double frequency;
+		/**The direction, with respect to the robot's current heading, that the sound came from.
+		 * In degrees, in front of the robot being 0 and anti-clockwise from there increasing.*/
+		double direction;
+		/**Some volume level given to the tone. Can indicate how far away the tone is possibly.*/
+		double volume;
 
-
+	}audio_message_t;
 
 
 
@@ -117,10 +139,11 @@ public:
 	//linked list of AudioBins for the frequencies currently being played.
 	AudioBin *environment;
 	double lowerFFTBounds[FFT_BLOCK_SIZE/2];
+	int numberOfBins;
 
 	//player stuff
-	SimulationProxy	*simProxy;
-	PlayerClient *simClient;
+	PlayerCc::SimulationProxy	*simProxy;
+	PlayerCc::PlayerClient *simClient;
 	char aRobotName[32];
 
 	//function prototypes
@@ -133,7 +156,7 @@ public:
 	 * @param name the name of the robot that initialises the AudioHandler.
 	 * This is used for accessing data from the simulation proxy, as you need the name of a model to get simulation time information.
 	 * */
-	static AudioHandler* GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, char* name);
+	static AudioHandler* GetAudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::SimulationProxy *sim, char* name);
 
 	virtual ~AudioHandler();
 
@@ -145,6 +168,27 @@ public:
 	 * @param name string containing the name of the robot playing the tone.
 	 * */
 	void playTone(int freq, double duration, char* name);
+
+	/**
+	 * Returns the number of AudioBins currently in the environment. This function is needed so that space can be allocated for the Tones in the EPuck code.
+	 * @returns notones the number of different frequency tones the robot can detect.
+	 * */
+	int numberOfTones(void);
+
+	/**
+	 * Provides the audio data in the environment, including frequency, volume and direction of the tones.
+	 * The function which calls this must allocate the memory needed as an array, and provide the address and size of the memory slot.
+	 * This function will then copy the environmental audio data into the provided memory using the audio_message_t structure.
+	 * @param robotName	the name of the robot which is requesting the data (this is given in the worldfile)
+	 * @param store		link to where the audio data memory has been allocated.
+	 * @param storesize	the number of bytes allocated to the audio data.
+	 * @returns success 0 if successfully copied data, 1 if unsuccessful (like say if new data has been added between allocating memory and trying to copy it over).
+	 * @see AudioHandler#numberOfTones()
+	 * Example code:<br>
+	 * {@code audio_message_t *noise = new audio_message_t[AudioHandler.numberOfTones()];}
+	 * {@code getTones(robotname, noise, sizeof(audio_message_t)*AudioHandler.numberOfTones());}
+	 * */
+	int getTones(char* robotName, audio_message_t *store, size_t storesize);
 
 
 	/** Test function to print all of the sound environment data to stdout.
@@ -160,7 +204,7 @@ protected:
 	 * @param name the name of the robot that initialises the AudioHandler.
 	 * This is used for accessing data from the simulation proxy, as you need the name of a model to get simulation time information.
 	 * */
-	AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, char* name);
+	AudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::SimulationProxy *sim, char* name);
 
 private:
 	//singleton reference to only instance of audiohandler.

@@ -24,8 +24,8 @@ AudioHandler::AudioBin::AudioBin(double lowerFreq, AudioBin *prev, AudioBin *nxt
 AudioHandler::AudioBin::~AudioBin()
 {
 	//remove all tones in Linked list
-	AudioTone *ptr = tones;
-	AudioTone *prev;
+	audio_tone_t *ptr = tones;
+	audio_tone_t *prev;
 
 	while(ptr != NULL)
 	{
@@ -33,6 +33,7 @@ AudioHandler::AudioBin::~AudioBin()
 		ptr = ptr->next;
 		delete prev;
 	}
+
 	return;
 }
 
@@ -40,12 +41,12 @@ AudioHandler::AudioBin::~AudioBin()
 int AudioHandler::AudioBin::updateList(double currentTime)
 {
 	//move through LL and remove any entries with end times after the current time
-	AudioTone *ptr;
+	audio_tone_t *ptr;
 
 	ptr = tones;
 	while(ptr != NULL)
 	{
-		AudioTone *del = ptr;
+		audio_tone_t *del = ptr;
 
 		ptr = ptr->next;
 		//if tone should have finished
@@ -64,7 +65,7 @@ int AudioHandler::AudioBin::updateList(double currentTime)
 void AudioHandler::AudioBin::addTone(double x, double y, double endtime)
 {
 	//construct new audiotone from the supplied data
-	AudioTone* newtone = new AudioTone;
+	audio_tone_t* newtone = new audio_tone_t;
 
 	newtone->tx = x;
 	newtone->ty = y;
@@ -80,7 +81,7 @@ void AudioHandler::AudioBin::addTone(double x, double y, double endtime)
 	else
 	{
 		//search linked list until the end is reached
-		AudioTone *toneptr = tones;
+		audio_tone_t *toneptr = tones;
 
 		while(toneptr->next != NULL)
 		{
@@ -101,7 +102,7 @@ void AudioHandler::AudioBin::addTone(double x, double y, double endtime)
 //							PRIVATE FUNCTIONS
 //==================================================================================================
 
-int AudioHandler::AudioBin::removeTone(AudioTone *del)
+int AudioHandler::AudioBin::removeTone(audio_tone_t *del)
 {
 	//Four possibilities for this, each needing different stuff doing.
 	//case 1, tone is the first in the list.
@@ -137,7 +138,7 @@ int AudioHandler::AudioBin::removeTone(AudioTone *del)
 void AudioHandler::AudioBin::updatePosition(void)
 {
 	//move through LL and sum all x, and y coordinates. Also count number of entries.
-	AudioTone *ptr;
+	audio_tone_t *ptr;
 	double sumX = 0;
 	double sumY = 0;
 	int count = 0;

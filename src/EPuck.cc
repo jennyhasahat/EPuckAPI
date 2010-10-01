@@ -58,7 +58,6 @@ EPuck::~EPuck(void)
 	delete	simProxy;		//leds
 	delete	epuck;
 	delete	simulation;
-//	delete	handler;
 
 	return;
 }

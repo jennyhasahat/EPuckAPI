@@ -14,7 +14,7 @@
 AudioHandler* AudioHandler::_instance = 0;
 
 
-AudioHandler* AudioHandler::GetAudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, char* name)
+AudioHandler* AudioHandler::GetAudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::SimulationProxy *sim, char* name)
 {
 	if(_instance == 0)
 	{
@@ -24,7 +24,7 @@ AudioHandler* AudioHandler::GetAudioHandler(PlayerClient *simulationClient, Simu
 }
 
 
-AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim, char* name)
+AudioHandler::AudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::SimulationProxy *sim, char* name)
 {
 	int i;
 
@@ -32,6 +32,7 @@ AudioHandler::AudioHandler(PlayerClient *simulationClient, SimulationProxy *sim,
 	simProxy = sim;
 	environment = NULL;
 	strncpy(aRobotName, name, 32);
+	numberOfBins = 0;
 
 	//make array of frequency bins depending on FFT settings.
 	for(i=0; i<FFT_BLOCK_SIZE/2; i++)
@@ -61,11 +62,12 @@ AudioHandler::~AudioHandler()
 		delete prev;
 	}
 
+	printf("AudioHandler destroyed.\n");
 	return;
 }
 
 
-void AudioHandler::playTone(int freq, double duration, char* name)
+void AudioHandler::playTone(int freq, double duration, char* robotName)
 {
 	int whichbin;
 	char timeflag[] = "sim_time";
@@ -97,6 +99,7 @@ void AudioHandler::playTone(int freq, double duration, char* name)
 	if(current == NULL)
 	{
 		current = new AudioBin(lowerFFTBounds[whichbin], last, NULL);
+		numberOfBins++;
 		//if this is the first bin in the LL then point the Handler to it
 		if(environment == NULL)
 		{
@@ -107,7 +110,7 @@ void AudioHandler::playTone(int freq, double duration, char* name)
 	}
 
 	//add data to the audio bin entry
-	simProxy->GetPose2d(name, x, y, yaw);
+	simProxy->GetPose2d(robotName, x, y, yaw);
 
 	//todo fix the next lines when clock stuff is sorted.
 	//simProxy->GetProperty(name, timeflag, &currenttime, sizeof(currenttime));
@@ -123,20 +126,48 @@ void AudioHandler::playTone(int freq, double duration, char* name)
 	return;
 }
 
+int AudioHandler::numberOfTones(void)
+{
+	return numberOfBins;
+}
+
+int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t storesize)
+{
+	//find how many audio_message_t slots have been allocated and see if it is enough
+	int i, numberAllocatedSlots;
+	AudioBin *binptr = environment;
+	audio_message_t *message = store;
+
+	numberAllocatedSlots = storesize/sizeof(audio_message_t);
+
+	if(numberOfBins > numberAllocatedSlots)
+	{
+		printf("There are %d tones in the environment, but you have only reserved enough space for %d. Try again\n", numberOfBins, numberAllocatedSlots);
+		return 1;
+	}
+
+	//get positional info about the robot calling this function
+	double x, y, yaw;
+	simProxy->GetPose2d(robotName, x, y, yaw);
+
+	//for each bin...
+	while(binptr != NULL)
+	{
+		//find distance between
+	}
 
 
+}
 
-//==================================================================================================
-//							PRIVATE FUNCTIONS
-//==================================================================================================
+
 
 
 void AudioHandler::dumpData_TEST(void)
 {
 	AudioBin *binptr = environment;
-	AudioBin::AudioTone *toneptr;
+	AudioBin::audio_tone_t *toneptr;
 
-	printf("AudioHandler stored data:\n");
+	printf("AudioHandler has %d bins containing stored data:\n", numberOfBins);
 	if(binptr == NULL)
 	{
 		printf("\tno audio data\n");
@@ -160,6 +191,10 @@ void AudioHandler::dumpData_TEST(void)
 
 	return;
 }
+
+//==================================================================================================
+//							PRIVATE FUNCTIONS
+//==================================================================================================
 
 
 
@@ -187,6 +222,7 @@ int AudioHandler::removeBin(AudioBin *del)
 		{
 			//delete tone and flag as empty.
 			delete del;
+			numberOfBins = 0;
 			return 1;
 		}
 
@@ -194,6 +230,7 @@ int AudioHandler::removeBin(AudioBin *del)
 		environment = del->next;
 	}
 	delete del;
+	numberOfBins--;
 	return 0;
 }
 

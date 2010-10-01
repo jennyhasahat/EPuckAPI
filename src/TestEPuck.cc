@@ -38,7 +38,7 @@ printf("playing tones\n");
 
 	testbot1->playTone(500, 250);
 	testbot2->dumpAudio_TEST();
-	sleep(1);
+
 
 
 	printf("test finished now\n");
