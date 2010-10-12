@@ -1,2 +1,4 @@
 *.o
 helpful_files/*
+Debug/src/*
+Debug/test/*

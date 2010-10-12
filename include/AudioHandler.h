@@ -105,6 +105,16 @@ public:
 		 * */
 		void addTone(double x, double y, double volume, double endtime);
 
+		/**
+		 * Given the position and yaw of the robot this function calculates the cumulative level and direction of the tones in this frequency bin.
+		 * This is written to an audio_message_t data structure, the pointer to which the calling function mus supply.
+		 * @param x the x position of the robot
+		 * @param y the y position of the robot
+		 * @param yaw the yaw of the robot
+		 * @param output the audio_message_t pointer where the data should be stored.
+		 * */
+		int calculateCumulativeDataForPosition(double x, double y, double yaw, audio_message_t* output);
+
 	private:
 		/**
 		 * Removes the supplied audioTone from the linked list.

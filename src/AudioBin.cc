@@ -99,6 +99,31 @@ void AudioHandler::AudioBin::addTone(double x, double y, double volume, double e
 	return;
 }
 
+int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double x, double y, double yaw, audio_message_t* output)
+{
+	audio_tone_t *ptr =  tones;
+
+	//reset any values in the memory
+	output->direction = 0;
+	output->volume = 0;
+	output->frequency = lowerFrequencyBound;
+
+	while(ptr != NULL)
+	{
+		double xdiff, ydiff, dist;
+		double anglefromX, toneVol;
+
+		xdiff = ptr->tx - x;
+		ydiff = ptr->ty - y;
+		dist = sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
+		toneVol = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
+		//TODO finish this function
+
+	}
+
+	return 0;
+}
+
 //==================================================================================================
 //							PRIVATE FUNCTIONS
 //==================================================================================================
