@@ -43,9 +43,7 @@
 <option id="gnu.cpp.link.option.libs.298072416" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="pthread"/>
 </option>
-<option id="gnu.cpp.link.option.paths.569108165" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-<listOptionValue builtIn="false" value="/local/d0p6/jowen/boost/lib"/>
-</option>
+<option id="gnu.cpp.link.option.paths.569108165" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths"/>
 <option id="gnu.cpp.link.option.implname.1557078977" name="Import Library name (-Wl,--out-implib=)" superClass="gnu.cpp.link.option.implname" value="" valueType="string"/>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1036503695" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
