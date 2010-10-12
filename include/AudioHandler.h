@@ -214,16 +214,17 @@ private:
 
 
 	/**
-	 * AudioBins are stored in a linked list. This function appends a bin to the LL.
-	 * @param newbin AudioBin to add to LL.
-	 * */
-	void addBin(AudioBin *newbin);
-
-	/**
 	 * Removes an AudioBin from the Linked list.
 	 * @param del AudioBin to remove from LL.
 	 * */
 	int removeBin(AudioBin *del);
+
+	/**
+	 * Function to convert a distance in metres into a volume for the robots.
+	 * @param distance the distance in metres
+	 * @returns volume the volume of the tone at that distance, normalised between 0 and 1
+	 * */
+	double convertDistanceIntoSoundLevel(double distance);
 
 	/**
 	 * Updates the list of AudioBins so that tones which have finished playing are removed from data storage.

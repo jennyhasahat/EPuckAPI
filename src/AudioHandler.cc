@@ -153,7 +153,9 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 	//for each bin...
 	while(binptr != NULL)
 	{
-		//find distance between
+		//find distance between apparent tone and robot location
+		//convert into a volume
+
 	}
 
 
@@ -231,6 +233,19 @@ int AudioHandler::removeBin(AudioBin *del)
 	}
 	delete del;
 	numberOfBins--;
+	return 0;
+}
+
+double AudioHandler::convertDistanceIntoSoundLevel(double distance)
+{
+	double volume;
+	volume++;
+
+	//http://www.ehow.com/how_5953173_calculate-sound-reduction-over-distance.html
+	//the equation for the decrease in sound intensity (I) over a distance (r) given the sound power at its source (L):
+	//I = L / (4 x pi x r-squared)
+
+
 	return 0;
 }
 
