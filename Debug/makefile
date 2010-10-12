@@ -10,6 +10,7 @@ RM := rm -rf
 -include sources.mk
 -include subdir.mk
 -include src/subdir.mk
+-include .metadata/.plugins/org.eclipse.cdt.make.core/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -44,7 +45,7 @@ all: EPuckAPI
 EPuckAPI: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L/local/d0p6/jowen/boost/lib `pkg-config --libs playerc++` -o"EPuckAPI" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ `pkg-config --libs playerc++` -o"EPuckAPI" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

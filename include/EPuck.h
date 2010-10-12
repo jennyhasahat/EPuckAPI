@@ -102,7 +102,7 @@ class EPuck
 
 		//audio methods
 		int initaliseAudio(void);
-		int playTone(int frequency, double duration);
+		int playTone(int frequency, double duration, double volume);
 		int listenToTones(void);
 
 		void printTimes_TEST(void);

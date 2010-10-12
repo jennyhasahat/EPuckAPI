@@ -62,13 +62,14 @@ int AudioHandler::AudioBin::updateList(double currentTime)
 	return 0;
 }
 
-void AudioHandler::AudioBin::addTone(double x, double y, double endtime)
+void AudioHandler::AudioBin::addTone(double x, double y, double volume, double endtime)
 {
 	//construct new audiotone from the supplied data
 	audio_tone_t* newtone = new audio_tone_t;
 
 	newtone->tx = x;
 	newtone->ty = y;
+	newtone->tlevel = volume;
 	newtone->end = endtime;
 	newtone->next = NULL;
 
@@ -155,4 +156,20 @@ void AudioHandler::AudioBin::updatePosition(void)
 	y = sumY/count;
 
 	return;
+}
+
+double AudioHandler::AudioBin::convertDistanceIntoSoundLevel(double originalLevel, double distance)
+{
+	double volume;
+	const double pi = 3.14159;
+
+	//the sound makes a hemisphere of radius r (where r is distance from source to destination)
+	//the sound is spread evenly over all points of this hemisphere
+	//so divide original sound level by volume of hemisphere...?
+
+	//V of a hemisphere = 2/3 * pi * r^3
+	volume = (2/3) * pi * pow(distance, 3);
+	printf("volume is %d\n", volume);
+
+	return originalLevel/volume;
 }

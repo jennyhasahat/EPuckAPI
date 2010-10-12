@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <math.h>
 #include <pthread.h>
 #include "libplayerc++/playerc++.h"
 
@@ -35,7 +36,10 @@
 
 //using namespace PlayerCc;
 
-
+//TODO make tone volume a parameter in audio_tone_t
+//TODO make getTones sum levels of all tones in the area and return that as sound level
+//TODO make getTones use x and y of each tone instead of the apparent tone bullshizzle.
+//TODO move code where we combine all tones in a bin into AudioBin.
 
 class AudioHandler
 {
@@ -53,6 +57,8 @@ public:
 			double tx;
 			/**The y coord of tone source*/
 			double ty;
+			/**The sound level of the tone at source*/
+			double tlevel;
 			/**Time that the tone will stop playing*/
 			double end;
 			/**Audio tones are stored as a linked list in an audio bin, previous and next are ways of navigating the linked list*/
@@ -62,7 +68,7 @@ public:
 
 		/**frequency bin lower bound*/
 		double lowerFrequencyBound;
-		/**apparent x coordinate of tone, calculated by taking the mean of all the x values of currently playing audio_tone_t objects.*/
+				/**apparent x coordinate of tone, calculated by taking the mean of all the x values of currently playing audio_tone_t objects.*/
 		double x;
 		/**apparent y coordinate of tone, calculated by taking the mean of all the y values of currently playing audio_tone_t objects.*/
 		double y;
@@ -94,9 +100,10 @@ public:
 		 * Adds an audio_tone_t into the AudioBin. Creates an audio_tone_t object, appends it to the linked list and updates itself.
 		 * @param x the x position of the robot playing the tone
 		 * @param y the y position of the robot playing the tone
+		 * @param volume the sound level (volume) to play the tone at.
 		 * @param endtime the simulated time at which the tone will end.
 		 * */
-		void addTone(double x, double y, double endtime);
+		void addTone(double x, double y, double volume, double endtime);
 
 	private:
 		/**
@@ -112,8 +119,15 @@ public:
 		 * */
 		void updatePosition(void);
 
-	};
+		/**
+		 * Function to convert a distance in metres into a volume for the robots.
+		 * @param originalLevel the sound level produced at source
+		 * @param distance the distance in metres
+		 * @returns volume the volume of the tone at that distance, normalised between 0 and 1
+		 * */
+		double convertDistanceIntoSoundLevel(double originalLevel, double distance);
 
+	};
 
 	/**
 	 * This data structure is used to send audio data from the AudioHandler to the EPuck API
@@ -165,9 +179,10 @@ public:
 	 * Puts a tone of the desired frequency and duration into the audio environment.
 	 * @param freq the frequency of the tone in Hz
 	 * @param duration the length of the tone in milliseconds
+	 * @param volume the sound level (volume) to play the tone at.
 	 * @param name string containing the name of the robot playing the tone.
 	 * */
-	void playTone(int freq, double duration, char* name);
+	void playTone(int freq, double duration, double volume, char* name);
 
 	/**
 	 * Returns the number of AudioBins currently in the environment. This function is needed so that space can be allocated for the Tones in the EPuck code.
@@ -219,12 +234,6 @@ private:
 	 * */
 	int removeBin(AudioBin *del);
 
-	/**
-	 * Function to convert a distance in metres into a volume for the robots.
-	 * @param distance the distance in metres
-	 * @returns volume the volume of the tone at that distance, normalised between 0 and 1
-	 * */
-	double convertDistanceIntoSoundLevel(double distance);
 
 	/**
 	 * Updates the list of AudioBins so that tones which have finished playing are removed from data storage.
