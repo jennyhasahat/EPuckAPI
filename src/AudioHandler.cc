@@ -126,7 +126,7 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 	return;
 }
 
-int AudioHandler::numberOfTones(void)
+int AudioHandler::getNumberOfTones(void)
 {
 	return numberOfBins;
 }
@@ -134,7 +134,9 @@ int AudioHandler::numberOfTones(void)
 int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t storesize)
 {
 	//find how many audio_message_t slots have been allocated and see if it is enough
-	int i, numberAllocatedSlots;
+	int numberAllocatedSlots;
+	int i = 0;
+	double x, y, yaw;
 	AudioBin *binptr = environment;
 	audio_message_t *message = store;
 
@@ -147,20 +149,13 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 	}
 
 	//get positional info about the robot calling this function
-	double x, y, yaw;
 	simProxy->GetPose2d(robotName, x, y, yaw);
 
 	//for each bin...
-	while(binptr != NULL)
+	while(binptr != NULL && i < numberAllocatedSlots)
 	{
-		double xd, yd, dist, vol;
-		//find distance between apparent tone and robot location
-		xd = binptr->x - x;
-		yd = binptr->y - y;
-		dist = sqrt( (xd*xd) + (yd*yd) );
-		//convert into a sound level
-		// vol = convertDistanceIntoSoundLevel(1, dist);
-
+		binptr->calculateCumulativeDataForPosition(x, y, yaw, &store[i]);
+		i++;
 	}
 
 	return 0;

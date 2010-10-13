@@ -45,6 +45,24 @@ class AudioHandler
 {
 public:
 
+	/**
+	 * This data structure is used to send audio data from the AudioHandler to the EPuck API
+	 * */
+	typedef struct audio_message
+	{
+		/**the frequency of the tone heard*/
+		double frequency;
+		/**The direction, with respect to the robot's current heading, that the sound came from.
+		 * In degrees, in front of the robot being 0 and anti-clockwise from there increasing.*/
+		double direction;
+		/**Some volume level given to the tone. Can indicate how far away the tone is possibly.*/
+		double volume;
+
+	}audio_message_t;
+
+
+
+
 	/** AudioBin stores information about a tone in the environment. Each object represents a frequency band containing tones being played.
 	 * */
 	class AudioBin
@@ -137,22 +155,15 @@ public:
 		 * */
 		double convertDistanceIntoSoundLevel(double originalLevel, double distance);
 
+		/**
+		 * Function to convert two coordinates into a bearing.
+		 * Takes the coordinates of the sound source and the sound reciever, and works out the bearing of the sound source wrt the reciever.
+		 * Bearings are measured anticlockwise from where the robot is facing straight ahead, the unit used is degrees (not radians).
+		 * */
+		double convertTwoCoordinatesIntoBearing(double sourceX, double sourceY, double recieverX, double recieverY, double recieverYaw);
 	};
 
-	/**
-	 * This data structure is used to send audio data from the AudioHandler to the EPuck API
-	 * */
-	typedef struct audio_message
-	{
-		/**the frequency of the tone heard*/
-		double frequency;
-		/**The direction, with respect to the robot's current heading, that the sound came from.
-		 * In degrees, in front of the robot being 0 and anti-clockwise from there increasing.*/
-		double direction;
-		/**Some volume level given to the tone. Can indicate how far away the tone is possibly.*/
-		double volume;
 
-	}audio_message_t;
 
 
 
@@ -198,7 +209,7 @@ public:
 	 * Returns the number of AudioBins currently in the environment. This function is needed so that space can be allocated for the Tones in the EPuck code.
 	 * @returns notones the number of different frequency tones the robot can detect.
 	 * */
-	int numberOfTones(void);
+	int getNumberOfTones(void);
 
 	/**
 	 * Provides the audio data in the environment, including frequency, volume and direction of the tones.
@@ -208,10 +219,10 @@ public:
 	 * @param store		link to where the audio data memory has been allocated.
 	 * @param storesize	the number of bytes allocated to the audio data.
 	 * @returns success 0 if successfully copied data, 1 if unsuccessful (like say if new data has been added between allocating memory and trying to copy it over).
-	 * @see AudioHandler#numberOfTones()
+	 * @see AudioHandler#getNumberOfTones()
 	 * Example code:<br>
-	 * {@code audio_message_t *noise = new audio_message_t[AudioHandler.numberOfTones()];}
-	 * {@code getTones(robotname, noise, sizeof(audio_message_t)*AudioHandler.numberOfTones());}
+	 * {@code audio_message_t *noise = new audio_message_t[AudioHandler.getNumberOfTones()];}
+	 * {@code getTones(robotname, noise, sizeof(audio_message_t)*AudioHandler.getNumberOfTones());}
 	 * */
 	int getTones(char* robotName, audio_message_t *store, size_t storesize);
 

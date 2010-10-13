@@ -25,11 +25,10 @@ int main(void)
 	testbot3->initaliseAudio();
 printf("playing tones\n");
 	testbot1->playTone(520, 2500, 5);
-	testbot2->dumpAudio_TEST();
 	testbot2->playTone(1525, 100, 50);
-	testbot2->dumpAudio_TEST();
 	testbot3->playTone(530, 1500, 4);
-	testbot2->dumpAudio_TEST();
+
+	testbot1->listenForTones();
 
 	printf("sleeping\n");
 	sleep(5);
@@ -37,7 +36,6 @@ printf("playing tones\n");
 
 
 	testbot1->playTone(500, 250, 0.5);
-	testbot2->dumpAudio_TEST();
 
 
 

@@ -117,12 +117,15 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double x, double 
 		ydiff = ptr->ty - y;
 		dist = sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
 		toneVol = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
-		//TODO finish this function
+
+		convertTwoCoordinatesIntoBearing(ptr->tx, ptr->tx, x, y, yaw);
 
 	}
 
 	return 0;
 }
+
+
 
 //==================================================================================================
 //							PRIVATE FUNCTIONS
@@ -194,7 +197,19 @@ double AudioHandler::AudioBin::convertDistanceIntoSoundLevel(double originalLeve
 
 	//V of a hemisphere = 2/3 * pi * r^3
 	volume = (2/3) * pi * pow(distance, 3);
-	printf("volume is %d\n", volume);
+	printf("volume is %f, returning %f\n", volume, originalLevel/volume);
 
 	return originalLevel/volume;
 }
+
+double AudioHandler::AudioBin::convertTwoCoordinatesIntoBearing(double Xs, double Ys,
+		double Xr, double Yr, double YawR)
+{
+	//convert yaw so that it is between 0 and 360
+	printf("yaw from p/s is %f, yaw %% 360 is %d\n", YawR, (int)YawR%360);
+
+	//first calculate bearing wrt the x axis
+	return 200;
+}
+
+

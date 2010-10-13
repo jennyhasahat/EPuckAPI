@@ -194,7 +194,7 @@ int EPuck::getNumberBlobs(void)
  * @return blob information, in the form of a Blob object
  * @see  EPuck.h#Blob Blob
  * */
-Blob EPuck::getBlob(int index)
+EPuck::Blob EPuck::getBlob(int index)
 {
 	player_blobfinder_blob_t oldBlob;
 	Blob newBlob;
@@ -376,17 +376,41 @@ int EPuck::playTone(int frequency, double duration, double volume)
 	return -1;
 }
 
-
-int EPuck::listenToTones(void)
+/**
+ * Listens for any sounds in the audio environment and stores them in the EPuck class until the user requests them.
+ * Tones of similar frequency are grouped together because a Fourier transform is performed on the signal from the microphones,
+ * the resulting information is combined in a way that is physically plausible (because this is a simulation after all...)
+ * and stored in the EPuck object until requested by the user.
+ * @returns numberoftones the number of different tones the robot can hear.
+ * */
+int EPuck::listenForTones(void)
 {
+	static int numberoftones = 0;
+	static AudioHandler::audio_message_t *message;
+
 	if(audioInitialised)
 	{
+		//need to remember how many tones were allocated last time and free that memory
+		if(numberoftones != 0)
+		{
+			delete[] message;
+		}
+
+		numberoftones = handler->getNumberOfTones();
+
 		return 0;
 	}
 
 	printf("Unsuccessful epuck %s listenToTones() request. Audio not initialised.\n", name);
 	return -1;
 }
+
+
+EPuck::Tone EPuck::getTone(int index)
+{
+	return 0;
+}
+
 
 void EPuck::printTimes_TEST(void)
 {
