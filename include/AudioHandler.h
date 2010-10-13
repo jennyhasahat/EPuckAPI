@@ -41,6 +41,11 @@
 //TODO make getTones use x and y of each tone instead of the apparent tone bullshizzle.
 //TODO move code where we combine all tones in a bin into AudioBin.
 
+/**
+ * takes care of all audio processing and collection, stores audio data and takes care of returning it to the calling object.
+ * Audio in the simulation is global so AudioHandler is handled as a singleton and there can be only one AudioHandler,
+ * which contains all the audio data in the environment.
+ **/
 class AudioHandler
 {
 public:
@@ -54,7 +59,7 @@ public:
 		double frequency;
 		/**The direction, with respect to the robot's current heading, that the sound came from.
 		 * In degrees, in front of the robot being 0 and anti-clockwise from there increasing.*/
-		double direction;
+		int direction;
 		/**Some volume level given to the tone. Can indicate how far away the tone is possibly.*/
 		double volume;
 

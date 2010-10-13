@@ -111,15 +111,19 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double x, double 
 	while(ptr != NULL)
 	{
 		double xdiff, ydiff, dist;
-		double anglefromX, toneVol;
+		double toneDirection, toneVol;
 
 		xdiff = ptr->tx - x;
 		ydiff = ptr->ty - y;
 		dist = sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
 		toneVol = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
 
-		convertTwoCoordinatesIntoBearing(ptr->tx, ptr->tx, x, y, yaw);
+		toneDirection = convertTwoCoordinatesIntoBearing(ptr->tx, ptr->tx, x, y, yaw);
 
+		//if tone is louder it has more of an effect on the tone direction than if it does not.
+		//this may actually be a dumb way of doing it because if there's only one tone...
+		//TODO this section needs work
+		//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
 	}
 
 	return 0;

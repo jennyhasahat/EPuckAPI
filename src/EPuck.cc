@@ -59,6 +59,8 @@ EPuck::~EPuck(void)
 	delete	epuck;
 	delete	simulation;
 
+	if(audioInitialised) delete[] toneArray;
+
 	return;
 }
 
@@ -385,18 +387,26 @@ int EPuck::playTone(int frequency, double duration, double volume)
  * */
 int EPuck::listenForTones(void)
 {
-	static int numberoftones = 0;
-	static AudioHandler::audio_message_t *message;
+	int i, numberoftones = 0;
+	AudioHandler::audio_message_t *message;
 
 	if(audioInitialised)
 	{
 		//need to remember how many tones were allocated last time and free that memory
-		if(numberoftones != 0)
-		{
-			delete[] message;
-		}
+		delete[] toneArray;
 
+		//reserve space for new tone data
 		numberoftones = handler->getNumberOfTones();
+		toneArray = new Tone[numberoftones];
+		message = new AudioHandler::audio_message_t[numberoftones];
+		handler->getTones(name, message, numberoftones);
+
+		for(i=0; i<numberoftones; i++)
+		{
+			toneArray[i].volume = message->volume;
+			toneArray[i].bearing = message->direction;
+			toneArray[i].frequency = message->frequency;
+		}
 
 		return 0;
 	}

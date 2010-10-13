@@ -91,6 +91,7 @@ public:
 		//audio stuff
 		AudioHandler *handler;
 		bool audioInitialised;
+		Tone *toneArray;
 
 		//robot also supports power, aio and blinkenlight proxies
 		//as far as I can tell, stage does not support these
