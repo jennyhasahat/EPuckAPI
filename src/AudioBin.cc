@@ -52,8 +52,6 @@ int AudioHandler::AudioBin::updateList(double currentTime)
 		//if tone should have finished
 		if(del->end <= currentTime)
 		{
-			printf("\tdeleting a tone x: %f y:%f end: %f current %f\n",
-					del->tx, del->ty, del->end, currentTime);
 			//delete it and if LL is empty now return 1
 			if(removeTone(del)) return 1;
 		}
@@ -104,18 +102,18 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double x, double 
 	audio_tone_t *ptr =  tones;
 
 	//reset any values in the memory
-	output->direction = 0;
-	output->volume = 0;
-	output->frequency = lowerFrequencyBound;
+	output->direction 	= 0;
+	output->volume 		= 0;
+	output->frequency 	= lowerFrequencyBound;
 
 	while(ptr != NULL)
 	{
 		double xdiff, ydiff, dist;
 		double toneDirection, toneVol;
 
-		xdiff = ptr->tx - x;
-		ydiff = ptr->ty - y;
-		dist = sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
+		xdiff 	= ptr->tx - x;
+		ydiff 	= ptr->ty - y;
+		dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
 		toneVol = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
 
 		toneDirection = convertTwoCoordinatesIntoBearing(ptr->tx, ptr->tx, x, y, yaw);

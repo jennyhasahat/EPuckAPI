@@ -28,7 +28,8 @@ printf("playing tones\n");
 	testbot2->playTone(1525, 100, 50);
 	testbot3->playTone(530, 1500, 4);
 
-	testbot1->listenForTones();
+	int i = testbot1->listenForTones();
+	testbot1->getTone(i);
 
 	printf("sleeping\n");
 	sleep(5);

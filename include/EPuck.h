@@ -18,7 +18,7 @@ This is a base class for the more specific SimulatedRobot and RealRobot classes,
 Upon initialisation this class will create a thread using POSIX which reads in the sensor data from the robot.
 This allows multiple instances of EPuck to function in parallel and read in their sensor data with no effort from the programmer.
 Any interaction with the robot must be done through this class to localise the use of Player syntax.
-*/
+ */
 class EPuck
 {
 public:
@@ -79,6 +79,8 @@ public:
 	int port;
 	char name[32];
 
+private:
+
 	//player object member variables
 	PlayerCc::PlayerClient		*epuck;
 	PlayerCc::PlayerClient		*simulation;
@@ -88,55 +90,57 @@ public:
 	PlayerCc::BlobfinderProxy	*blobProxy;		//camera
 	PlayerCc::SimulationProxy	*simProxy;		//leds
 
-		//audio stuff
-		AudioHandler *handler;
-		bool audioInitialised;
-		Tone *toneArray;
+	//audio stuff
+	AudioHandler *handler;
+	bool audioInitialised;
+	Tone *toneArray;
+	int numberOfTones;
 
-		//robot also supports power, aio and blinkenlight proxies
-		//as far as I can tell, stage does not support these
+	//robot also supports power, aio and blinkenlight proxies
+	//as far as I can tell, stage does not support these
 
-	
-		EPuck(char* robotName);
-		EPuck(int robotPort, char* robotName);
-		EPuck(int robotPort, char* robotName, int simulationPort);
-		~EPuck(void);
-		
-		void readSensors(void);
-		double getSimulationTime(void);
-		
-		// IR methods
-		double* getIRReadings(void);
-		double getIRReading(int index);
-		int getNumberOfIRs(void);
+public:
 
-		// Blobfinder methods
-		int getCameraWidth(void);
-		int getCameraHeight(void);
-		int getNumberBlobs(void);
-		Blob getBlob(int index);
+	EPuck(char* robotName);
+	EPuck(int robotPort, char* robotName);
+	EPuck(int robotPort, char* robotName, int simulationPort);
+	~EPuck(void);
 
-		// motor control methods
-		void setMotors(double forward, double turnrate);
-		void setDifferentialMotors(double left, double right);
+	void readSensors(void);
+	double getSimulationTime(void);
 
-		// LED methods
-		void setAllLEDSOn(void);
-		void setAllLEDSOff(void);
-		void setLED(int index, int state);
+	// IR methods
+	double* getIRReadings(void);
+	double getIRReading(int index);
+	int getNumberOfIRs(void);
 
-		//audio methods
-		int initaliseAudio(void);
-		int playTone(int frequency, double duration, double volume);
-		int listenForTones(void);
-		Tone getTone(int index);
+	// Blobfinder methods
+	int getCameraWidth(void);
+	int getCameraHeight(void);
+	int getNumberBlobs(void);
+	Blob getBlob(int index);
 
-		void printTimes_TEST(void);
-		void dumpAudio_TEST(void);
+	// motor control methods
+	void setMotors(double forward, double turnrate);
+	void setDifferentialMotors(double left, double right);
 
-	
-	protected:
-		double irReadings[8];
+	// LED methods
+	void setAllLEDSOn(void);
+	void setAllLEDSOff(void);
+	void setLED(int index, int state);
+
+	//audio methods
+	int initaliseAudio(void);
+	int playTone(int frequency, double duration, double volume);
+	int listenForTones(void);
+	Tone getTone(int index);
+
+	void printTimes_TEST(void);
+	void dumpAudio_TEST(void);
+
+
+protected:
+	double irReadings[8];
 
 #if THREADED
 	pthread_t readSensorsThread;
@@ -150,12 +154,12 @@ public:
 
 #endif
 
-	private:
-			virtual void initialise(int robotPort, char* robotName, int simulationPort);
+private:
+	virtual void initialise(int robotPort, char* robotName, int simulationPort);
 
 
-	
-		
+
+
 
 };
 

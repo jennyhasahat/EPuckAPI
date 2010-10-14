@@ -208,8 +208,6 @@ int AudioHandler::removeBin(AudioBin *del)
 	//case 2, tone is in the middle
 	//case 3 tone is at the end of the list
 
-	printf("deleting a bin %f\n", del->lowerFrequencyBound);
-
 	//if next is not null then update its previous pointer to this.previous
 	if(del->next != NULL) del->next->previous = del->previous;
 
@@ -265,7 +263,6 @@ void AudioHandler::updateAudioBinListThreaded(void)
 				if(removeBin(del))
 				{
 					environment = NULL;
-					printf("no more bins\n");
 				}
 
 				//already advanced the ptr so should skip rest of loop

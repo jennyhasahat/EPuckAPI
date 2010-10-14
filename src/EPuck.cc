@@ -387,7 +387,7 @@ int EPuck::playTone(int frequency, double duration, double volume)
  * */
 int EPuck::listenForTones(void)
 {
-	int i, numberoftones = 0;
+	int i;
 	AudioHandler::audio_message_t *message;
 
 	if(audioInitialised)
@@ -396,16 +396,16 @@ int EPuck::listenForTones(void)
 		delete[] toneArray;
 
 		//reserve space for new tone data
-		numberoftones = handler->getNumberOfTones();
-		toneArray = new Tone[numberoftones];
-		message = new AudioHandler::audio_message_t[numberoftones];
-		handler->getTones(name, message, numberoftones);
+		numberOfTones 	= handler->getNumberOfTones();
+		toneArray 		= new Tone[numberOfTones];
+		message 		= new AudioHandler::audio_message_t[numberOfTones];
+		handler->getTones(name, message, numberOfTones);
 
-		for(i=0; i<numberoftones; i++)
+		for(i=0; i<numberOfTones; i++)
 		{
-			toneArray[i].volume = message->volume;
-			toneArray[i].bearing = message->direction;
-			toneArray[i].frequency = message->frequency;
+			toneArray[i].volume 	= message->volume;
+			toneArray[i].bearing 	= message->direction;
+			toneArray[i].frequency 	= message->frequency;
 		}
 
 		return 0;
@@ -415,10 +415,21 @@ int EPuck::listenForTones(void)
 	return -1;
 }
 
-
+/**
+ * Will return the requested
+ * If listenForTones() has
+ * */
 EPuck::Tone EPuck::getTone(int index)
 {
-	return 0;
+	if(index < numberOfTones || index > -1)
+	{
+		return toneArray[index];
+	}
+	else
+	{
+		printf("In EPuck::getTone, index %d does not exist.\n", index);
+	}
+	//return NULL;
 }
 
 
@@ -450,19 +461,20 @@ void EPuck::dumpAudio_TEST(void)
 void EPuck::initialise(int robotPort, char* robotName, int simulationPort)
 {
 	//initialise member variables
-	port = robotPort;
 	strcpy(name, robotName);
-	audioInitialised = false;
+	port 				= robotPort;
+	audioInitialised 	= false;
+	toneArray 			= NULL;
 
 	try
 	{
-		epuck = new PlayerCc::PlayerClient("localhost", port);
-		simulation = new PlayerCc::PlayerClient("localhost", simulationPort);
+		epuck 		= new PlayerCc::PlayerClient("localhost", port);
+		simulation 	= new PlayerCc::PlayerClient("localhost", simulationPort);
 
-		p2dProxy = new PlayerCc::Position2dProxy(epuck, 0);
-		sonarProxy = new PlayerCc::SonarProxy(epuck, 0);
-		blobProxy = new PlayerCc::BlobfinderProxy(epuck, 0);
-		simProxy = new PlayerCc::SimulationProxy(simulation, 0);
+		p2dProxy 	= new PlayerCc::Position2dProxy(epuck, 0);
+		sonarProxy 	= new PlayerCc::SonarProxy(epuck, 0);
+		blobProxy 	= new PlayerCc::BlobfinderProxy(epuck, 0);
+		simProxy 	= new PlayerCc::SimulationProxy(simulation, 0);
 	}
 	catch (PlayerCc::PlayerError e)
 	{
