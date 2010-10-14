@@ -114,14 +114,15 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double x, double 
 		xdiff 	= ptr->tx - x;
 		ydiff 	= ptr->ty - y;
 		dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
-		toneVol = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
+		//toneVol = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
 
-		toneDirection = convertTwoCoordinatesIntoBearing(ptr->tx, ptr->tx, x, y, yaw);
+		toneDirection = convertDifferentialCoordsIntoBearing(xdiff, ydiff, yaw);
 
 		//if tone is louder it has more of an effect on the tone direction than if it does not.
 		//this may actually be a dumb way of doing it because if there's only one tone...
 		//TODO this section needs work
 		//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
+		ptr = ptr->next;
 	}
 
 	return 0;
@@ -172,7 +173,7 @@ void AudioHandler::AudioBin::updatePosition(void)
 	audio_tone_t *ptr;
 	double sumX = 0;
 	double sumY = 0;
-	int count = 0;
+	int count 	= 0;
 
 	ptr = tones;
 	while(ptr != NULL)
@@ -193,25 +194,62 @@ double AudioHandler::AudioBin::convertDistanceIntoSoundLevel(double originalLeve
 	double volume;
 	const double pi = 3.14159;
 
+	printf("calculating volume:\n\toriginal level is %f, distance is %f\n", originalLevel, distance);
+
+	//if distance = 0 then this is the robot making the noise
+	if(distance <= 0) return originalLevel;
+
 	//the sound makes a hemisphere of radius r (where r is distance from source to destination)
 	//the sound is spread evenly over all points of this hemisphere
-	//so divide original sound level by volume of hemisphere...?
+	//so divide original sound level by volume of hemisphere
+	//(add 1 to hemisphere vol to get rid of innaccuracies when vol < 1.)
 
-	//V of a hemisphere = 2/3 * pi * r^3
-	volume = (2/3) * pi * pow(distance, 3);
-	printf("volume is %f, returning %f\n", volume, originalLevel/volume);
+	//Vol of a hemisphere = 2/3 * pi * r^3
+	volume = 2*pi*pow(distance, 3)/3;
 
-	return originalLevel/volume;
+	printf("\tvolume of hemisphere is %f, returning %f\n", volume, originalLevel/(1+volume) );
+
+	return originalLevel/(1+volume);
 }
 
-double AudioHandler::AudioBin::convertTwoCoordinatesIntoBearing(double Xs, double Ys,
-		double Xr, double Yr, double YawR)
+double AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff, double ydiff, double recieverYaw)
 {
+	int yaw, bearingWRTx;
+
+	//convert yaw to degrees
+	yaw = degreesToRadians(recieverYaw);
 	//convert yaw so that it is between 0 and 360
-	printf("yaw from p/s is %f, yaw %% 360 is %d\n", YawR, (int)YawR%360);
+	printf("yaw from p/s is %f, in degrees is %d, yaw%%360 is %d\n", recieverYaw, yaw, (int)yaw%360);
+	//puts yaw in range -360 to 360
+	yaw = yaw%360;
+	//get rid of any pesky minuses by adding 360. Now in range 0 to 720
+	yaw += 360;
+	//modulo again to get in range 0 to 360
+	yaw = yaw%360;
+
 
 	//first calculate bearing wrt the x axis
+	if(xdiff > 0)
+	{
+		bearingWRTx =  degreesToRadians(tan(xdiff/ydiff));
+	}
+	else
+	{
+		bearingWRTx =  degreesToRadians(tan(xdiff/ydiff)+180);
+	}
+	printf("bearing wrt x is %d. tan(x/y) is %f radians\n", tan(xdiff/ydiff));
+
+
 	return 200;
 }
 
+int AudioHandler::AudioBin::degreesToRadians(double rads)
+{
+	double degs;
+
+	degs = 180*rads;
+	degs = degs/PI;
+
+	return (int)degs;
+}
 

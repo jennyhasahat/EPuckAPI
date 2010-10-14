@@ -33,6 +33,7 @@
 
 #define SAMPLE_RATE		16000
 #define FFT_BLOCK_SIZE	128
+#define PI				3.14159
 
 //using namespace PlayerCc;
 
@@ -133,7 +134,7 @@ public:
 		 * This is written to an audio_message_t data structure, the pointer to which the calling function mus supply.
 		 * @param x the x position of the robot
 		 * @param y the y position of the robot
-		 * @param yaw the yaw of the robot
+		 * @param yaw the yaw of the robot. In radians because that's the measure used by playerstage
 		 * @param output the audio_message_t pointer where the data should be stored.
 		 * */
 		int calculateCumulativeDataForPosition(double x, double y, double yaw, audio_message_t* output);
@@ -164,8 +165,16 @@ public:
 		 * Function to convert two coordinates into a bearing.
 		 * Takes the coordinates of the sound source and the sound reciever, and works out the bearing of the sound source wrt the reciever.
 		 * Bearings are measured anticlockwise from where the robot is facing straight ahead, the unit used is degrees (not radians).
+		 * @param xdiff the source x coordinate minus the reciever x coordinate
+		 * @param ydiff the source y coordinate minus the reciever y coordinate
+		 * @param recieverYaw the yaw of the robot that is listening for tones.
 		 * */
-		double convertTwoCoordinatesIntoBearing(double sourceX, double sourceY, double recieverX, double recieverY, double recieverYaw);
+		double convertDifferentialCoordsIntoBearing(double xdiff, double ydiff, double recieverYaw);
+
+		/**
+		 * converts radians to degrees.
+		 * */
+		int degreesToRadians(double rads);
 	};
 
 
@@ -222,9 +231,10 @@ public:
 	 * This function will then copy the environmental audio data into the provided memory using the audio_message_t structure.
 	 * @param robotName	the name of the robot which is requesting the data (this is given in the worldfile)
 	 * @param store		link to where the audio data memory has been allocated.
-	 * @param storesize	the number of bytes allocated to the audio data.
+	 * @param storesize	the number of audio_message_t objects allocated to the audio data.
 	 * @returns success 0 if successfully copied data, 1 if unsuccessful (like say if new data has been added between allocating memory and trying to copy it over).
 	 * @see AudioHandler#getNumberOfTones()
+	 * @see
 	 * Example code:<br>
 	 * {@code audio_message_t *noise = new audio_message_t[AudioHandler.getNumberOfTones()];}
 	 * {@code getTones(robotname, noise, sizeof(audio_message_t)*AudioHandler.getNumberOfTones());}

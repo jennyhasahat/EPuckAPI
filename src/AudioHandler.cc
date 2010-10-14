@@ -135,16 +135,17 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 {
 	//find how many audio_message_t slots have been allocated and see if it is enough
 	int numberAllocatedSlots;
-	int i = 0;
 	double x, y, yaw;
+	int i = 0;
 	AudioBin *binptr = environment;
-	audio_message_t *message = store;
 
+	printf("You have reserved %d bytes, and audio message needs %d bytes: ", (int)storesize, sizeof(audio_message_t));
 	numberAllocatedSlots = storesize/sizeof(audio_message_t);
+	printf("that is %d tone slots\n", numberAllocatedSlots);
 
 	if(numberOfBins > numberAllocatedSlots)
 	{
-		printf("There are %d tones in the environment, but you have only reserved enough space for %d. Try again\n", numberOfBins, numberAllocatedSlots);
+		printf("There are %d tones in the environment, but you have only reserved enough space for %d. Try again.\n", numberOfBins, numberAllocatedSlots);
 		return 1;
 	}
 
@@ -154,8 +155,11 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 	//for each bin...
 	while(binptr != NULL && i < numberAllocatedSlots)
 	{
+		printf("looking at bin %f, ", binptr->lowerFrequencyBound);
+		printf("putting this data in index %d\n", i);
 		binptr->calculateCumulativeDataForPosition(x, y, yaw, &store[i]);
 		i++;
+		binptr = binptr->next;
 	}
 
 	return 0;

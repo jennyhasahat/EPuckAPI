@@ -399,7 +399,7 @@ int EPuck::listenForTones(void)
 		numberOfTones 	= handler->getNumberOfTones();
 		toneArray 		= new Tone[numberOfTones];
 		message 		= new AudioHandler::audio_message_t[numberOfTones];
-		handler->getTones(name, message, numberOfTones);
+		handler->getTones(name, message, sizeof(AudioHandler::audio_message_t)*numberOfTones);
 
 		for(i=0; i<numberOfTones; i++)
 		{

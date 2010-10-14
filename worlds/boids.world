@@ -23,7 +23,7 @@ floorplan
 epuck
 (
 	#color "green"
-	pose [1 1 10 0]
+	pose [1 1 10 -45]
 	name "robot1"
 )
 
