@@ -97,7 +97,7 @@ void AudioHandler::AudioBin::addTone(double x, double y, double volume, double e
 	return;
 }
 
-int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double x, double y, double yaw, audio_message_t* output)
+int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double yr, double yaw, audio_message_t* output)
 {
 	audio_tone_t *ptr =  tones;
 
@@ -106,7 +106,7 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double x, double 
 	output->volume 		= 0;
 	output->frequency 	= lowerFrequencyBound;
 
-	while(ptr != NULL)
+/*	while(ptr != NULL)
 	{
 		double xdiff, ydiff, dist;
 		double toneDirection, toneVol;
@@ -114,7 +114,7 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double x, double 
 		xdiff 	= ptr->tx - x;
 		ydiff 	= ptr->ty - y;
 		dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
-		//toneVol = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
+		toneVol = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
 
 		toneDirection = convertDifferentialCoordsIntoBearing(xdiff, ydiff, yaw);
 
@@ -124,7 +124,15 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double x, double 
 		//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
 		ptr = ptr->next;
 	}
+*//*
+	double xdiff, ydiff, distance;
 
+	xdiff 	= x - xr;
+	ydiff 	= y - yr;
+	dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
+
+	output->volume = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
+*/
 	return 0;
 }
 
@@ -194,8 +202,6 @@ double AudioHandler::AudioBin::convertDistanceIntoSoundLevel(double originalLeve
 	double volume;
 	const double pi = 3.14159;
 
-	printf("calculating volume:\n\toriginal level is %f, distance is %f\n", originalLevel, distance);
-
 	//if distance = 0 then this is the robot making the noise
 	if(distance <= 0) return originalLevel;
 
@@ -207,19 +213,16 @@ double AudioHandler::AudioBin::convertDistanceIntoSoundLevel(double originalLeve
 	//Vol of a hemisphere = 2/3 * pi * r^3
 	volume = 2*pi*pow(distance, 3)/3;
 
-	printf("\tvolume of hemisphere is %f, returning %f\n", volume, originalLevel/(1+volume) );
-
 	return originalLevel/(1+volume);
 }
 
-double AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff, double ydiff, double recieverYaw)
+int AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff, double ydiff, double recieverYaw)
 {
-	int yaw, bearingWRTx;
+	int yaw, bearingWRTx, bearingWRTrobot;
 
 	//convert yaw to degrees
-	yaw = degreesToRadians(recieverYaw);
+	yaw = radiansToDegrees(recieverYaw);
 	//convert yaw so that it is between 0 and 360
-	printf("yaw from p/s is %f, in degrees is %d, yaw%%360 is %d\n", recieverYaw, yaw, (int)yaw%360);
 	//puts yaw in range -360 to 360
 	yaw = yaw%360;
 	//get rid of any pesky minuses by adding 360. Now in range 0 to 720
@@ -227,23 +230,28 @@ double AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff
 	//modulo again to get in range 0 to 360
 	yaw = yaw%360;
 
-
 	//first calculate bearing wrt the x axis
-	if(xdiff > 0)
-	{
-		bearingWRTx =  degreesToRadians(tan(xdiff/ydiff));
-	}
-	else
-	{
-		bearingWRTx =  degreesToRadians(tan(xdiff/ydiff)+180);
-	}
-	printf("bearing wrt x is %d. tan(x/y) is %f radians\n", tan(xdiff/ydiff));
+	bearingWRTx =  radiansToDegrees(atan(ydiff/xdiff));
+	//if source is to left of receiver, bearing is out by 180deg.
+	//adding 360 otherwise gets rid of any negative tan results.
+	if(xdiff < 0) 	bearingWRTx += 180;
+	else			bearingWRTx += 360;
 
+	bearingWRTx = bearingWRTx%360;
 
-	return 200;
+	// did some maths to work out the next line. It works for all orientations of the sender and receiver.
+	// This is becuase bearing wrt x and yaw have been changed to be in range 0 to 360.
+	bearingWRTrobot = 360 - yaw + bearingWRTx;
+	bearingWRTrobot = bearingWRTrobot%360;
+
+	return (int)roundToNearest(bearingWRTrobot, 5);
 }
 
-int AudioHandler::AudioBin::degreesToRadians(double rads)
+
+
+
+
+int AudioHandler::AudioBin::radiansToDegrees(double rads)
 {
 	double degs;
 
@@ -251,5 +259,26 @@ int AudioHandler::AudioBin::degreesToRadians(double rads)
 	degs = degs/PI;
 
 	return (int)degs;
+}
+
+double AudioHandler::AudioBin::roundToNearest(double input, double resolution)
+{
+	double floor, ceiling;
+	int temp;
+
+	//using an int here because the type cast automatically rounds DOWN to the nearest whole integer. How useful!
+	temp = input/resolution;
+	floor = temp*resolution;
+
+	temp = (input+resolution)/resolution;
+	ceiling = temp*resolution;
+
+	//which is it closer to?
+	//if floor is further away that ceil. return ceil.
+	if( (input - floor) > (ceiling - input) )
+	{
+		return ceiling;
+	}
+	else return floor;
 }
 

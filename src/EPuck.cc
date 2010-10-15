@@ -305,8 +305,8 @@ void EPuck::setDifferentialMotors(double left, double right)
  * */
 void EPuck::setAllLEDSOn(void)
 {
-	uint32_t red = 0xffff0000;
-	char colour[]="MP_COLOR";
+	float red[]={1, 0, 0, 1};
+	char colour[]="colour";
 
 	simProxy->SetProperty(name, colour, &red, sizeof(red));
 
@@ -320,8 +320,8 @@ void EPuck::setAllLEDSOn(void)
  * */
 void EPuck::setAllLEDSOff(void)
 {
-	uint32_t darkGreen = 0xff006400;
-	char colour[]="MP_COLOR";
+	float darkGreen[]={0.67, 0.88, 0.43, 1};
+	char colour[]="colour";
 
 	simProxy->SetProperty(name, colour, &darkGreen, sizeof(darkGreen));
 	return;
@@ -429,6 +429,7 @@ EPuck::Tone EPuck::getTone(int index)
 	{
 		printf("In EPuck::getTone, index %d does not exist.\n", index);
 	}
+	//TODO find some way of returning nothing from this function.
 	//return NULL;
 }
 

@@ -7,7 +7,7 @@ include "epuck-mine.inc"
 window
 ( 
 	size [ 700.000 700.000 ] 
-	scale 400
+	scale 200
 	show_blocks 1
 )
 
@@ -30,7 +30,7 @@ epuck
 epuck
 (
 	#color "red"
-	pose [1 -2 0 0]
+	pose [1 -1 0 0]
 	name "robot2"
 )
 
@@ -39,5 +39,12 @@ epuck
 	#color "red"
 	pose [-0.5 -0.5 0 0]
 	name "robot3"
+)
+
+epuck
+(
+	#color "red"
+	pose [-1 1 0 275]
+	name "robot4"
 )
 

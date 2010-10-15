@@ -169,12 +169,19 @@ public:
 		 * @param ydiff the source y coordinate minus the reciever y coordinate
 		 * @param recieverYaw the yaw of the robot that is listening for tones.
 		 * */
-		double convertDifferentialCoordsIntoBearing(double xdiff, double ydiff, double recieverYaw);
+		int convertDifferentialCoordsIntoBearing(double xdiff, double ydiff, double recieverYaw);
 
 		/**
 		 * converts radians to degrees.
 		 * */
-		int degreesToRadians(double rads);
+		int radiansToDegrees(double rads);
+
+		/**
+		 * Rounds the given number to the nearest multiple of the "resolution" parameter.
+		 * e.g. if input is 23.720954 and resolution is 5 this will return 25.
+		 * e.g. if input is 23.720954 and resolution is 0.5 this will return 23.5.
+		 * */
+		double roundToNearest(double input, double resolution);
 	};
 
 
