@@ -3,13 +3,11 @@
  * It provides interfaces for storing audio information and for accessing audio information.
  * A number of simplifications about sound have been made in this class for the purpose of creating a simulation:<p>
  * <ul>
- * <li>Sounds a combined linearly</li>
+ * <li>Electrical watts and sound intensity watts are the same (it's all joules per second after all).</li>
  * <li>there is no interference between tones of different frequencies</li>
- * <li>Sound decays linearly over distance at a rate of initial_level / distance_away_in_m </li>
  * <li>All frequencies decay over distance at the same rate</li>
  * <li>The environment has no reverberations to confuse the direction and level of a sound</li>
  * <li>Robots don't move whilst making a sound</li>
- * <li>All robots play a tone at the same volume</li>
  * <li>Obstacles in the environment allow sound to pass through them as if they (the obstacles) were not there</li>
  * </ul>
  * AudioHandler is accessed by the EPuck class.
@@ -31,20 +29,17 @@
 #include <pthread.h>
 #include "libplayerc++/playerc++.h"
 
-#define SAMPLE_RATE		16000
-#define FFT_BLOCK_SIZE	128
-#define PI				3.14159
+#define SAMPLE_RATE					16000
+#define FFT_BLOCK_SIZE				128
+#define PI							3.141592654
+#define IMPEDANCE_OF_SPEAKER_OHMS 	10
 
-//may not work:
-extern int IMPEDANCE_OF_SPEAKER_OHMS;
 
 
 //using namespace PlayerCc;
 
-//TODO make tone volume a parameter in audio_tone_t
 //TODO make getTones sum levels of all tones in the area and return that as sound level
 //TODO make getTones use x and y of each tone instead of the apparent tone bullshizzle.
-//TODO move code where we combine all tones in a bin into AudioBin.
 
 /**
  * takes care of all audio processing and collection, stores audio data and takes care of returning it to the calling object.
@@ -85,8 +80,8 @@ public:
 			double tx;
 			/**The y coord of tone source*/
 			double ty;
-			/**The sound level of the tone at source*/
-			double tlevel;
+			/**The sound intensity level of the tone at source*/
+			double wattsAtSource;
 			/**Time that the tone will stop playing*/
 			double end;
 			/**Audio tones are stored as a linked list in an audio bin, previous and next are ways of navigating the linked list*/
@@ -128,10 +123,12 @@ public:
 		 * Adds an audio_tone_t into the AudioBin. Creates an audio_tone_t object, appends it to the linked list and updates itself.
 		 * @param x the x position of the robot playing the tone
 		 * @param y the y position of the robot playing the tone
-		 * @param volume the sound level (volume) to play the tone at.
+		 * @@param volume how loud to play the tone at. Value indicates in VOLTS how big the signal to the speaker should be.
+		 * This must be in the range 0 to 5, if this number is outside the range it will be assumed to be either 0 or 5 (whichever is closer).
+		 * So if you set this as 3, the speaker will play a sine wave at 3 volts (peak to peak).
 		 * @param endtime the simulated time at which the tone will end.
 		 * */
-		void addTone(double x, double y, double volume, double endtime);
+		void addTone(double x, double y, double voltage, double endtime);
 
 		/**
 		 * Given the position and yaw of the robot this function calculates the cumulative level and direction of the tones in this frequency bin.
@@ -159,11 +156,22 @@ public:
 
 		/**
 		 * Function to convert a distance in metres into a volume for the robots.
-		 * @param originalLevel the sound level produced at source
+		 * @param levelAtSource the number of watts produced at by the speaker at the tone source.
 		 * @param distance the distance in metres
-		 * @returns volume the volume of the tone at that distance, normalised between 0 and 1
+		 * @returns intensity the sound intensity of the tone in W/m^2. This is then used in {@link AudioBin#addTwoSoundIntensities }
 		 * */
-		double convertDistanceIntoSoundLevel(double originalLevel, double distance);
+		double getSoundIntensity(double levelAtSource, double distance);
+
+		/**
+		 * Adds one sound intensity level to another and gives the resulting sound intensity level.
+		 * All measures are assumed to be in W/m^2. I am not an acoustician this means nothing to me.
+		 * Numbers go in, number come out, what more do I need to know? I found the formula at: <br>
+		 * http://www.suite101.com/content/how-loud-is-it-a62825
+		 * @param sound1 level of a sound in W/m^2.
+		 * @param sound2 level of a sound in W/m^2.
+		 * @returns soundSum combined level of the two sounds in dB SPL.
+		 * */
+		double addTwoSoundIntensities(double sound1, double sound2);
 
 		/**
 		 * Function to convert two coordinates into a bearing.
@@ -175,16 +183,6 @@ public:
 		 * */
 		int convertDifferentialCoordsIntoBearing(double xdiff, double ydiff, double recieverYaw);
 
-		/**
-		 * Adds one sound level to another and gives the resulting sound level.
-		 * All measures are assumed to be in dB SPL. SPL being "sound pressure level", I am not an acoustician this means nothing to me.
-		 * Numbers go in, number come out, what more do I need to know? I found the formula at: <br>
-		 * http://www.sengpielaudio.com/calculator-spl.htm
-		 * @param sound1 level of a sound in dB SPL.
-		 * @param sound2 level of a sound in dB SPL.
-		 * @returns soundSum combined level of the two sounds in dB SPL.
-		 * */
-		double addTwoSoundLevels(double sound1, double sound2);
 
 		/**
 		 * converts radians to degrees.
@@ -195,6 +193,9 @@ public:
 		 * Rounds the given number to the nearest multiple of the "resolution" parameter.
 		 * e.g. if input is 23.720954 and resolution is 5 this will return 25.
 		 * e.g. if input is 23.720954 and resolution is 0.5 this will return 23.5.
+		 * @param input the number to round
+		 * @param resolution the resolution to round to
+		 * @returns out the answer.
 		 * */
 		double roundToNearest(double input, double resolution);
 	};
@@ -236,10 +237,12 @@ public:
 	 * Puts a tone of the desired frequency and duration into the audio environment.
 	 * @param freq the frequency of the tone in Hz
 	 * @param duration the length of the tone in milliseconds
-	 * @param volume the sound level (volume) to play the tone at.
+	 * @param volume how loud to play the tone at. Value indicates in VOLTS how big the signal to the speaker should be.
+	 * This must be in the range 0 to 5, if this number is outside the range it will be assumed to be either 0 or 5 (whichever is closer).
+	 * So if you set this as 3, the speaker will play a sine wave at 3 volts (peak to peak).
 	 * @param name string containing the name of the robot playing the tone.
 	 * */
-	void playTone(int freq, double duration, double volume, char* name);
+	void playTone(int freq, double duration, double voltage, char* name);
 
 	/**
 	 * Returns the number of AudioBins currently in the environment. This function is needed so that space can be allocated for the Tones in the EPuck code.

@@ -67,7 +67,7 @@ AudioHandler::~AudioHandler()
 }
 
 
-void AudioHandler::playTone(int freq, double duration, double volume, char* robotName)
+void AudioHandler::playTone(int freq, double duration, double voltage, char* robotName)
 {
 	int whichbin;
 	char timeflag[] = "sim_time";
@@ -115,7 +115,7 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 	//todo fix the next lines when clock stuff is sorted.
 	//simProxy->GetProperty(name, timeflag, &currenttime, sizeof(currenttime));
 	currenttime = (double)time(NULL);
-	current->addTone(x, y, volume, currenttime+(duration/1000));
+	current->addTone(x, y, voltage, currenttime+(duration/1000));
 
 
 

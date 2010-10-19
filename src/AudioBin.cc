@@ -60,14 +60,14 @@ int AudioHandler::AudioBin::updateList(double currentTime)
 	return 0;
 }
 
-void AudioHandler::AudioBin::addTone(double x, double y, double volume, double endtime)
+void AudioHandler::AudioBin::addTone(double x, double y, double voltage, double endtime)
 {
 	//construct new audiotone from the supplied data
 	audio_tone_t* newtone = new audio_tone_t;
 
 	newtone->tx = x;
 	newtone->ty = y;
-	newtone->tlevel = volume;
+	newtone->wattsAtSource = (voltage * voltage)/IMPEDANCE_OF_SPEAKER_OHMS;
 	newtone->end = endtime;
 	newtone->next = NULL;
 
@@ -114,8 +114,8 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double
 		xdiff 	= ptr->tx - x;
 		ydiff 	= ptr->ty - y;
 		dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
-		toneVol = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
-		output->volume = addTwoSoundLevels(output->volume, toneVol);
+		toneVol = getSoundIntensity(ptr->wattsAtSource, dist);
+		output->volume = addTwoSoundIntensities(output->volume, toneVol);
 
 		toneDirection = convertDifferentialCoordsIntoBearing(xdiff, ydiff, yaw);
 
@@ -125,10 +125,10 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double
 		//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
 		ptr = ptr->next;
 	}
-	addTwoSoundLevels(1, 1);
-	addTwoSoundLevels(1, 2);
-	addTwoSoundLevels(1, 5);
-	addTwoSoundLevels(5, 5);
+	addTwoSoundIntensities(1, 1);
+	addTwoSoundIntensities(1, 2);
+	addTwoSoundIntensities(1, 5);
+	addTwoSoundIntensities(5, 5);
 /*
 	double xdiff, ydiff, distance;
 
@@ -202,24 +202,45 @@ void AudioHandler::AudioBin::updatePosition(void)
 	return;
 }
 
-double AudioHandler::AudioBin::convertDistanceIntoSoundLevel(double originalLevel, double distance)
+//TODO check this function
+double AudioHandler::AudioBin::getSoundIntensity(double levelAtSource, double distance)
 {
-	double volume;
-	const double pi = 3.14159;
+	double area;
 
 	//if distance = 0 then this is the robot making the noise
-	if(distance <= 0) return originalLevel;
+	if(distance <= 0) return levelAtSource;
 
 	//the sound makes a hemisphere of radius r (where r is distance from source to destination)
-	//the sound is spread evenly over all points of this hemisphere
-	//so divide original sound level by volume of hemisphere
-	//(add 1 to hemisphere vol to get rid of innaccuracies when vol < 1.)
+	//the sound is spread evenly over the surface of this hemisphere
+	//so divide original sound level by surface area of hemisphere
+	//(add 1 to hemisphere area to get rid of innaccuracies when area < 1.)
 
-	//Vol of a hemisphere = 2/3 * pi * r^3
-	volume = 2*pi*pow(distance, 3)/3;
+	//area of a hemisphere = 2 pi r^2
+	area = 2 * PI * distance * distance;
 
-	return originalLevel/(1+volume);
+	return levelAtSource/(1+area);
 }
+
+//TODO rework thisfor sound intensity measured in W/m2
+double AudioHandler::AudioBin::addTwoSoundIntensities(double sound1, double sound2)
+{
+	printf("sound1 is %f, sound2 is %f.\n", sound1, sound2);
+	//if either entry is 0 then don't bother with calculations
+	if(sound1 == 0) return sound2;
+	if(sound2 == 0) return sound1;
+
+	double f1, f2, out;
+
+	f1 = pow(10, sound1/10);
+	f2 = pow(10, sound2/10);
+
+	out = log10(f1 + f2);
+	printf("\tf1 is %f, f2 is %f\n", f1, f2);
+	printf("\tout is %f returned is %f\n", out, 10*out);
+
+	return 10*out;
+}
+
 
 int AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff, double ydiff, double recieverYaw)
 {
@@ -252,24 +273,6 @@ int AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff, d
 	return (int)roundToNearest(bearingWRTrobot, 5);
 }
 
-double AudioHandler::AudioBin::addTwoSoundLevels(double sound1, double sound2)
-{
-	printf("sound1 is %f, sound2 is %f.\n", sound1, sound2);
-	//if either entry is 0 then don't bother with calculations
-	if(sound1 == 0) return sound2;
-	if(sound2 == 0) return sound1;
-
-	double f1, f2, out;
-
-	f1 = pow(10, sound1/10);
-	f2 = pow(10, sound2/10);
-
-	out = log10(f1 + f2);
-	printf("\tf1 is %f, f2 is %f\n", f1, f2);
-	printf("\tout is %f returned is %f\n", out, 10*out);
-
-	return 10*out;
-}
 
 
 
