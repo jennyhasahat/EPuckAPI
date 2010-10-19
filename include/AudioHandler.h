@@ -35,6 +35,10 @@
 #define FFT_BLOCK_SIZE	128
 #define PI				3.14159
 
+//may not work:
+extern int IMPEDANCE_OF_SPEAKER_OHMS;
+
+
 //using namespace PlayerCc;
 
 //TODO make tone volume a parameter in audio_tone_t
@@ -170,6 +174,17 @@ public:
 		 * @param recieverYaw the yaw of the robot that is listening for tones.
 		 * */
 		int convertDifferentialCoordsIntoBearing(double xdiff, double ydiff, double recieverYaw);
+
+		/**
+		 * Adds one sound level to another and gives the resulting sound level.
+		 * All measures are assumed to be in dB SPL. SPL being "sound pressure level", I am not an acoustician this means nothing to me.
+		 * Numbers go in, number come out, what more do I need to know? I found the formula at: <br>
+		 * http://www.sengpielaudio.com/calculator-spl.htm
+		 * @param sound1 level of a sound in dB SPL.
+		 * @param sound2 level of a sound in dB SPL.
+		 * @returns soundSum combined level of the two sounds in dB SPL.
+		 * */
+		double addTwoSoundLevels(double sound1, double sound2);
 
 		/**
 		 * converts radians to degrees.

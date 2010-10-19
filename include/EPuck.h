@@ -9,6 +9,7 @@
 #include "AudioHandler.h"
 
 #define THREADED 1
+#define IMPEDANCE_OF_SPEAKER_OHMS 10
 
 
 /**

@@ -139,9 +139,7 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 	int i = 0;
 	AudioBin *binptr = environment;
 
-	printf("You have reserved %d bytes, and audio message needs %d bytes: ", (int)storesize, sizeof(audio_message_t));
 	numberAllocatedSlots = storesize/sizeof(audio_message_t);
-	printf("that is %d tone slots\n", numberAllocatedSlots);
 
 	if(numberOfBins > numberAllocatedSlots)
 	{

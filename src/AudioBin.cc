@@ -106,7 +106,7 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double
 	output->volume 		= 0;
 	output->frequency 	= lowerFrequencyBound;
 
-/*	while(ptr != NULL)
+	while(ptr != NULL)
 	{
 		double xdiff, ydiff, dist;
 		double toneDirection, toneVol;
@@ -115,6 +115,7 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double
 		ydiff 	= ptr->ty - y;
 		dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
 		toneVol = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
+		output->volume = addTwoSoundLevels(output->volume, toneVol);
 
 		toneDirection = convertDifferentialCoordsIntoBearing(xdiff, ydiff, yaw);
 
@@ -124,7 +125,11 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double
 		//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
 		ptr = ptr->next;
 	}
-*//*
+	addTwoSoundLevels(1, 1);
+	addTwoSoundLevels(1, 2);
+	addTwoSoundLevels(1, 5);
+	addTwoSoundLevels(5, 5);
+/*
 	double xdiff, ydiff, distance;
 
 	xdiff 	= x - xr;
@@ -247,7 +252,24 @@ int AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff, d
 	return (int)roundToNearest(bearingWRTrobot, 5);
 }
 
+double AudioHandler::AudioBin::addTwoSoundLevels(double sound1, double sound2)
+{
+	printf("sound1 is %f, sound2 is %f.\n", sound1, sound2);
+	//if either entry is 0 then don't bother with calculations
+	if(sound1 == 0) return sound2;
+	if(sound2 == 0) return sound1;
 
+	double f1, f2, out;
+
+	f1 = pow(10, sound1/10);
+	f2 = pow(10, sound2/10);
+
+	out = log10(f1 + f2);
+	printf("\tf1 is %f, f2 is %f\n", f1, f2);
+	printf("\tout is %f returned is %f\n", out, 10*out);
+
+	return 10*out;
+}
 
 
 

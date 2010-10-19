@@ -35,15 +35,15 @@ int main(void)
 printf("playing tones\n");
 	testbot1->playTone(520, 2500, 5);
 	testbot2->playTone(530, 100, 50);
-	testbot3->playTone(1530, 1500, 4);
-	testbot4->playTone(1830, 1500, 4);
+	testbot3->playTone(530, 1500, 4);
+	testbot4->playTone(530, 1500, 4);
 
 	testbot1->setAllLEDSOn();
 	int i = testbot1->listenForTones();
 	testbot1->getTone(i);
 
 	printf("sleeping\n");
-	sleep(5);
+	//sleep(5);
 	//testbot1->getSimulationTime();
 
 
