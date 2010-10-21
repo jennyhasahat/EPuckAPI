@@ -42,7 +42,7 @@ printf("\t 3, ");
 printf("\t 4.\n");
 	testbot4->playTone(530, 1500, 5);
 
-	testbot1->setAllLEDSOn();
+	testbot1->setAllLEDsOn();
 	printf("listening.\n");
 	int numTones = testbot1->listenForTones();
 	int i;

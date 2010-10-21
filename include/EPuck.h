@@ -76,7 +76,9 @@ public:
 
 
 	//member variables
+	/**The Player/Stage port that this robot uses to get simulation information*/
 	int port;
+	/**The name given to this robot in the player/Stage configuration file and world file.*/
 	char name[32];
 
 private:
@@ -90,6 +92,8 @@ private:
 	PlayerCc::BlobfinderProxy	*blobProxy;		//camera
 	PlayerCc::SimulationProxy	*simProxy;		//leds
 
+	//LED stuff
+	bool allLEDsOn;
 	//audio stuff
 	AudioHandler *handler;
 	bool audioInitialised;
@@ -125,8 +129,9 @@ public:
 	void setDifferentialMotors(double left, double right);
 
 	// LED methods
-	void setAllLEDSOn(void);
-	void setAllLEDSOff(void);
+	void setAllLEDsOn(void);
+	void setAllLEDsOff(void);
+	void toggleAllLEDs(void);
 	void setLED(int index, int state);
 
 	//audio methods
@@ -141,6 +146,7 @@ public:
 
 
 protected:
+	/**array containing the IR readings from the EPuck*/
 	double irReadings[8];
 
 #if THREADED

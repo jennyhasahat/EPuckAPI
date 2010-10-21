@@ -8,7 +8,7 @@
  * Creates an instance of the EPuck class.
  * Calls {@link EPuck#EPuck(int robotPort, char* robotName, int simulationPort) EPuck(int robotPort, char* robotName, int simulationPort)}
  * using default simulation port 6664 and default robot port 6665.
- * @param name the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
+ * @param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
  * */
 EPuck::EPuck(char* robotName)
 {
@@ -19,8 +19,8 @@ EPuck::EPuck(char* robotName)
  * Creates an instance of the EPuck class.
  * Calls {@link EPuck#EPuck(int robotPort, char* robotName, int simulationPort) EPuck(int robotPort, char* robotName, int simulationPort)}
  * using default simulation port 6664.
- * @param port the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
- * @param name the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
+ * @param robotPort the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
+ * @param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
  * */
 EPuck::EPuck(int robotPort, char* robotName)
 {
@@ -29,8 +29,8 @@ EPuck::EPuck(int robotPort, char* robotName)
 
 /**
 Creates and instance of the EPuck class.
-@param port the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
-@param name the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
+@param robotPort the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
+@param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
 @param simulationPort the port on which the simulation is running. Get this from the .cfg file of your simulation.
 */
 EPuck::EPuck(int robotPort, char* robotName, int simulationPort)
@@ -303,27 +303,38 @@ void EPuck::setDifferentialMotors(double left, double right)
  * <br>
  * @warning This function may not work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.
  * */
-void EPuck::setAllLEDSOn(void)
+void EPuck::setAllLEDsOn(void)
 {
 	float red[]={1, 0, 0, 1};
 	char colour[]="colour";
 
 	simProxy->SetProperty(name, colour, &red, sizeof(red));
-
+	allLEDsOn = true;
 	return;
 }
 
 /**
  * Sets all the robot LEDs into the OFF state
  * <br>
- * <b>WARNING: This function may not work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.</b>
+ * @warning This function may not work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.
  * */
-void EPuck::setAllLEDSOff(void)
+void EPuck::setAllLEDsOff(void)
 {
 	float darkGreen[]={0.67, 0.88, 0.43, 1};
 	char colour[]="colour";
 
 	simProxy->SetProperty(name, colour, &darkGreen, sizeof(darkGreen));
+	allLEDsOn = false;
+	return;
+}
+
+/**
+ * Each time this function is called it will toggle between all the LEDs being on, and all the LEDs being off.
+ * */
+void EPuck::toggleAllLEDs(void)
+{
+	if(allLEDsOn) setAllLEDsOff();
+	else setAllLEDsOn();
 	return;
 }
 
@@ -332,12 +343,12 @@ void EPuck::setAllLEDSOff(void)
  *  * <br>
  * <b>WARNING: This function doesn't actually work in simulation. The entire robot can be either on or off.</b>
  * @param index The index of the LED to change.
- * @param the state to set that LED to. 1 indicates on, anything else indicates off.
+ * @param state the state to set that LED to. 1 indicates on, anything else indicates off.
  * */
 void EPuck::setLED(int index, int state)
 {
-	if(state == 1) setAllLEDSOn();
-	else setAllLEDSOff();
+	if(state == 1) setAllLEDsOn();
+	else setAllLEDsOff();
 	return;
 }
 
@@ -383,7 +394,7 @@ int EPuck::playTone(int frequency, double duration, double volume)
  * Tones of similar frequency are grouped together because a Fourier transform is performed on the signal from the microphones,
  * the resulting information is combined in a way that is physically plausible (because this is a simulation after all...)
  * and stored in the EPuck object until requested by the user.
- * @returns numberoftones the number of different tones the robot can hear.
+ * @returns numberOfTones the number of different tones the robot can hear.
  * */
 int EPuck::listenForTones(void)
 {
@@ -408,8 +419,6 @@ int EPuck::listenForTones(void)
 			toneArray[i].frequency 	= message[i].frequency;
 		}
 
-		//dumpToneData_TEST(message, sizeof(AudioHandler::audio_message_t)*numberOfTones);
-
 		return numberOfTones;
 	}
 
@@ -418,8 +427,10 @@ int EPuck::listenForTones(void)
 }
 
 /**
- * Will return the requested
- * If listenForTones() has
+ * Will return the requested tone. The EPuck object stores a list of tones, their frequencies, volumes and directions wrt the epuck.
+ * This list of tones is updated when {@link EPuck#listenForTones} is called. This function allows you to request a tone from this array.
+ * @param index the index of the tone you wish to get from the EPuck object
+ * @returns tone the tone.
  * */
 EPuck::Tone EPuck::getTone(int index)
 {
@@ -430,9 +441,12 @@ EPuck::Tone EPuck::getTone(int index)
 	else
 	{
 		printf("In EPuck::getTone, index %d does not exist.\n", index);
+		EPuck::Tone t;
+		t.bearing = 0;
+		t.frequency = 0;
+		t.volume = 0;
+		return t;
 	}
-	//TODO find some way of returning nothing from this function.
-	//return NULL;
 }
 
 
@@ -479,6 +493,7 @@ void EPuck::initialise(int robotPort, char* robotName, int simulationPort)
 	//initialise member variables
 	strcpy(name, robotName);
 	port 				= robotPort;
+	allLEDsOn			= false;
 	audioInitialised 	= false;
 	toneArray 			= NULL;
 

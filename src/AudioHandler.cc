@@ -13,7 +13,13 @@
 //I hope this statement doesn't have global scope... I don't think it does.
 AudioHandler* AudioHandler::_instance = 0;
 
-
+/**
+ * Function that allows AudioHandler to be a singleton. Use this to construct the AudioHandler object.
+ * @param simulationClient the PlayerClient object which handles the simulation.
+ * @param sim the simulationProxy attached to the playerclient handling this simulation.
+ * @param name the name of the robot that initialises the AudioHandler.
+ * This is used for accessing data from the simulation proxy, as you need the name of a model to get simulation time information.
+ * */
 AudioHandler* AudioHandler::GetAudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::SimulationProxy *sim, char* name)
 {
 	if(_instance == 0)
@@ -23,7 +29,13 @@ AudioHandler* AudioHandler::GetAudioHandler(PlayerCc::PlayerClient *simulationCl
 	return _instance;
 }
 
-
+/**
+ * Creates the audiohandler object and builds an array to store the sound data for each robot.
+ * @param simulationClient the PlayerClient object which handles the simulation.
+ * @param sim the simulationProxy attached to the playerclient handling this simulation.
+ * @param name the name of the robot that initialises the AudioHandler.
+ * This is used for accessing data from the simulation proxy, as you need the name of a model to get simulation time information.
+ * */
 AudioHandler::AudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::SimulationProxy *sim, char* name)
 {
 	int i;
@@ -66,7 +78,15 @@ AudioHandler::~AudioHandler()
 	return;
 }
 
-
+/**
+ * Puts a tone of the desired frequency and duration into the audio environment.
+ * @param freq the frequency of the tone in Hz
+ * @param duration the length of the tone in milliseconds
+ * @param voltage how loud to play the tone at. Value indicates in VOLTS how big the signal to the speaker should be.
+ * This must be in the range 0 to 5, if this number is outside the range it will be assumed to be either 0 or 5 (whichever is closer).
+ * So if you set this as 3, the speaker will play a sine wave at 3 volts (peak to peak).
+ * @param robotName string containing the name of the robot playing the tone.
+ * */
 void AudioHandler::playTone(int freq, double duration, double voltage, char* robotName)
 {
 	int whichbin;
@@ -127,13 +147,29 @@ void AudioHandler::playTone(int freq, double duration, double voltage, char* rob
 	return;
 }
 
+/**
+ * Returns the number of AudioBins currently in the environment. This function is needed so that space can be allocated for the Tones in the EPuck code.
+ * @returns notones the number of different frequency tones the robot can detect.
+ * */
 int AudioHandler::getNumberOfTones(void)
 {
 	return numberOfBins;
 }
 
+/**
+ * Provides the audio data in the environment, including frequency, volume and direction of the tones.
+ * The function which calls this must allocate the memory needed as an array, and provide the address and size of the memory slot.
+ * This function will then copy the environmental audio data into the provided memory using the audio_message_t structure.
+ * @param robotName	the name of the robot which is requesting the data (this is given in the worldfile)
+ * @param store		link to where the audio data memory has been allocated.
+ * @param storesize	the number of audio_message_t objects allocated to the audio data.
+ * @returns success 0 if successfully copied data, 1 if unsuccessful (like say if new data has been added between allocating memory and trying to copy it over).
+ * @see AudioHandler#getNumberOfTones()
+ *
+ * */
 int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t storesize)
 {
+	//
 	//find how many audio_message_t slots have been allocated and see if it is enough
 	int numberAllocatedSlots;
 	double x, y, yaw;
@@ -201,12 +237,15 @@ void AudioHandler::dumpData_TEST(void)
 //==================================================================================================
 
 
-
+/**
+ * Removes an AudioBin from the Linked list.
+ * @param del AudioBin to remove from LL.
+ * */
 int AudioHandler::removeBin(AudioBin *del)
 {
 	//Four possibilities for this, each needing different stuff doing.
 	//case 1, tone is the first in the list.
-		//case 1a tone is the only thing in the list
+	//case 1a tone is the only thing in the list
 	//case 2, tone is in the middle
 	//case 3 tone is at the end of the list
 
@@ -236,7 +275,10 @@ int AudioHandler::removeBin(AudioBin *del)
 	return 0;
 }
 
-
+/**
+ * Updates the list of AudioBins so that tones which have finished playing are removed from data storage.
+ * This function is intended to be threaded, so contains a loop which does not terminate.
+ * */
 void AudioHandler::updateAudioBinListThreaded(void)
 {
 	printf("AudioHandler is threaded\n");
