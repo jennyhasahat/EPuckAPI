@@ -38,14 +38,34 @@ printf("playing tones\n");
 printf("\t 2, ");
 	testbot2->playTone(530, 100, 5);
 printf("\t 3, ");
-	testbot3->playTone(530, 1500, 5);
+	testbot3->playTone(730, 1500, 5);
 printf("\t 4.\n");
 	testbot4->playTone(530, 1500, 5);
 
 	testbot1->setAllLEDSOn();
 	printf("listening.\n");
-	int i = testbot1->listenForTones();
-	testbot1->getTone(i);
+	int numTones = testbot1->listenForTones();
+	int i;
+
+	printf("1. in TestEPuck robot heard %d tone(s).\n", numTones);
+	for(i=0; i<numTones; i++)
+	{
+		EPuck::Tone tone = testbot1->getTone(i);
+		printf("\tTone %d has freq %f, volume %f and bearing %d\n", i, tone.frequency, tone.volume, tone.bearing);
+	}
+
+
+	testbot3->playTone(1000, 300, 7);
+
+	numTones = testbot1->listenForTones();
+
+	printf("1. in TestEPuck robot heard %d tone(s).\n", numTones);
+	for(i=0; i<numTones; i++)
+	{
+		EPuck::Tone tone = testbot1->getTone(i);
+		printf("\tTone %d has freq %f, volume %f and bearing %d\n", i, tone.frequency, tone.volume, tone.bearing);
+	}
+
 
 	printf("sleeping\n");
 	//sleep(5);

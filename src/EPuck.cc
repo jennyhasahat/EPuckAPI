@@ -403,12 +403,14 @@ int EPuck::listenForTones(void)
 
 		for(i=0; i<numberOfTones; i++)
 		{
-			toneArray[i].volume 	= message->volume;
-			toneArray[i].bearing 	= message->direction;
-			toneArray[i].frequency 	= message->frequency;
+			toneArray[i].volume 	= message[i].volume;
+			toneArray[i].bearing 	= message[i].direction;
+			toneArray[i].frequency 	= message[i].frequency;
 		}
 
-		return 0;
+		//dumpToneData_TEST(message, sizeof(AudioHandler::audio_message_t)*numberOfTones);
+
+		return numberOfTones;
 	}
 
 	printf("Unsuccessful epuck %s listenToTones() request. Audio not initialised.\n", name);
@@ -446,6 +448,19 @@ void EPuck::dumpAudio_TEST(void)
 {
 	handler->dumpData_TEST();
 	return;
+}
+
+void EPuck::dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize)
+{
+	int i;
+	int numberAllocatedSlots = storesize/sizeof(AudioHandler::audio_message_t);
+
+	printf("Dumping tone data as recieved from AudioHandler:\n");
+	for(i=0; i<numberAllocatedSlots; i++)
+	{
+		printf("\tbin number %d\n", i);
+		printf("\tfrequency %f\n\tvolume %f\n\tdirection %d\n", store[i].frequency, store[i].volume, store[i].direction);
+	}
 }
 
 /*====================================================================

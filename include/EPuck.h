@@ -63,7 +63,7 @@ public:
 	{
 	public:
 		/**The lower bound on the frequency range this tone could be*/
-		int frequency;
+		double frequency;
 		/**The volume of the tone. This is some arbitrary number without a real measurement, but they are consistent with each other so can be
 		 * compared to other tones and volumes*/
 		double volume;
@@ -137,6 +137,7 @@ public:
 
 	void printTimes_TEST(void);
 	void dumpAudio_TEST(void);
+	void dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize);
 
 
 protected:
