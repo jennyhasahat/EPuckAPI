@@ -56,7 +56,6 @@ int AudioHandler::AudioBin::updateList(double currentTime)
 			if(removeTone(del)) return 1;
 		}
 	}
-	updatePosition();
 	return 0;
 }
 
@@ -91,8 +90,6 @@ void AudioHandler::AudioBin::addTone(double x, double y, double voltage, double 
 		newtone->previous = toneptr;
 		toneptr->next = newtone;
 	}
-	//update the bin's apparent x,y coordinates using the new data.
-	updatePosition();
 
 	return;
 }
@@ -100,29 +97,34 @@ void AudioHandler::AudioBin::addTone(double x, double y, double voltage, double 
 int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double yr, double yaw, audio_message_t* output)
 {
 	audio_tone_t *ptr =  tones;
+	double sumPolarX = 0;
+	double sumPolarY = 0;
 
 	//reset any values in the memory
 	output->direction 	= 0;
 	output->volume 		= 0;
 	output->frequency 	= lowerFrequencyBound;
 
+	//for each tone in this bin.
 	while(ptr != NULL)
 	{
 		double xdiff, ydiff, dist;
 		double toneDirection, toneVol;
 
-		xdiff 	= ptr->tx - x;
-		ydiff 	= ptr->ty - y;
+		//calculate the level and direction of the tone
+		//first work out the distance from the source to the robot
+		xdiff 	= ptr->tx - xr;
+		ydiff 	= ptr->ty - yr;
 		dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
-		toneVol = getSoundIntensity(ptr->wattsAtSource, dist);
-		output->volume = addTwoSoundIntensities(output->volume, toneVol);
 
+		toneVol = getSoundIntensity(ptr->wattsAtSource, dist);
 		toneDirection = convertDifferentialCoordsIntoBearing(xdiff, ydiff, yaw);
 
 		//if tone is louder it has more of an effect on the tone direction than if it does not.
-		//this may actually be a dumb way of doing it because if there's only one tone...
-		//TODO this section needs work
 		//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
+		//using the average of ALL polar coordinates that we worked out.
+		sumPolarX += toneVol;
+
 		ptr = ptr->next;
 	}
 	addTwoSoundIntensities(1, 1);
@@ -180,29 +182,7 @@ int AudioHandler::AudioBin::removeTone(audio_tone_t *del)
 	return 0;
 }
 
-void AudioHandler::AudioBin::updatePosition(void)
-{
-	//move through LL and sum all x, and y coordinates. Also count number of entries.
-	audio_tone_t *ptr;
-	double sumX = 0;
-	double sumY = 0;
-	int count 	= 0;
 
-	ptr = tones;
-	while(ptr != NULL)
-	{
-		sumX += ptr->tx;
-		sumY += ptr->ty;
-		count++;
-		ptr = ptr->next;
-	}
-	x = sumX/count;
-	y = sumY/count;
-
-	return;
-}
-
-//TODO check this function
 double AudioHandler::AudioBin::getSoundIntensity(double levelAtSource, double distance)
 {
 	double area;
@@ -284,6 +264,16 @@ int AudioHandler::AudioBin::radiansToDegrees(double rads)
 	degs = degs/PI;
 
 	return (int)degs;
+}
+
+double AudioHandler::AudioBin::degreesToRadians(int degs)
+{
+	double rads;
+
+	rads = PI*degs;
+	rads = rads/180;
+
+	return rads;
 }
 
 double AudioHandler::AudioBin::roundToNearest(double input, double resolution)

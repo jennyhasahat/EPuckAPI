@@ -80,7 +80,8 @@ public:
 			double tx;
 			/**The y coord of tone source*/
 			double ty;
-			/**The sound intensity level of the tone at source*/
+			/**The sound intensity level of the tone at source. Watts are used instead of volts (which is what the user gives) because this
+			 * takes into account the impedance of the speaker and the microphones.*/
 			double wattsAtSource;
 			/**Time that the tone will stop playing*/
 			double end;
@@ -91,10 +92,6 @@ public:
 
 		/**frequency bin lower bound*/
 		double lowerFrequencyBound;
-				/**apparent x coordinate of tone, calculated by taking the mean of all the x values of currently playing audio_tone_t objects.*/
-		double x;
-		/**apparent y coordinate of tone, calculated by taking the mean of all the y values of currently playing audio_tone_t objects.*/
-		double y;
 		/**Linked list of tones currently in this bin*/
 		audio_tone_t *tones;
 
@@ -149,12 +146,6 @@ public:
 		int removeTone(audio_tone_t *del);
 
 		/**
-		 * Updates the apparent position of the audio tone.
-		 * This method should be called whenever a new tone is added to the list, or whenever a tone is removed.
-		 * */
-		void updatePosition(void);
-
-		/**
 		 * Function to convert a distance in metres into a volume for the robots.
 		 * @param levelAtSource the number of watts produced at by the speaker at the tone source.
 		 * @param distance the distance in metres
@@ -183,11 +174,17 @@ public:
 		 * */
 		int convertDifferentialCoordsIntoBearing(double xdiff, double ydiff, double recieverYaw);
 
+		//==== USEFUL STUFF ====
 
 		/**
 		 * converts radians to degrees.
 		 * */
 		int radiansToDegrees(double rads);
+
+		/**
+		 * converts degrees to radians
+		 * */
+		double degreesToRadians(int degrees);
 
 		/**
 		 * Rounds the given number to the nearest multiple of the "resolution" parameter.

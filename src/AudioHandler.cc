@@ -181,13 +181,11 @@ void AudioHandler::dumpData_TEST(void)
 	while(binptr != NULL)
 	{
 		printf("\nBin lower bound is %f\n", binptr->lowerFrequencyBound);
-		printf("\tapparent x is %f\n", binptr->x);
-		printf("\tapparent y is %f\n", binptr->y);
 		printf("Stored tones:\n");
 		toneptr = binptr->tones;
 		while(toneptr != NULL)
 		{
-			printf("\t\tx: %f, y: %f, end: %f\n", toneptr->tx, toneptr->ty, (double)toneptr->end);
+			printf("\t\tx: %f, y: %f, wattage: %f, end: %f\n", toneptr->tx, toneptr->ty, toneptr->wattsAtSource, (double)toneptr->end);
 			toneptr = toneptr->next;
 		}
 		binptr = binptr->next;
