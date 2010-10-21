@@ -129,13 +129,13 @@ public:
 
 		/**
 		 * Given the position and yaw of the robot this function calculates the cumulative level and direction of the tones in this frequency bin.
-		 * This is written to an audio_message_t data structure, the pointer to which the calling function mus supply.
+		 * This is written to an audio_message_t data structure, the pointer to which the calling function must supply.
 		 * @param x the x position of the robot
 		 * @param y the y position of the robot
 		 * @param yaw the yaw of the robot. In radians because that's the measure used by playerstage
 		 * @param output the audio_message_t pointer where the data should be stored.
 		 * */
-		int calculateCumulativeDataForPosition(double x, double y, double yaw, audio_message_t* output);
+		void calculateCumulativeDataForPosition(double x, double y, double yaw, audio_message_t* output);
 
 	private:
 		/**

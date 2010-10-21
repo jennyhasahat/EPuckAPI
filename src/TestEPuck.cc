@@ -33,12 +33,17 @@ int main(void)
 
 
 printf("playing tones\n");
-	testbot1->playTone(520, 2500, 5);
-	testbot2->playTone(530, 100, 50);
-	testbot3->playTone(530, 1500, 4);
-	testbot4->playTone(530, 1500, 4);
+//printf("\t 1, ");
+	//testbot1->playTone(520, 2500, 5);
+printf("\t 2, ");
+	testbot2->playTone(530, 100, 5);
+printf("\t 3, ");
+	testbot3->playTone(530, 1500, 5);
+printf("\t 4.\n");
+	testbot4->playTone(530, 1500, 5);
 
 	testbot1->setAllLEDSOn();
+	printf("listening.\n");
 	int i = testbot1->listenForTones();
 	testbot1->getTone(i);
 

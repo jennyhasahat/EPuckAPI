@@ -94,11 +94,12 @@ void AudioHandler::AudioBin::addTone(double x, double y, double voltage, double 
 	return;
 }
 
-int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double yr, double yaw, audio_message_t* output)
+void AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double yr, double yaw, audio_message_t* output)
 {
 	audio_tone_t *ptr =  tones;
-	double sumPolarX = 0;
-	double sumPolarY = 0;
+	double meanPolarX = 0;
+	double meanPolarY = 0;
+	int numTones = 0;
 
 	//reset any values in the memory
 	output->direction 	= 0;
@@ -109,7 +110,8 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double
 	while(ptr != NULL)
 	{
 		double xdiff, ydiff, dist;
-		double toneDirection, toneVol;
+		double toneVol;
+		int toneDirection;
 
 		//calculate the level and direction of the tone
 		//first work out the distance from the source to the robot
@@ -123,24 +125,25 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double
 		//if tone is louder it has more of an effect on the tone direction than if it does not.
 		//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
 		//using the average of ALL polar coordinates that we worked out.
-		sumPolarX += toneVol;
+
+		meanPolarX += toneVol * cos( degreesToRadians(toneDirection) );
+		meanPolarY += toneVol * sin( degreesToRadians(toneDirection) );
+		numTones++;
 
 		ptr = ptr->next;
 	}
-	addTwoSoundIntensities(1, 1);
-	addTwoSoundIntensities(1, 2);
-	addTwoSoundIntensities(1, 5);
-	addTwoSoundIntensities(5, 5);
-/*
-	double xdiff, ydiff, distance;
 
-	xdiff 	= x - xr;
-	ydiff 	= y - yr;
-	dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
+	//now we have the total x and y contributions of each tone we find the average
+	meanPolarX = meanPolarX / numTones;
+	meanPolarY = meanPolarY / numTones;
 
-	output->volume = convertDistanceIntoSoundLevel(ptr->tlevel, dist);
-*/
-	return 0;
+	//and convert back to polar coords.
+	output->volume = sqrt( (meanPolarX * meanPolarX) + (meanPolarY * meanPolarY) );
+	output->direction = convertDifferentialCoordsIntoBearing(meanPolarX, meanPolarY, 0);
+
+	printf("\t\ttone direction is %d, volume is %f\n", output->direction, output->volume);
+
+	return;
 }
 
 
@@ -236,13 +239,15 @@ int AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff, d
 	//modulo again to get in range 0 to 360
 	yaw = yaw%360;
 
+	//gets rid of divide by 0 troubles
+	if( (xdiff ==0) && (ydiff == 0) ) return 0;
+
 	//first calculate bearing wrt the x axis
 	bearingWRTx =  radiansToDegrees(atan(ydiff/xdiff));
 	//if source is to left of receiver, bearing is out by 180deg.
 	//adding 360 otherwise gets rid of any negative tan results.
 	if(xdiff < 0) 	bearingWRTx += 180;
 	else			bearingWRTx += 360;
-
 	bearingWRTx = bearingWRTx%360;
 
 	// did some maths to work out the next line. It works for all orientations of the sender and receiver.
@@ -263,6 +268,8 @@ int AudioHandler::AudioBin::radiansToDegrees(double rads)
 	degs = 180*rads;
 	degs = degs/PI;
 
+	//printf("%f radians is %d degrees\n", rads, (int)degs);
+
 	return (int)degs;
 }
 
@@ -272,6 +279,8 @@ double AudioHandler::AudioBin::degreesToRadians(int degs)
 
 	rads = PI*degs;
 	rads = rads/180;
+
+	//printf("%d degrees is %f radians\n", degs, rads);
 
 	return rads;
 }

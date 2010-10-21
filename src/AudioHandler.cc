@@ -71,6 +71,8 @@ void AudioHandler::playTone(int freq, double duration, double voltage, char* rob
 {
 	int whichbin;
 	char timeflag[] = "sim_time";
+	const int maxVolatge = 5;
+	const int minVolatge = 0;
 
 	double x, y, yaw, currenttime;
 	AudioBin *current = environment;
@@ -115,13 +117,12 @@ void AudioHandler::playTone(int freq, double duration, double voltage, char* rob
 	//todo fix the next lines when clock stuff is sorted.
 	//simProxy->GetProperty(name, timeflag, &currenttime, sizeof(currenttime));
 	currenttime = (double)time(NULL);
+
+	//limit volatge to be between the max and min voltages.
+	if(voltage > maxVolatge) voltage = maxVolatge;
+	else if(voltage < minVolatge) voltage = minVolatge;
+
 	current->addTone(x, y, voltage, currenttime+(duration/1000));
-
-
-
-	//if so, append this tone to the end of the tone list and update the list.
-	//if not, create a new audio bin and populate it with data from the epuck
-
 
 	return;
 }
