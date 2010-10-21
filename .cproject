@@ -43,7 +43,7 @@
 <option id="gnu.cpp.link.option.libs.298072416" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="pthread"/>
 </option>
-<option id="gnu.cpp.link.option.paths.569108165" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths"/>
+<option id="gnu.cpp.link.option.paths.569108165" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
 <option id="gnu.cpp.link.option.implname.1557078977" name="Import Library name (-Wl,--out-implib=)" superClass="gnu.cpp.link.option.implname" value="" valueType="string"/>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1036503695" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -56,7 +56,7 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
-<entry excluding="epuckapi-doxygen|test/testAPI.cc|test/worlds|helpful files|worlds" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+<entry excluding="src/TestEPuck.cc|epuckapi-doxygen|test/testAPI.cc|test/worlds|helpful files|worlds" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 </sourceEntries>
 </configuration>
 </storageModule>
@@ -366,7 +366,7 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
-<entry excluding="worlds|test/testAPI.cc|test/worlds|helpful files" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+<entry excluding="src/TestEPuck.cc|worlds|test/testAPI.cc|test/worlds|helpful files" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 </sourceEntries>
 </configuration>
 </storageModule>
