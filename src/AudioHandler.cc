@@ -190,8 +190,8 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 	//for each bin...
 	while(binptr != NULL && i < numberAllocatedSlots)
 	{
-		printf("looking at bin %f, ", binptr->lowerFrequencyBound);
-		printf("putting this data in index %d\n", i);
+		//printf("looking at bin %f, ", binptr->lowerFrequencyBound);
+		//printf("putting this data in index %d\n", i);
 		binptr->calculateCumulativeDataForPosition(x, y, yaw, &store[i]);
 		i++;
 		binptr = binptr->next;

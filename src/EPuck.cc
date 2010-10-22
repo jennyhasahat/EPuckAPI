@@ -224,17 +224,21 @@ EPuck::Blob EPuck::getBlob(int index)
 
 /**
 Sets the wheel speeds of the epuck's motors, requires a forward speed and a turnrate. Values are given in metres per second and radians per second.
+The maximum speed of the robots is 4cm/s so the wheels are limited to +/- 0.04 metres per second.
 @param forward speed at which the robot moves forward in metres/sec
 @param turnrate speed at which the robot turns. Positive to turn left, negative to turn right. Value required in radians/sec.
 */
 void EPuck::setMotors(double forward, double turnrate)
 {
+	if(forward > MAX_WHEEL_SPEED) forward = MAX_WHEEL_SPEED;
+	if(forward < (-1)*MAX_WHEEL_SPEED) forward = (-1)*MAX_WHEEL_SPEED;
 	p2dProxy->SetSpeed(forward, turnrate);
 	return;
 }
 
 /**
 Sets the wheel speeds of the epuck's motors, this function is used to directly set the left and right wheel speed. Values are given in metres per second.
+The maximum speed of the robots is 4cm/s so the wheels are limited to +/- 0.04 metres per second.
 @param left speed of the left wheel
 @param right speed of the right wheel
 */
@@ -251,6 +255,12 @@ void EPuck::setDifferentialMotors(double left, double right)
 	const double separation = 52*0.001; //52 millimetres
 	double newspeed, newturnrate;
 	
+	//limit wheel speeds to+/- maximum
+	if(left > MAX_WHEEL_SPEED) left = MAX_WHEEL_SPEED;
+	if(left < (-1)*MAX_WHEEL_SPEED) left = (-1)*MAX_WHEEL_SPEED;
+	if(right > MAX_WHEEL_SPEED) right = MAX_WHEEL_SPEED;
+	if(right < (-1)*MAX_WHEEL_SPEED) right = (-1)*MAX_WHEEL_SPEED;
+
 	/*inside wheel should turn at newspeed/radius radians per sec.
 	  inner(rads) * radius = newspeed
 	  we know wheel turn rate in metres/sec. Must convert to rads/sec.

@@ -81,6 +81,9 @@ public:
 	/**The name given to this robot in the player/Stage configuration file and world file.*/
 	char name[32];
 
+	/**The maximum wheel speed that the epuck can turn its wheels at.*/
+	static const double MAX_WHEEL_SPEED = 0.041;;
+
 private:
 
 	//player object member variables

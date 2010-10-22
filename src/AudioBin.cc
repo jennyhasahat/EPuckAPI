@@ -163,7 +163,7 @@ void AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, doubl
 	output->volume = sqrt( (meanPolarX * meanPolarX) + (meanPolarY * meanPolarY) );
 	output->direction = convertDifferentialCoordsIntoBearing(meanPolarX, meanPolarY, 0);
 
-	printf("\tbin direction is %d, volume is %f\n", output->direction, output->volume);
+	//printf("\tbin direction is %d, volume is %f\n", output->direction, output->volume);
 
 	return;
 }
