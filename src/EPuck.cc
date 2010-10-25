@@ -444,8 +444,6 @@ int EPuck::listenForTones(void)
  * */
 EPuck::Tone EPuck::getTone(int index)
 {
-	printf("EPuck currently stores %d tones\n", numberOfTones);
-
 	if(index < numberOfTones && index > -1)
 	{
 		return toneArray[index];

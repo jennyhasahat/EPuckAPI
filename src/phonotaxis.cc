@@ -23,13 +23,12 @@ void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 	//check IR sensors right
 	rightIR = bot->getIRReading(7);
 
-	if( (leftIR < tooClose) && (rightIR < tooClose) )
+	printf("left IR reads: %f, right IR reads: %f\n", leftIR, rightIR);
+
+	if( (leftIR > tooClose) && (rightIR > tooClose) )
 	{
-		//if there;s objects in both of them move back
-		left = EPuck::MAX_WHEEL_SPEED;
-		left = -left/2;
-		right = EPuck::MAX_WHEEL_SPEED;
-		right = -right/2;
+		//if nothing is too close then do nothing
+		return;
 	}
 	else if(leftIR < tooClose)
 	{
@@ -40,13 +39,21 @@ void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 		right = -right/2;
 
 	}
-	else
+	else if(rightIR < tooClose)
 	{
 		//if there's an object to the right move left
 		left = EPuck::MAX_WHEEL_SPEED;
 		left = -left/2;
 		right = EPuck::MAX_WHEEL_SPEED;
 		right = right/2;
+	}
+	else
+	{
+		//if there;s objects in both of them move back
+		left = EPuck::MAX_WHEEL_SPEED;
+		left = -left/2;
+		right = EPuck::MAX_WHEEL_SPEED;
+		right = -right/2;
 	}
 
 	*leftWheel = left;
@@ -67,7 +74,6 @@ void phonotaxis(EPuck *bot, double *leftWheel, double *rightWheel)
 	double left, right;
 
 	numberTones = bot->listenForTones();
-	printf("robot heard %d tones\n", numberTones);
 
 	if(numberTones > 0)
 	{
@@ -89,14 +95,12 @@ void phonotaxis(EPuck *bot, double *leftWheel, double *rightWheel)
 			//slow left wheel
 			right = 1;
 			left  = cos(rads);
-			printf("sound is to the left of the robot\n");
 		}
 		else
 		{
 			//slow right wheel
 			left  = 1;
 			right = cos(rads);
-			printf("sound is to the right of the robot\n");
 		}
 		printf("\tphonotaxis: left %f, right %f\n", left, right);
 
@@ -187,7 +191,7 @@ int main(void)
 	while(true)
 	{
 		phonotaxis(robots[1], &left, &right);
-		//avoidObjects(robots[1], &left, &right);
+		avoidObjects(robots[1], &left, &right);
 
 		robots[1]->setDifferentialMotors(left, right);
 		usleep(50000);
