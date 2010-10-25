@@ -444,7 +444,9 @@ int EPuck::listenForTones(void)
  * */
 EPuck::Tone EPuck::getTone(int index)
 {
-	if(index < numberOfTones || index > -1)
+	printf("EPuck currently stores %d tones\n", numberOfTones);
+
+	if(index < numberOfTones && index > -1)
 	{
 		return toneArray[index];
 	}
@@ -459,6 +461,14 @@ EPuck::Tone EPuck::getTone(int index)
 	}
 }
 
+void EPuck::printLocation_TEST(void)
+{
+	double x, y, yaw;
+	simProxy->GetPose2d(name, x, y, yaw);
+	printf("robot %s is at location: (%f, %f) and yaw %f radians\n", name, x, y, yaw);
+
+	return;
+}
 
 void EPuck::printTimes_TEST(void)
 {

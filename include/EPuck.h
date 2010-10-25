@@ -84,7 +84,7 @@ public:
 	/**The maximum wheel speed that the epuck can turn its wheels at.*/
 	static const double MAX_WHEEL_SPEED = 0.041;;
 
-private:
+protected:
 
 	//player object member variables
 	PlayerCc::PlayerClient		*epuck;
@@ -95,6 +95,8 @@ private:
 	PlayerCc::BlobfinderProxy	*blobProxy;		//camera
 	PlayerCc::SimulationProxy	*simProxy;		//leds
 
+	/**array containing the IR readings from the EPuck*/
+	double irReadings[8];
 	//LED stuff
 	bool allLEDsOn;
 	//audio stuff
@@ -143,14 +145,14 @@ public:
 	int listenForTones(void);
 	Tone getTone(int index);
 
+	void printLocation_TEST(void);
 	void printTimes_TEST(void);
 	void dumpAudio_TEST(void);
 	void dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize);
 
 
 protected:
-	/**array containing the IR readings from the EPuck*/
-	double irReadings[8];
+
 
 #if THREADED
 	pthread_t readSensorsThread;
@@ -165,7 +167,7 @@ protected:
 #endif
 
 private:
-	virtual void initialise(int robotPort, char* robotName, int simulationPort);
+	void initialise(int robotPort, char* robotName, int simulationPort);
 
 
 
