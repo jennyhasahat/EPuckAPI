@@ -32,7 +32,7 @@
 #define SAMPLE_RATE					16000
 #define FFT_BLOCK_SIZE				128
 #define PI							3.141592654
-#define IMPEDANCE_OF_SPEAKER_OHMS 	10
+
 
 
 

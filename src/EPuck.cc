@@ -46,9 +46,10 @@ Epuck destructor. Closes threads and stops the robot nicely (ish).
 */
 EPuck::~EPuck(void)
 {
-#if THREADED
-	pthread_detach(readSensorsThread);
-#endif
+
+	pthread_cancel(readSensorsThread);
+	stopFlashLEDs();
+
 
 	//free the items in memory
 	//this is probably unnecessary
@@ -362,6 +363,33 @@ void EPuck::setLED(int index, int state)
 	return;
 }
 
+/**
+ * Flashes the LEDs at the requested frequency.
+ * @param frequency the frequency in Hz at which the LEDs should flash.
+ * */
+void EPuck::flashLEDs(double frequency)
+{
+	//user can also stop flashing LEDs with this function.
+	if(frequency <= 0) stopFlashLEDs();
+
+	LEDFlashFrequency = frequency;
+	pthread_create(&flashLEDsThread, 0, EPuck::startFlashLEDsThread, this);
+	return;
+}
+
+/**
+ * Stops the LEDs from flashing if they are already flashing.
+ * */
+void EPuck::stopFlashLEDs(void)
+{
+	if(LEDFlashFrequency != 0)
+	{
+		pthread_cancel(flashLEDsThread);
+		LEDFlashFrequency = 0;
+	}
+	return;
+}
+
 //******************************* AUDIO *************************************
 
 /**
@@ -463,7 +491,7 @@ void EPuck::printLocation_TEST(void)
 {
 	double x, y, yaw;
 	simProxy->GetPose2d(name, x, y, yaw);
-	printf("robot %s is at location: (%f, %f) and yaw %f radians\n", name, x, y, yaw);
+	printf("%s is at location: (%f, %f) and yaw %f radians\n", name, x, y, yaw);
 
 	return;
 }
@@ -531,14 +559,10 @@ void EPuck::initialise(int robotPort, char* robotName, int simulationPort)
 		return;
 	}
 
-#if THREADED
 	pthread_create(&readSensorsThread, 0, EPuck::startReadSensorThread, this);
-#endif
-
 }
 
 
-#if THREADED
 /**
 Reads the robot's sensors but is threadable.
 */
@@ -553,7 +577,24 @@ void EPuck::readSensorsThreaded(void)
 	pthread_exit(NULL);
 	return;
 }
-#endif
+
+/**
+Reads the robot's sensors but is threadable.
+*/
+void EPuck::flashLEDsThreaded(void)
+{
+	double period = 1/LEDFlashFrequency; //flash period in seconds
+	period = period*1000000; //now in micro-seconds
+	period = period/2;	//will toggle LEDs each half period
+
+	while(true)
+	{
+		toggleAllLEDs();
+		usleep(period);
+	}
+	pthread_exit(NULL);
+	return;
+}
 
 
 

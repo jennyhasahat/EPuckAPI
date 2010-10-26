@@ -23,8 +23,6 @@ void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 	//check IR sensors right
 	rightIR = bot->getIRReading(7);
 
-	printf("left IR reads: %f, right IR reads: %f\n", leftIR, rightIR);
-
 	if( (leftIR > tooClose) && (rightIR > tooClose) )
 	{
 		//if nothing is too close then do nothing
@@ -81,7 +79,6 @@ void phonotaxis(EPuck *bot, double *leftWheel, double *rightWheel)
 		EPuck::Tone t;
 
 		t = bot->getTone(0);
-		printf("detected a sound of frequency %f, volume %f and bearing %d\n", t.frequency, t.volume, t.bearing);
 
 		//bearing is in range 0 to 360
 		//the close to 0 or 360 the number is the more similar we want the wheel speeds to be
@@ -102,7 +99,6 @@ void phonotaxis(EPuck *bot, double *leftWheel, double *rightWheel)
 			left  = 1;
 			right = cos(rads);
 		}
-		printf("\tphonotaxis: left %f, right %f\n", left, right);
 
 		//then scale results so the speeds are between -0.04 and +0.04
 		right *= EPuck::MAX_WHEEL_SPEED;
@@ -117,8 +113,6 @@ void phonotaxis(EPuck *bot, double *leftWheel, double *rightWheel)
 		right = EPuck::MAX_WHEEL_SPEED*(right / 1000);	//num between 0 and max speed to 1dp
 		left += *leftWheel;
 		right += *rightWheel;
-
-		printf("random walk: left %f, right %f\n", left, right);
 	}
 
 	//copy info into provided memory slot
@@ -186,10 +180,10 @@ int main(void)
 	//set the bot flashing and noising
 	pthread_create(&noisyBotThread, NULL, flashAndSound, (void *)robots[bot]);
 
-	double left, right;
-
 	while(true)
 	{
+		double left, right;
+
 		phonotaxis(robots[1], &left, &right);
 		avoidObjects(robots[1], &left, &right);
 

@@ -5,6 +5,7 @@
  *      Author: Jennifer Owen
  */
 
+#include "EPuck.h"
 #include "AudioHandler.h"
 
 /**
@@ -80,7 +81,7 @@ void AudioHandler::AudioBin::addTone(double x, double y, double voltage, double 
 
 	newtone->tx = x;
 	newtone->ty = y;
-	newtone->wattsAtSource = (voltage * voltage)/IMPEDANCE_OF_SPEAKER_OHMS;
+	newtone->wattsAtSource = (voltage * voltage)/(EPuck::IMPEDANCE_OF_SPEAKER_OHMS);
 	newtone->end = endtime;
 	newtone->next = NULL;
 

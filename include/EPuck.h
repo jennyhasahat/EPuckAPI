@@ -8,9 +8,6 @@
 #include "libplayerc++/playerc++.h"
 #include "AudioHandler.h"
 
-#define THREADED 1
-
-
 /**
 Interacts with a simulated e-puck robot using Player commands.
 This is a base class for the more specific SimulatedRobot and RealRobot classes, this class uses virtual functions so that polymorphism can be used.
@@ -73,16 +70,26 @@ public:
 	};
 
 
+	//constants
+
+	/**The maximum wheel speed that the epuck can turn its wheels at.*/
+	static const double MAX_WHEEL_SPEED = 0.041;
+	/**The impedance of the robot's microphone*/
+	static const int IMPEDANCE_OF_MIC_OHMS = 300;
+	/**The impedance of the robot's speaker*/
+	static const int IMPEDANCE_OF_SPEAKER_OHMS = 8;
+	/**How much voltage is supplied to the epuck's audio board*/
+	static const double MAXIMUM_BOARD_VOLTAGE = 3.6;
+	/**How much voltage is supplied to the epuck's audio board (minimum)*/
+	static const double MINIMUM_BOARD_VOLTAGE = 0;
 
 
 	//member variables
+
 	/**The Player/Stage port that this robot uses to get simulation information*/
 	int port;
 	/**The name given to this robot in the player/Stage configuration file and world file.*/
 	char name[32];
-
-	/**The maximum wheel speed that the epuck can turn its wheels at.*/
-	static const double MAX_WHEEL_SPEED = 0.041;;
 
 protected:
 
@@ -99,6 +106,8 @@ protected:
 	double irReadings[8];
 	//LED stuff
 	bool allLEDsOn;
+	double LEDFlashFrequency;
+
 	//audio stuff
 	AudioHandler *handler;
 	bool audioInitialised;
@@ -138,6 +147,8 @@ public:
 	void setAllLEDsOff(void);
 	void toggleAllLEDs(void);
 	void setLED(int index, int state);
+	void flashLEDs(double frequency);
+	void stopFlashLEDs(void);
 
 	//audio methods
 	int initaliseAudio(void);
@@ -153,8 +164,6 @@ public:
 
 protected:
 
-
-#if THREADED
 	pthread_t readSensorsThread;
 	void readSensorsThreaded(void);
 	static void *startReadSensorThread(void *obj)
@@ -164,7 +173,15 @@ protected:
 		return NULL;
 	}
 
-#endif
+	pthread_t flashLEDsThread;
+	void flashLEDsThreaded(void);
+	static void *startFlashLEDsThread(void *obj)
+	{
+		//All we do here is call the readSensorsThreaded() function
+		reinterpret_cast<EPuck *>(obj)->flashLEDsThreaded();
+		return NULL;
+	}
+
 
 private:
 	void initialise(int robotPort, char* robotName, int simulationPort);

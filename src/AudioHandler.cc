@@ -5,6 +5,7 @@
  * @author Jennifer Owen
  */
 
+#include "EPuck.h"
 #include "AudioHandler.h"
 
 
@@ -91,8 +92,8 @@ void AudioHandler::playTone(int freq, double duration, double voltage, char* rob
 {
 	int whichbin;
 	char timeflag[] = "sim_time";
-	const int maxVolatge = 5;
-	const int minVolatge = 0;
+	const int maxVoltage = EPuck::MAXIMUM_BOARD_VOLTAGE;
+	const int minVoltage = EPuck::MINIMUM_BOARD_VOLTAGE;
 
 	double x, y, yaw, currenttime;
 	AudioBin *current = environment;
@@ -138,9 +139,9 @@ void AudioHandler::playTone(int freq, double duration, double voltage, char* rob
 	//simProxy->GetProperty(name, timeflag, &currenttime, sizeof(currenttime));
 	currenttime = (double)time(NULL);
 
-	//limit volatge to be between the max and min voltages.
-	if(voltage > maxVolatge) voltage = maxVolatge;
-	else if(voltage < minVolatge) voltage = minVolatge;
+	//limit voltage to be between the max and min voltages.
+	if(voltage > maxVoltage) voltage = maxVoltage;
+	else if(voltage < minVoltage) voltage = minVoltage;
 
 	current->addTone(x, y, voltage, currenttime+(duration/1000));
 
@@ -163,7 +164,7 @@ int AudioHandler::getNumberOfTones(void)
  * @param robotName	the name of the robot which is requesting the data (this is given in the worldfile)
  * @param store		link to where the audio data memory has been allocated.
  * @param storesize	the number of audio_message_t objects allocated to the audio data.
- * @returns success 0 if successfully copied data, 1 if unsuccessful (like say if new data has been added between allocating memory and trying to copy it over).
+ * @returns the number of tones in the environment that this robot can detect, -1 if unsuccessful (like say if new data has been added between allocating memory and trying to copy it over).
  * @see AudioHandler#getNumberOfTones()
  *
  * */
@@ -181,13 +182,13 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 	if(numberOfBins > numberAllocatedSlots)
 	{
 		printf("There are %d tones in the environment, but you have only reserved enough space for %d. Try again.\n", numberOfBins, numberAllocatedSlots);
-		return 1;
+		return -1;
 	}
 
 	//get positional info about the robot calling this function
 	simProxy->GetPose2d(robotName, x, y, yaw);
 
-	//for each bin...
+	//for each bin get the full tone information for it.
 	while(binptr != NULL && i < numberAllocatedSlots)
 	{
 		//printf("looking at bin %f, ", binptr->lowerFrequencyBound);
@@ -196,6 +197,9 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 		i++;
 		binptr = binptr->next;
 	}
+	// now work out what the minimum detectable voltage is
+	//work out the voltage of each tone
+	//delete tones that are not detectable.
 
 	return 0;
 }

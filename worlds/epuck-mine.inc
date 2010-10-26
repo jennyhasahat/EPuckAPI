@@ -46,7 +46,12 @@ define epuck_cam blobfinder
 
 define soundboard model
 (
+	obstacle_return 1
+	ranger_return 1
+	blob_return 1
+	
 	size [0.02 0.07 0.02]
+
 	block
 	(
 		points 4
@@ -93,6 +98,12 @@ define soundboard model
 # epuck base
 define epuck position
 (
+	obstacle_return 1
+	ranger_return 1
+	blob_return 1
+	gui_outline 1
+	
+    
 	# actual size
 	size [0.07 0.07 0.045]
 	color "DarkGreen"
