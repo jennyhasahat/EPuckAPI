@@ -83,19 +83,19 @@ AudioHandler::~AudioHandler()
  * Puts a tone of the desired frequency and duration into the audio environment.
  * @param freq the frequency of the tone in Hz
  * @param duration the length of the tone in milliseconds
- * @param voltage how loud to play the tone at. Value indicates in VOLTS how big the signal to the speaker should be.
+ * @param volume how loud to play the tone at. A number between 0 and 10. This does not go up to 11.
  * This must be in the range 0 to 5, if this number is outside the range it will be assumed to be either 0 or 5 (whichever is closer).
  * So if you set this as 3, the speaker will play a sine wave at 3 volts (peak to peak).
  * @param robotName string containing the name of the robot playing the tone.
  * */
-void AudioHandler::playTone(int freq, double duration, double voltage, char* robotName)
+void AudioHandler::playTone(int freq, double duration, double volume, char* robotName)
 {
 	int whichbin;
 	char timeflag[] = "sim_time";
 	const int maxVoltage = EPuck::MAXIMUM_BOARD_VOLTAGE;
 	const int minVoltage = EPuck::MINIMUM_BOARD_VOLTAGE;
 
-	double x, y, yaw, currenttime;
+	double x, y, yaw, currenttime, voltage;
 	AudioBin *current = environment;
 	AudioBin *last;
 
@@ -140,6 +140,14 @@ void AudioHandler::playTone(int freq, double duration, double voltage, char* rob
 	currenttime = (double)time(NULL);
 
 	//limit voltage to be between the max and min voltages.
+
+	//find how much voltage is represented by each "volume" unit.
+	voltage = maxVoltage - minVoltage;	//what's our working voltage range
+	voltage = voltage/10;	//there are 10 units so divide by 10 to get volts per unit
+	voltage *= volume;		//scale volts per unit by number of "volume units"
+	voltage += minVoltage;	//in case minVoltage is non-zero
+
+	//incase the requested volume is less than 0 or more than 10
 	if(voltage > maxVoltage) voltage = maxVoltage;
 	else if(voltage < minVoltage) voltage = minVoltage;
 

@@ -412,7 +412,7 @@ int EPuck::initaliseAudio(void)
  * Get this Epuck to play a tone of the desired frequency and duration.
  * @param frequency frequency of tone to play in Hz
  * @param duration duration of the tone in milliseconds
- * @param volume the sound level (volume) to play the tone at
+ * @param volume the sound level (volume) to play the tone at. A number between 0 and 10. This does not go up to 11.
  * @returns 0 if successful -1 if unsuccessful
  */
 int EPuck::playTone(int frequency, double duration, double volume)

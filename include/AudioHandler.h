@@ -125,11 +125,9 @@ public:
 	virtual ~AudioHandler();
 
 	//methods.
-	void playTone(int freq, double duration, double voltage, char* name);
+	void playTone(int freq, double duration, double volume, char* name);
 	int getNumberOfTones(void);
-
 	int getTones(char* robotName, audio_message_t *store, size_t storesize);
-
 
 	/** Test function to print all of the sound environment data to stdout.
 	 * */

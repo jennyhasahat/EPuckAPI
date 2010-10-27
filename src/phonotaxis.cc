@@ -145,7 +145,7 @@ void *flashAndSound(void *bot)
 int main(void)
 {
 	EPuck* robots[4];
-	pthread_t noisyBotThread;
+	pthread_t noisyBotThread1, noisyBotThread2;
 
 	char testbot1Name[] = "robot1";
 	robots[1] = new EPuck(6665, testbot1Name);
@@ -163,27 +163,38 @@ int main(void)
 	robots[4] = new EPuck(6668, testbot4Name);
 	robots[4]->initaliseAudio();
 
-	int bot;
-	char noisebot[] = "robot%d";
+	int bot1, bot2;
+	char noisebot1[] = "robot%d";
+	char noisebot2[] = "robot%d";
 
 	printf("Which robot would you like to make a noise (enter 1, 2 or 3): ");
-	scanf("%d", &bot);
-	while(bot < 1 || bot > 3)
+	scanf("%d", &bot1);
+	while(bot1 < 1 || bot1 > 3)
 	{
 		printf("\nWhich robot would you like to make a noise (enter 1, 2 or 3): ");
-		scanf("%d", &bot);
+		scanf("%d", &bot1);
 	}
-	printf("\nYou have chosen robot %d. It will flash to show which one it is.\n", bot);
-	bot++;
-	sprintf(noisebot, noisebot, bot);
+	printf("Which other robot would you like to make a noise (enter 1, 2 or 3): ");
+	scanf("%d", &bot2);
+	while(bot2 < 1 || bot2 > 3)
+	{
+		printf("\nWhich other robot would you like to make a noise (enter 1, 2 or 3): ");
+		scanf("%d", &bot2);
+	}
+	printf("\nYou have chosen robots %d and %d. It will flash to show which one it is.\n", bot1, bot2);
+	bot1++;
+	bot2++;
+	sprintf(noisebot1, noisebot1, bot1);
+	sprintf(noisebot2, noisebot2, bot2);
 
 	//set the bot flashing and noising
-	pthread_create(&noisyBotThread, NULL, flashAndSound, (void *)robots[bot]);
+	pthread_create(&noisyBotThread1, NULL, flashAndSound, (void *)robots[bot1]);
+	pthread_create(&noisyBotThread2, NULL, flashAndSound, (void *)robots[bot2]);
+
+	double left, right;
 
 	while(true)
 	{
-		double left, right;
-
 		phonotaxis(robots[1], &left, &right);
 		avoidObjects(robots[1], &left, &right);
 
