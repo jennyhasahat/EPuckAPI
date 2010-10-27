@@ -132,11 +132,12 @@ void AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, doubl
 	//for each tone in this bin.
 	while(ptr != NULL)
 	{
+		//calculate the level and direction of the tone
+
 		double xdiff, ydiff, dist;
 		double toneVol;
 		int toneDirection;
 
-		//calculate the level and direction of the tone
 		//first work out the distance from the source to the robot
 		xdiff 	= ptr->tx - xr;
 		ydiff 	= ptr->ty - yr;
@@ -237,33 +238,6 @@ double AudioHandler::AudioBin::getSoundIntensity(double levelAtSource, double di
 	return levelAtSource/(1+area);
 }
 
-/**
- * Adds one sound intensity level to another and gives the resulting sound intensity level.
- * All measures are assumed to be in W/m^2. I am not an acoustician this means nothing to me.
- * Numbers go in, number come out, what more do I need to know? I found the formula at: <br>
- * http://www.suite101.com/content/how-loud-is-it-a62825
- * @param sound1 level of a sound in W/m^2.
- * @param sound2 level of a sound in W/m^2.
- * @returns soundSum combined level of the two sounds in dB SPL.
- * */
-double AudioHandler::AudioBin::addTwoSoundIntensities(double sound1, double sound2)
-{
-	printf("sound1 is %f, sound2 is %f.\n", sound1, sound2);
-	//if either entry is 0 then don't bother with calculations
-	if(sound1 == 0) return sound2;
-	if(sound2 == 0) return sound1;
-
-	double f1, f2, out;
-
-	f1 = pow(10, sound1/10);
-	f2 = pow(10, sound2/10);
-
-	out = log10(f1 + f2);
-	printf("\tf1 is %f, f2 is %f\n", f1, f2);
-	printf("\tout is %f returned is %f\n", out, 10*out);
-
-	return 10*out;
-}
 
 /**
  * Function to convert two coordinates into a bearing.
@@ -287,7 +261,7 @@ int AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff, d
 	//modulo again to get in range 0 to 360
 	yaw = yaw%360;
 
-	//gets rid of divide by 0 troubles
+	//get rid of divide by 0 troubles
 	if( (xdiff ==0) && (ydiff == 0) ) return 0;
 
 	//first calculate bearing wrt the x axis
@@ -299,7 +273,7 @@ int AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff, d
 	bearingWRTx = bearingWRTx%360;
 
 	// did some maths to work out the next line. It works for all orientations of the sender and receiver.
-	// This is becuase bearing wrt x and yaw have been changed to be in range 0 to 360.
+	// This is becuase bearing wrt x and yaw have already been changed to be in range 0 to 360.
 	bearingWRTrobot = 360 - yaw + bearingWRTx;
 	bearingWRTrobot = bearingWRTrobot%360;
 

@@ -46,9 +46,9 @@ Epuck destructor. Closes threads and stops the robot nicely (ish).
 */
 EPuck::~EPuck(void)
 {
-
+	//close threads
 	pthread_cancel(readSensorsThread);
-	stopFlashLEDs();
+	stopFlashLEDs();	//stops the flashing LEDs and closes the thread
 
 
 	//free the items in memory
@@ -370,7 +370,11 @@ void EPuck::setLED(int index, int state)
 void EPuck::flashLEDs(double frequency)
 {
 	//user can also stop flashing LEDs with this function.
-	if(frequency <= 0) stopFlashLEDs();
+	if(frequency <= 0)
+	{
+		stopFlashLEDs();
+		return;
+	}
 
 	LEDFlashFrequency = frequency;
 	pthread_create(&flashLEDsThread, 0, EPuck::startFlashLEDsThread, this);
@@ -382,11 +386,11 @@ void EPuck::flashLEDs(double frequency)
  * */
 void EPuck::stopFlashLEDs(void)
 {
-	if(LEDFlashFrequency != 0)
-	{
-		pthread_cancel(flashLEDsThread);
+//	if(LEDFlashFrequency != 0)
+//	{
+//		pthread_cancel(flashLEDsThread);
 		LEDFlashFrequency = 0;
-	}
+//	}
 	return;
 }
 
@@ -587,7 +591,7 @@ void EPuck::flashLEDsThreaded(void)
 	period = period*1000000; //now in micro-seconds
 	period = period/2;	//will toggle LEDs each half period
 
-	while(true)
+	while(LEDFlashFrequency > 0)
 	{
 		toggleAllLEDs();
 		usleep(period);

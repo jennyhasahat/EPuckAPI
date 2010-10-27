@@ -62,7 +62,7 @@ AudioHandler::AudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::S
 AudioHandler::~AudioHandler()
 {
 	//close thread
-	pthread_detach(updateAudioBinListThread);
+	pthread_cancel(updateAudioBinListThread);
 
 	//remove all bins in Linked list
 	AudioBin *ptr = environment;
@@ -133,6 +133,8 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 	}
 
 	//add data to the audio bin entry
+
+	//get xy coords.
 	simProxy->GetPose2d(robotName, x, y, yaw);
 
 	//todo fix the next lines when clock stuff is sorted.
@@ -178,13 +180,12 @@ int AudioHandler::getNumberOfTones(void)
  * */
 int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t storesize)
 {
-	//
-	//find how many audio_message_t slots have been allocated and see if it is enough
 	int numberAllocatedSlots;
 	double x, y, yaw;
 	int i = 0;
 	AudioBin *binptr = environment;
 
+	//find how many audio_message_t slots have been allocated and see if it is enough
 	numberAllocatedSlots = storesize/sizeof(audio_message_t);
 
 	if(numberOfBins > numberAllocatedSlots)
@@ -205,9 +206,9 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 		i++;
 		binptr = binptr->next;
 	}
-	// now work out what the minimum detectable voltage is
-	//work out the voltage of each tone
-	//delete tones that are not detectable.
+
+	// the epucks have a hearing range of AT MOST 10cm on a good day.
+	//deal with this here
 
 	return 0;
 }

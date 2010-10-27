@@ -134,7 +134,7 @@ void *flashAndSound(void *bot)
 	robot->printLocation_TEST();
 	while(true)
 	{
-		robot->playTone(500, 500, 5);
+		robot->playTone(500, 500, 10);
 		usleep(500000);
 	}
 	pthread_exit(NULL);
@@ -176,7 +176,7 @@ int main(void)
 	}
 	printf("Which other robot would you like to make a noise (enter 1, 2 or 3): ");
 	scanf("%d", &bot2);
-	while(bot2 < 1 || bot2 > 3)
+	while( bot2 < 1 || bot2 > 3 || bot2 == bot1 )
 	{
 		printf("\nWhich other robot would you like to make a noise (enter 1, 2 or 3): ");
 		scanf("%d", &bot2);
@@ -189,6 +189,7 @@ int main(void)
 
 	//set the bot flashing and noising
 	pthread_create(&noisyBotThread1, NULL, flashAndSound, (void *)robots[bot1]);
+	usleep(100000);
 	pthread_create(&noisyBotThread2, NULL, flashAndSound, (void *)robots[bot2]);
 
 	double left, right;

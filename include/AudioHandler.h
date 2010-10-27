@@ -105,9 +105,7 @@ public:
 
 	private:
 		int removeTone(audio_tone_t *del);
-
 		double getSoundIntensity(double levelAtSource, double distance);
-		double addTwoSoundIntensities(double sound1, double sound2);
 		int convertDifferentialCoordsIntoBearing(double xdiff, double ydiff, double recieverYaw);
 
 		//==== USEFUL STUFF ====
