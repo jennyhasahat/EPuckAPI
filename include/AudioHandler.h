@@ -101,7 +101,7 @@ public:
 
 		int updateList(double currentTime);
 		void addTone(double x, double y, double voltage, double endtime);
-		void calculateCumulativeDataForPosition(double x, double y, double yaw, audio_message_t* output);
+		int calculateCumulativeDataForPosition(double x, double y, double yaw, audio_message_t* output);
 
 	private:
 		int removeTone(audio_tone_t *del);

@@ -23,6 +23,7 @@ void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 	//check IR sensors right
 	rightIR = bot->getIRReading(7);
 
+
 	if( (leftIR > tooClose) && (rightIR > tooClose) )
 	{
 		//if nothing is too close then do nothing
@@ -53,10 +54,28 @@ void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 		right = EPuck::MAX_WHEEL_SPEED;
 		right = -right/2;
 	}
+	printf("leftIR: %f, rightIR: %f\n", leftIR, rightIR);
 
 	*leftWheel = left;
 	*rightWheel = right;
 
+	return;
+}
+
+void randomWalk(EPuck *bot, double *leftWheel, double *rightWheel)
+{
+	double left, right;
+
+	//random wandering
+	left = (rand() % 11)-3; //num between -3 and 7
+	left = EPuck::MAX_WHEEL_SPEED*(left / 100);	//num between 0 and max speed to 1dp
+	right = (rand() % 11)-3; //num between -3 and 7
+	right = EPuck::MAX_WHEEL_SPEED*(right / 100);	//num between 0 and max speed to 1dp
+
+	//copy info into provided memory slot
+	*leftWheel += left;
+	*rightWheel += right;
+//printf("random walk setting left %f, right %f\n", *leftWheel, *rightWheel);
 	return;
 }
 
@@ -80,44 +99,46 @@ void phonotaxis(EPuck *bot, double *leftWheel, double *rightWheel)
 
 		t = bot->getTone(0);
 
-		//bearing is in range 0 to 360
-		//the close to 0 or 360 the number is the more similar we want the wheel speeds to be
-		//cos returns number that is scaled between -1 and 1 depending on the bearing with 180 being -1 and 0 or 360 being +1
-
-		rads = (t.bearing*3.14159)/180;
-
-		//if the tone is coming from the left side of the robot...
-		if( t.bearing < 180)
+		//if the robot can actually hear the tone
+		if(t.volume > 0)
 		{
-			//slow left wheel
-			right = 1;
-			left  = cos(rads);
-		}
-		else
-		{
-			//slow right wheel
-			left  = 1;
-			right = cos(rads);
-		}
+			printf("sound heard!\n");
+			//bearing is in range 0 to 360
+			//the close to 0 or 360 the number is the more similar we want the wheel speeds to be
+			//cos returns number that is scaled between -1 and 1 depending on the bearing with 180 being -1 and 0 or 360 being +1
 
-		//then scale results so the speeds are between -0.04 and +0.04
-		right *= EPuck::MAX_WHEEL_SPEED;
-		left  *= EPuck::MAX_WHEEL_SPEED;
+			rads = (t.bearing*3.14159)/180;
+
+			//if the tone is coming from the left side of the robot...
+			if( t.bearing < 180)
+			{
+				//slow left wheel
+				right = 1;
+				left  = cos(rads);
+			}
+			else
+			{
+				//slow right wheel
+				left  = 1;
+				right = cos(rads);
+			}
+
+			//then scale results so the speeds are between -0.04 and +0.04
+			right *= EPuck::MAX_WHEEL_SPEED;
+			left  *= EPuck::MAX_WHEEL_SPEED;
+
+			//copy info into provided memory slot
+			*leftWheel = left;
+			*rightWheel = right;
+
+			printf("phonotaxis setting left %f, right %f\n", *leftWheel, *rightWheel);
+		}
+		else randomWalk(bot, leftWheel, rightWheel);
 	}
 	else
 	{
-		//random wandering
-		left = rand() % 10; //num between 0 and 9
-		left = EPuck::MAX_WHEEL_SPEED*(left / 1000);	//num between 0 and max speed to 1dp
-		right = rand() % 10; //num between 0 and 9
-		right = EPuck::MAX_WHEEL_SPEED*(right / 1000);	//num between 0 and max speed to 1dp
-		left += *leftWheel;
-		right += *rightWheel;
+		randomWalk(bot, leftWheel, rightWheel);
 	}
-
-	//copy info into provided memory slot
-	*leftWheel = left;
-	*rightWheel = right;
 
 	return;
 }

@@ -116,8 +116,9 @@ void AudioHandler::AudioBin::addTone(double x, double y, double voltage, double 
  * @param yr the y position of the robot
  * @param yaw the yaw of the robot. In radians because that's the measure used by playerstage
  * @param output the audio_message_t pointer where the data should be stored.
+ * @returns 1 if no tones are within range of the robot, 0 if there was useful information.
  * */
-void AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double yr, double yaw, audio_message_t* output)
+int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double yr, double yaw, audio_message_t* output)
 {
 	audio_tone_t *ptr =  tones;
 	double meanPolarX = 0;
@@ -144,17 +145,28 @@ void AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, doubl
 		dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
 
 		toneVol = getSoundIntensity(ptr->wattsAtSource, dist);
-		toneDirection = convertDifferentialCoordsIntoBearing(xdiff, ydiff, yaw);
 
-		//if tone is louder it has more of an effect on the tone direction than if it does not.
-		//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
-		//using the average of ALL polar coordinates that we worked out.
+		// can this tone be heard? If so then add it to the other tones.
+		if(toneVol != 0)
+		{
+			toneDirection = convertDifferentialCoordsIntoBearing(xdiff, ydiff, yaw);
 
-		meanPolarX += toneVol * cos( degreesToRadians(toneDirection) );
-		meanPolarY += toneVol * sin( degreesToRadians(toneDirection) );
-		numTones++;
+			//if tone is louder it has more of an effect on the tone direction than if it does not.
+			//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
+			//using the average of ALL polar coordinates that we worked out.
+
+			meanPolarX += toneVol * cos( degreesToRadians(toneDirection) );
+			meanPolarY += toneVol * sin( degreesToRadians(toneDirection) );
+			numTones++;
+		}
 
 		ptr = ptr->next;
+	}
+
+	//if it turns out that no tones are within range of the robot then return nothing
+	if(numTones == 0)
+	{
+		return 1;
 	}
 
 	//now we have the total x and y contributions of each tone we find the average
@@ -167,7 +179,9 @@ void AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, doubl
 
 	//printf("\tbin direction is %d, volume is %f\n", output->direction, output->volume);
 
-	return;
+
+
+	return 0;
 }
 
 
@@ -218,11 +232,25 @@ int AudioHandler::AudioBin::removeTone(audio_tone_t *del)
  * Function to convert a distance in metres into a volume for the robots.
  * @param levelAtSource the number of watts produced at by the speaker at the tone source.
  * @param distance the distance in metres
- * @returns intensity the sound intensity of the tone in W/m^2. This is then used in {@link AudioBin#addTwoSoundIntensities }
+ * @returns intensity the sound intensity of the tone in W/m^2.
  * */
 double AudioHandler::AudioBin::getSoundIntensity(double levelAtSource, double distance)
 {
+	static double minIntensityHeard = 0;
 	double area;
+	double intensity;
+
+	//if we haven't done this already, calculate what the maximum detectable sound intensity is
+	if(minIntensityHeard == 0)
+	{
+		//in best conditions the epuck can only hear 10cm
+		const double hearingRange = 0.5;
+		double maxSourceIntensity;
+
+		maxSourceIntensity = (EPuck::MAXIMUM_BOARD_VOLTAGE * EPuck::MAXIMUM_BOARD_VOLTAGE)/EPuck::IMPEDANCE_OF_SPEAKER_OHMS;
+		minIntensityHeard = maxSourceIntensity /(1+(2 * PI * hearingRange * hearingRange));
+		printf("max intensity is %f, min detectable intensity is %f\n", maxSourceIntensity, minIntensityHeard);
+	}
 
 	//if distance = 0 then this is the robot making the noise
 	if(distance <= 0) return levelAtSource;
@@ -235,7 +263,13 @@ double AudioHandler::AudioBin::getSoundIntensity(double levelAtSource, double di
 	//area of a hemisphere = 2 pi r^2
 	area = 2 * PI * distance * distance;
 
-	return levelAtSource/(1+area);
+	//calculate intensity
+	intensity = levelAtSource/(1+area);
+
+	//If this intensity is less than the minimum detectable then return 0
+	if(intensity < minIntensityHeard) return 0;
+
+	return intensity;
 }
 
 
