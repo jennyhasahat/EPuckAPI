@@ -317,7 +317,7 @@ void EPuck::setDifferentialMotors(double left, double right)
 void EPuck::setAllLEDsOn(void)
 {
 	float red[]={1, 0, 0, 1};
-	char colour[]="colour";
+	char colour[]="color";
 
 	simProxy->SetProperty(name, colour, &red, sizeof(red));
 	allLEDsOn = true;

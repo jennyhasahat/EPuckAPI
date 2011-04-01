@@ -152,7 +152,6 @@ void *flashAndSound(void *bot)
 {
 	EPuck *robot = (EPuck*)bot;
 	robot->setAllLEDsOn();
-	robot->printLocation_TEST();
 	while(true)
 	{
 		robot->playTone(500, 500, 10);
@@ -169,25 +168,26 @@ int main(void)
 	pthread_t noisyBotThread1, noisyBotThread2;
 
 	char testbot1Name[] = "robot1";
-	robots[1] = new EPuck(6665, testbot1Name);
-	robots[1]->initaliseAudio();
+	robots[0] = new EPuck(6665, testbot1Name);
+	robots[0]->initaliseAudio();
 
 	char testbot2Name[] = "robot2";
-	robots[2] = new EPuck(6666, testbot2Name);
-	robots[2]->initaliseAudio();
+	robots[1] = new EPuck(6666, testbot2Name);
+	robots[1]->initaliseAudio();
 
 	char testbot3Name[] = "robot3";
-	robots[3] = new EPuck(6667, testbot3Name);
-	robots[3]->initaliseAudio();
+	robots[2] = new EPuck(6667, testbot3Name);
+	robots[2]->initaliseAudio();
 
 	char testbot4Name[] = "robot4";
-	robots[4] = new EPuck(6668, testbot4Name);
-	robots[4]->initaliseAudio();
+	robots[3] = new EPuck(6668, testbot4Name);
+	robots[3]->initaliseAudio();
 
-	int bot1, bot2;
+	int bot1;
+/*	int bot2;
 	char noisebot1[] = "robot%d";
 	char noisebot2[] = "robot%d";
-
+*/
 	printf("Which robot would you like to make a noise (enter 1, 2 or 3): ");
 	scanf("%d", &bot1);
 	while(bot1 < 1 || bot1 > 3)
@@ -195,7 +195,7 @@ int main(void)
 		printf("\nWhich robot would you like to make a noise (enter 1, 2 or 3): ");
 		scanf("%d", &bot1);
 	}
-	printf("Which other robot would you like to make a noise (enter 1, 2 or 3): ");
+/*	printf("Which other robot would you like to make a noise (enter 1, 2 or 3): ");
 	scanf("%d", &bot2);
 	while( bot2 < 1 || bot2 > 3 || bot2 == bot1 )
 	{
@@ -207,11 +207,11 @@ int main(void)
 	bot2++;
 	sprintf(noisebot1, noisebot1, bot1);
 	sprintf(noisebot2, noisebot2, bot2);
-
+*/
 	//set the bot flashing and noising
 	pthread_create(&noisyBotThread1, NULL, flashAndSound, (void *)robots[bot1]);
 	usleep(100000);
-	pthread_create(&noisyBotThread2, NULL, flashAndSound, (void *)robots[bot2]);
+//	pthread_create(&noisyBotThread2, NULL, flashAndSound, (void *)robots[bot2]);
 
 	double left, right;
 

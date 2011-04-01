@@ -8,6 +8,9 @@
 #include "libplayerc++/playerc++.h"
 #include "AudioHandler.h"
 
+/**Debugging flag. If set to 1 the debugging functions are compiled and can be accessed.*/
+#define DEBUGGING 1
+
 /**
 Interacts with a simulated e-puck robot using Player commands.
 This is a base class for the more specific SimulatedRobot and RealRobot classes, this class uses virtual functions so that polymorphism can be used.
@@ -156,11 +159,12 @@ public:
 	int listenForTones(void);
 	Tone getTone(int index);
 
+#if DEBUGGING == 1
 	void printLocation_TEST(void);
 	void printTimes_TEST(void);
 	void dumpAudio_TEST(void);
 	void dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize);
-
+#endif
 
 protected:
 
