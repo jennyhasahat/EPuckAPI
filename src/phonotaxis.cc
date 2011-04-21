@@ -123,8 +123,8 @@ void randomWalk(EPuck *bot, double *leftWheel, double *rightWheel)
 /**
  * Make a robot move towards a sound
  * @param bot the robot we want to move towards the sound
- * @param leftWheel the int to write a left wheel speed to
- * @param rightWheel the int to write a right wheel speed to
+ * @param leftWheel the double to write a left wheel speed to
+ * @param rightWheel the double to write a right wheel speed to
  * */
 void phonotaxis(EPuck *bot, double *leftWheel, double *rightWheel)
 {
@@ -195,8 +195,10 @@ void *flashAndSound(void *bot)
 	robot->setAllLEDsOn();
 	while(true)
 	{
-		robot->playTone(500, 500, 10);
-		usleep(500000);
+		printf("playing tone\n");
+		robot->playTone(500, 5000, 10);
+		robot->dumpAudio_TEST();
+		usleep(5000000);
 	}
 	pthread_exit(NULL);
 	return NULL;
@@ -235,7 +237,7 @@ int main(void)
 	}
 
 	//set the bot flashing and noising
-//	pthread_create(&noisyBotThread1, NULL, flashAndSound, (void *)robots[bot1]);
+	pthread_create(&noisyBotThread1, NULL, flashAndSound, (void *)robots[bot1]);
 	usleep(100000);
 
 	double left, right;

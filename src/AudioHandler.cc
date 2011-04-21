@@ -84,8 +84,6 @@ AudioHandler::~AudioHandler()
  * @param freq the frequency of the tone in Hz
  * @param duration the length of the tone in milliseconds
  * @param volume how loud to play the tone at. A number between 0 and 10. This does not go up to 11.
- * This must be in the range 0 to 5, if this number is outside the range it will be assumed to be either 0 or 5 (whichever is closer).
- * So if you set this as 3, the speaker will play a sine wave at 3 volts (peak to peak).
  * @param robotName string containing the name of the robot playing the tone.
  * */
 void AudioHandler::playTone(int freq, double duration, double volume, char* robotName)
@@ -93,7 +91,7 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 	int whichbin;
 	char timeflag[] = "sim_time";
 	const int maxVoltage = EPuck::MAXIMUM_BATTERY_VOLTAGE;
-	const int minVoltage = EPuck::MINIMUM_BATTERY_VOLTAGE;
+	const int minVoltage = 0; //EPuck::MINIMUM_BATTERY_VOLTAGE;
 
 	double x, y, yaw, currenttime, voltage;
 	AudioBin *current = environment;
