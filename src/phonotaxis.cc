@@ -15,7 +15,7 @@
 void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 {
 	double leftIR, rightIR;
-	double left, right;
+	static double left, right;
 	const double tooClose = 0.04;
 
 	//check ir sensors left
@@ -23,6 +23,9 @@ void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 	//check IR sensors right
 	rightIR = bot->getIRReading(7);
 
+	//remember old values of left and right
+	left = *leftWheel;
+	right = *rightWheel;
 
 	if( (leftIR > tooClose) && (rightIR > tooClose) )
 	{
@@ -62,20 +65,55 @@ void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 	return;
 }
 
+/**
+ * Generates random walk wheel speeds.
+ * This function counts how many times it is called. When it is called 5 times whilst going forwards it will start to turn.
+ * When it is called 2 times whilst turning it will start going forward.
+ * @param bot pointer to the epuck we want to random walk
+ * @param leftWheel pointer to the left wheel speed
+ * @param rightWheel pointer to the right wheel speed
+ * */
 void randomWalk(EPuck *bot, double *leftWheel, double *rightWheel)
 {
-	double left, right;
+	const int forwardCount = 50;
+	const int turnCount = 20;
 
-	//random wandering
-	left = (rand() % 11)-3; //num between -3 and 7
-	left = EPuck::MAX_WHEEL_SPEED*(left / 100);	//num between 0 and max speed to 1dp
-	right = (rand() % 11)-3; //num between -3 and 7
-	right = EPuck::MAX_WHEEL_SPEED*(right / 100);	//num between 0 and max speed to 1dp
+	static int statusCounter = 0;
+	static bool isTurning = false;
+	static double left = 0, right = 0;
+
+	//count how many times this function is called
+	statusCounter++;
+
+	//if robot is going forwards and should turn, generate new turning speeds
+	if((statusCounter > forwardCount) && !isTurning)
+	{
+		//random turn amount
+		left = (rand() % 11)-5; //num between -5 and 5
+		left = EPuck::MAX_WHEEL_SPEED*(left / 5);	//num between -maxspeed and +maxspeed to 1dp
+		right = (rand() % 11)-5; //num between -5 and 5
+		right = EPuck::MAX_WHEEL_SPEED*(right / 5);	//num between -maxspeed and +maxspeed to 1dp
+
+		//refresh counter
+		statusCounter = 0;
+		isTurning = true;
+	}
+	//otherwise, if the robot is turning and should go forwards. generate new forward speeds
+	else if((statusCounter > turnCount) && isTurning)
+	{
+		left = EPuck::MAX_WHEEL_SPEED *0.8;
+		right = EPuck::MAX_WHEEL_SPEED *0.8;
+
+		//refresh counter
+		statusCounter = 0;
+		isTurning = false;
+	}
 
 	//copy info into provided memory slot
-	*leftWheel += left;
-	*rightWheel += right;
-//printf("random walk setting left %f, right %f\n", *leftWheel, *rightWheel);
+	*leftWheel = left;
+	*rightWheel = right;
+
+	//printf("random walk setting left %f, right %f\n", *leftWheel, *rightWheel);
 	return;
 }
 
@@ -184,10 +222,7 @@ int main(void)
 	robots[3]->initaliseAudio();
 
 	int bot1;
-/*	int bot2;
-	char noisebot1[] = "robot%d";
-	char noisebot2[] = "robot%d";
-*/
+
 	printf("Which robot would you like to make a noise (enter 1, 2 or 3): ");
 	scanf("%d", &bot1);
 	while(bot1 < 1 || bot1 > 3)
@@ -209,7 +244,7 @@ int main(void)
 	sprintf(noisebot2, noisebot2, bot2);
 */
 	//set the bot flashing and noising
-	pthread_create(&noisyBotThread1, NULL, flashAndSound, (void *)robots[bot1]);
+//	pthread_create(&noisyBotThread1, NULL, flashAndSound, (void *)robots[bot1]);
 	usleep(100000);
 //	pthread_create(&noisyBotThread2, NULL, flashAndSound, (void *)robots[bot2]);
 
@@ -217,10 +252,11 @@ int main(void)
 
 	while(true)
 	{
-		phonotaxis(robots[1], &left, &right);
-		avoidObjects(robots[1], &left, &right);
+		phonotaxis(robots[0], &left, &right);
+		//avoidObjects(robots[1], &left, &right);
 
-		robots[1]->setDifferentialMotors(left, right);
+		robots[0]->setDifferentialMotors(left, right);
+		printf("left: %f. right %f\n", left, right);
 		usleep(50000);
 	}
 
