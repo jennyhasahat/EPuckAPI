@@ -1,0 +1,68 @@
+include "map.inc"
+
+floorplan
+(
+	bitmap "bitmaps/rink2.png"
+	size [4 4 0.5]	
+	name "cave"
+	
+	obstacle_return 1
+	ranger_return 1
+	blob_return 1
+	gui_outline 1
+)
+
+#ranger sensors
+define epuck_IR ranger
+(
+	# number of sonars
+	scount 2
+
+	# define the pose of each transducer [xpos ypos heading]
+	spose[0] [0.030	-0.010	-15]	#fr right
+	spose[1] [0.03	0.01 	 15]	#fr left
+	
+	# define the field of view of each transducer [range_min range_max view_angle]
+	sview [0.0064 0.1 10]
+
+	# define the size of each transducer [xsize ysize] in meters
+	ssize [0.007 0.002]
+)
+
+# epuck base
+define epuck position
+(
+	obstacle_return 1
+	ranger_return 1
+	blob_return 1
+	gui_outline 1
+	gui_nose 1
+    
+	# actual size
+	size [0.1 0.1 0.05]
+	color "DarkGreen"
+
+	#Defining the shape of an epuck
+	block
+	(
+		points 5
+		point[0] [1 0]
+		point[1] [1.4 0.5]
+		point[2] [1 1]
+		point[3] [0 1]
+		point[4] [0 0]
+		z [0 1]
+	)
+
+	# differential steering model
+	drive "diff"
+
+	# sensors attached to epuck
+	epuck_IR()
+) 
+
+epuck
+(
+	pose [0 0 0 -45]
+	name "robot1"
+)

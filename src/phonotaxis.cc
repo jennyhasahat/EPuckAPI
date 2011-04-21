@@ -11,11 +11,19 @@
 #include <stdlib.h>
 #include "EPuck.h"
 
-
-void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
+/**
+ * Checks the given robot for nearby obstacles and generates motor speeds to avoid them.
+ * If no obstacles are generated, no new motor speeds are generated.
+ * The leftwheel and rightwheel parameters are unchanged.
+ * @param bot the robot to avoid obstacles with
+ * @param leftwheel the double to write the new wheel speed to
+ * @param rightwheel the double to write the new wheel speed to
+ * @return true if avoiding an obstacle, false otherwise.
+ * */
+bool avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 {
 	double leftIR, rightIR;
-	static double left, right;
+	double left, right;
 	const double tooClose = 0.04;
 
 	//check ir sensors left
@@ -23,14 +31,10 @@ void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 	//check IR sensors right
 	rightIR = bot->getIRReading(7);
 
-	//remember old values of left and right
-	left = *leftWheel;
-	right = *rightWheel;
-
 	if( (leftIR > tooClose) && (rightIR > tooClose) )
 	{
 		//if nothing is too close then do nothing
-		return;
+		return false;
 	}
 	else if(leftIR < tooClose)
 	{
@@ -39,7 +43,6 @@ void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 		left = left/2;
 		right = EPuck::MAX_WHEEL_SPEED;
 		right = -right/2;
-
 	}
 	else if(rightIR < tooClose)
 	{
@@ -57,18 +60,17 @@ void avoidObjects(EPuck *bot, double *leftWheel, double *rightWheel)
 		right = EPuck::MAX_WHEEL_SPEED;
 		right = -right/2;
 	}
-	printf("leftIR: %f, rightIR: %f\n", leftIR, rightIR);
 
 	*leftWheel = left;
 	*rightWheel = right;
 
-	return;
+	return true;
 }
 
 /**
  * Generates random walk wheel speeds.
- * This function counts how many times it is called. When it is called 5 times whilst going forwards it will start to turn.
- * When it is called 2 times whilst turning it will start going forward.
+ * This function counts how many times it is called. When it is called 50 times whilst going forwards it will start to turn.
+ * When it is called 20 times whilst turning it will start going forward.
  * @param bot pointer to the epuck we want to random walk
  * @param leftWheel pointer to the left wheel speed
  * @param rightWheel pointer to the right wheel speed
@@ -80,7 +82,8 @@ void randomWalk(EPuck *bot, double *leftWheel, double *rightWheel)
 
 	static int statusCounter = 0;
 	static bool isTurning = false;
-	static double left = 0, right = 0;
+	static double left = EPuck::MAX_WHEEL_SPEED;
+	static double right = EPuck::MAX_WHEEL_SPEED;
 
 	//count how many times this function is called
 	statusCounter++;
@@ -203,7 +206,7 @@ void *flashAndSound(void *bot)
 int main(void)
 {
 	EPuck* robots[4];
-	pthread_t noisyBotThread1, noisyBotThread2;
+	pthread_t noisyBotThread1;
 
 	char testbot1Name[] = "robot1";
 	robots[0] = new EPuck(6665, testbot1Name);
@@ -230,33 +233,24 @@ int main(void)
 		printf("\nWhich robot would you like to make a noise (enter 1, 2 or 3): ");
 		scanf("%d", &bot1);
 	}
-/*	printf("Which other robot would you like to make a noise (enter 1, 2 or 3): ");
-	scanf("%d", &bot2);
-	while( bot2 < 1 || bot2 > 3 || bot2 == bot1 )
-	{
-		printf("\nWhich other robot would you like to make a noise (enter 1, 2 or 3): ");
-		scanf("%d", &bot2);
-	}
-	printf("\nYou have chosen robots %d and %d. It will flash to show which one it is.\n", bot1, bot2);
-	bot1++;
-	bot2++;
-	sprintf(noisebot1, noisebot1, bot1);
-	sprintf(noisebot2, noisebot2, bot2);
-*/
+
 	//set the bot flashing and noising
 //	pthread_create(&noisyBotThread1, NULL, flashAndSound, (void *)robots[bot1]);
 	usleep(100000);
-//	pthread_create(&noisyBotThread2, NULL, flashAndSound, (void *)robots[bot2]);
 
 	double left, right;
 
 	while(true)
 	{
 		phonotaxis(robots[0], &left, &right);
-		//avoidObjects(robots[1], &left, &right);
+
+		if(avoidObjects(robots[0], &left, &right))
+		{
+			printf("avoiding obstacles\n");
+		}
 
 		robots[0]->setDifferentialMotors(left, right);
-		printf("left: %f. right %f\n", left, right);
+	//	printf("left: %f. right %f\n", left, right);
 		usleep(50000);
 	}
 

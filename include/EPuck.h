@@ -1,10 +1,10 @@
 #ifndef EPUCK_H
 #define EPUCK_H
-
+/*
 #include <stdio.h>
-#include <pthread.h>
 #include <stdint.h>
-#include <time.h>
+#include <time.h>*/
+#include <pthread.h>
 #include "libplayerc++/playerc++.h"
 #include "AudioHandler.h"
 
@@ -18,6 +18,7 @@ This is a base class for the more specific SimulatedRobot and RealRobot classes,
 Upon initialisation this class will create a thread using POSIX which reads in the sensor data from the robot.
 This allows multiple instances of EPuck to function in parallel and read in their sensor data with no effort from the programmer.
 Any interaction with the robot must be done through this class to localise the use of Player syntax.
+@author Jennifer Owen
  */
 class EPuck
 {
@@ -81,10 +82,10 @@ public:
 	static const int IMPEDANCE_OF_MIC_OHMS = 300;
 	/**The impedance of the robot's speaker*/
 	static const int IMPEDANCE_OF_SPEAKER_OHMS = 8;
-	/**How much voltage is supplied to the epuck's audio board*/
-	static const double MAXIMUM_BOARD_VOLTAGE = 3.6;
-	/**How much voltage is supplied to the epuck's audio board (minimum)*/
-	static const double MINIMUM_BOARD_VOLTAGE = 0;
+	/**How much voltage is supplied to the epuck*/
+	static const double MAXIMUM_BATTERY_VOLTAGE = 3.6;
+	/**How much voltage is supplied to the epuck (minimum)*/
+	static const double MINIMUM_BATTERY_VOLTAGE = 0;
 
 
 	//member variables

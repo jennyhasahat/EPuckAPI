@@ -25,8 +25,8 @@ define epuck_IR ranger
 		# range min and max are from the epuck website prox sensor graphs.
 
 	# define the size of each transducer [xsize ysize] in meters
-	ssize [0.002 0.002]
-		#from IR data sheet
+	#ssize [0.007 0.002]
+	#from IR data sheet
 )
 
 # epuck blobfinder
@@ -41,7 +41,7 @@ define epuck_cam blobfinder
 		# camera parameters
 		image [640 480]		#resolution
 		
-		size [0.001 0.001 0.001]
+		size [0.01 0.01 0.01]
 )
 
 define soundboard model
@@ -102,14 +102,14 @@ define epuck position
 	ranger_return 1
 	blob_return 1
 	gui_outline 1
-	
+	gravity_return 1
     
 	# actual size
 	size [0.07 0.07 0.045]
 	color "DarkGreen"
 	
 	# estimated mass in KG
-	mass 0.5
+	mass 0.3
 	
 	#Defining the shape of an epuck
 	block
@@ -127,10 +127,6 @@ define epuck position
 	)
 	
 	soundboard(pose [0.03 0 0 0])
-	
-	#bitmap "bitmaps/circle.png"
-	gui_outline 0
-	#show_blocks 0
 
 	# differential steering model
 	drive "diff"

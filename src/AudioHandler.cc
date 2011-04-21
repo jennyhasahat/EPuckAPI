@@ -92,8 +92,8 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 {
 	int whichbin;
 	char timeflag[] = "sim_time";
-	const int maxVoltage = EPuck::MAXIMUM_BOARD_VOLTAGE;
-	const int minVoltage = EPuck::MINIMUM_BOARD_VOLTAGE;
+	const int maxVoltage = EPuck::MAXIMUM_BATTERY_VOLTAGE;
+	const int minVoltage = EPuck::MINIMUM_BATTERY_VOLTAGE;
 
 	double x, y, yaw, currenttime, voltage;
 	AudioBin *current = environment;

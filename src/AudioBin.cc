@@ -247,7 +247,7 @@ double AudioHandler::AudioBin::getSoundIntensity(double levelAtSource, double di
 		const double hearingRange = 0.5;
 		double maxSourceIntensity;
 
-		maxSourceIntensity = (EPuck::MAXIMUM_BOARD_VOLTAGE * EPuck::MAXIMUM_BOARD_VOLTAGE)/EPuck::IMPEDANCE_OF_SPEAKER_OHMS;
+		maxSourceIntensity = (EPuck::MAXIMUM_BATTERY_VOLTAGE * EPuck::MAXIMUM_BATTERY_VOLTAGE)/EPuck::IMPEDANCE_OF_SPEAKER_OHMS;
 		minIntensityHeard = maxSourceIntensity /(1+(2 * PI * hearingRange * hearingRange));
 		printf("max intensity is %f, min detectable intensity is %f\n", maxSourceIntensity, minIntensityHeard);
 	}
