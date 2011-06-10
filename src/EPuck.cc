@@ -64,8 +64,6 @@ EPuck::~EPuck(void)
 	delete	epuck;
 	delete	simulation;
 
-	if(audioInitialised) delete[] toneArray;
-
 	return;
 }
 
@@ -398,103 +396,6 @@ void EPuck::stopFlashLEDs(void)
 	return;
 }
 
-//******************************* AUDIO *************************************
-
-/**
- * Initialises the audio drivers so that we can use audio signals in stage.
- * @returns success. 0 if audio handler is initialised, -1 if already initialised.
- * */
-int EPuck::initaliseAudio(void)
-{
-	if(!audioInitialised)
-	{
-		handler = AudioHandler::GetAudioHandler(simulation, simProxy, name);
-		audioInitialised = TRUE;
-		return 0;
-	}
-
-	return -1;
-}
-
-/**
- * Get this Epuck to play a tone of the desired frequency and duration.
- * @param frequency frequency of tone to play in Hz
- * @param duration duration of the tone in milliseconds
- * @param volume the sound level (volume) to play the tone at. A number between 0 and 10. This does not go up to 11.
- * @returns 0 if successful -1 if unsuccessful
- */
-int EPuck::playTone(int frequency, double duration, double volume)
-{
-	if(audioInitialised)
-	{
-		handler->playTone(frequency, duration, volume, name);
-		return 0;
-	}
-
-	printf("Unsuccessful epuck %s playTone() request. Audio not initialised.\n", name);
-	return -1;
-}
-
-/**
- * Listens for any sounds in the audio environment and stores them in the EPuck class until the user requests them.
- * Tones of similar frequency are grouped together because a Fourier transform is performed on the signal from the microphones,
- * the resulting information is combined in a way that is physically plausible (because this is a simulation after all...)
- * and stored in the EPuck object until requested by the user.
- * @returns numberOfTones the number of different tones the robot can hear.
- * */
-int EPuck::listenForTones(void)
-{
-	int i;
-	AudioHandler::audio_message_t *message;
-
-	if(audioInitialised)
-	{
-		//need to remember how many tones were allocated last time and free that memory
-		delete[] toneArray;
-
-		//reserve space for new tone data
-		numberOfTones 	= handler->getNumberOfTones();
-		toneArray 		= new Tone[numberOfTones];
-		message 		= new AudioHandler::audio_message_t[numberOfTones];
-		handler->getTones(name, message, sizeof(AudioHandler::audio_message_t)*numberOfTones);
-
-		for(i=0; i<numberOfTones; i++)
-		{
-			toneArray[i].volume 	= message[i].volume;
-			toneArray[i].bearing 	= message[i].direction;
-			toneArray[i].frequency 	= message[i].frequency;
-		}
-
-		return numberOfTones;
-	}
-
-	printf("Unsuccessful epuck %s listenToTones() request. Audio not initialised.\n", name);
-	return -1;
-}
-
-/**
- * Will return the requested tone. The EPuck object stores a list of tones, their frequencies, volumes and directions wrt the epuck.
- * This list of tones is updated when {@link EPuck#listenForTones} is called. This function allows you to request a tone from this array.
- * @param index the index of the tone you wish to get from the EPuck object
- * @returns tone the tone.
- * */
-EPuck::Tone EPuck::getTone(int index)
-{
-	if(index < numberOfTones && index > -1)
-	{
-		return toneArray[index];
-	}
-	else
-	{
-		printf("In EPuck::getTone, index %d does not exist.\n", index);
-		EPuck::Tone t;
-		t.bearing = 0;
-		t.frequency = 0;
-		t.volume = 0;
-		return t;
-	}
-}
-
 void EPuck::printLocation_TEST(void)
 {
 	double x, y, yaw;
@@ -512,24 +413,6 @@ void EPuck::printTimes_TEST(void)
 	return;
 }
 
-void EPuck::dumpAudio_TEST(void)
-{
-	handler->dumpData_TEST();
-	return;
-}
-
-void EPuck::dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize)
-{
-	int i;
-	int numberAllocatedSlots = storesize/sizeof(AudioHandler::audio_message_t);
-
-	printf("Dumping tone data as recieved from AudioHandler:\n");
-	for(i=0; i<numberAllocatedSlots; i++)
-	{
-		printf("\tbin number %d\n", i);
-		printf("\tfrequency %f\n\tvolume %f\n\tdirection %d\n", store[i].frequency, store[i].volume, store[i].direction);
-	}
-}
 
 /*====================================================================
 			PRIVATE FUNCTIONS
@@ -548,8 +431,6 @@ void EPuck::initialise(int robotPort, char* robotName, int simulationPort)
 	strcpy(name, robotName);
 	port 				= robotPort;
 	allLEDsOn			= false;
-	audioInitialised 	= false;
-	toneArray 			= NULL;
 
 	try
 	{

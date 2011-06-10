@@ -6,7 +6,6 @@
 #include <time.h>*/
 #include <pthread.h>
 #include "libplayerc++/playerc++.h"
-#include "AudioHandler.h"
 
 /**Debugging flag. If set to 1 the debugging functions are compiled and can be accessed.*/
 #define DEBUGGING 1
@@ -54,24 +53,6 @@ public:
 		int bottom;
 	};
 
-	/**
-	 * Stores information about the tones in a single frequency band that can be heard by the robot.
-	 * This is the information that the robot will be able to detect and is all robot-centric.
-	 * @see EPuck#getTone
-	 * @see EPuck#listenForTones
-	 * */
-	class Tone
-	{
-	public:
-		/**The lower bound on the frequency range this tone could be*/
-		double frequency;
-		/**The volume of the tone. This is some arbitrary number without a real measurement, but they are consistent with each other so can be
-		 * compared to other tones and volumes*/
-		double volume;
-		/**The bearing of the sound source with respect to the EPuck. If it is directly in front of the EPuck this will be 0,
-		 * bearings are then measured in DEGREES anticlockwise from the robot's front.*/
-		int bearing;
-	};
 
 
 	//constants
@@ -112,11 +93,6 @@ protected:
 	bool allLEDsOn;
 	double LEDFlashFrequency;
 
-	//audio stuff
-	AudioHandler *handler;
-	bool audioInitialised;
-	Tone *toneArray;
-	int numberOfTones;
 
 	//robot also supports power, aio and blinkenlight proxies
 	//as far as I can tell, stage does not support these
@@ -154,17 +130,9 @@ public:
 	void flashLEDs(double frequency);
 	void stopFlashLEDs(void);
 
-	//audio methods
-	int initaliseAudio(void);
-	int playTone(int frequency, double duration, double volume);
-	int listenForTones(void);
-	Tone getTone(int index);
-
 #if DEBUGGING == 1
 	void printLocation_TEST(void);
 	void printTimes_TEST(void);
-	void dumpAudio_TEST(void);
-	void dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize);
 #endif
 
 protected:
