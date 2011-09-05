@@ -1,0 +1,9 @@
+All code in this folder falls under the following copyright:
+http://www.e-puck.org/index.php?option=com_content&task=view&id=18&Itemid=45
+
+Copyright © Ecole Polytechnique Fédérale de Lausanne (EPFL), Switzerland.
+
+The specifications of the e-puck mobile robot are "open source hardware". You can redistribute them and/or modify them under the terms of the e-puck Robot Open Source Hardware License as published by EPFL. You should have received a copy of the EPFL e-puck Robot Open Source Hardware License along with these specifications; if not, write to the Ecole Polytechnique Fédérale de Lausanne (EPFL), Industrial Relations Office, Station 10, 1015 Lausanne, Switzerland.
+
+These specifications are distributed in the hope that they will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For more details, see the EPFL e-puck Robot Open Source Hardware License.
+
