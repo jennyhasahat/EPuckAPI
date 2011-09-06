@@ -101,7 +101,7 @@ void EPuckSim::readSensors(void)
  * @warning this function casts from uint64_t to double, which may or may not cause troubles. If your OS is 32-bit it will be fine. It hasn't been tested on a 64-bit OS.
  * @returns sim simulated time in milliseconds. NOTE that the stage simulator uses a time step of 100ms so the returned value of this function will be a factor of 100.
  * */
-double EPuckSim::getSimulationTime(void)
+double EPuckSim::getTime(void)
 {
 	uint64_t data;
 	double time;

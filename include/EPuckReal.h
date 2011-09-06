@@ -129,7 +129,7 @@ public:
 	~EPuckReal(void);
 
 	void readSensors(void);
-	double getSimulationTime(void);
+	double getTime(void);
 
 	// IR methods
 	double* getIRReadings(void);
