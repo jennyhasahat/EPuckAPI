@@ -73,8 +73,10 @@ public:
 		int bearing;
 	};
 
+	//==========================================================
+	//				CONSTANTS
+	//==========================================================
 
-	//constants
 
 	/**The maximum wheel speed that the epuck can turn its wheels at.*/
 	static const double MAX_WHEEL_SPEED = 0.041;
@@ -88,35 +90,15 @@ public:
 	static const double MINIMUM_BATTERY_VOLTAGE = 0;
 
 
-	//member variables
+	//==========================================================
+	//				MEMBER VARIABLES
+	//==========================================================
+protected:
 
 	/**The Player/Stage port that this robot uses to get simulation information*/
 	int port;
 	/**The name given to this robot in the player/Stage configuration file and world file.*/
 	char name[32];
-
-protected:
-
-	//player object member variables
-	PlayerCc::PlayerClient		*epuck;
-	PlayerCc::PlayerClient		*simulation;
-
-	PlayerCc::Position2dProxy	*p2dProxy;		//motors
-	PlayerCc::SonarProxy		*sonarProxy;	//rangers
-	PlayerCc::BlobfinderProxy	*blobProxy;		//camera
-	PlayerCc::SimulationProxy	*simProxy;		//leds
-
-	/**array containing the IR readings from the EPuck*/
-	double irReadings[8];
-	//LED stuff
-	bool allLEDsOn;
-	double LEDFlashFrequency;
-
-	//audio stuff
-	AudioHandler *handler;
-	bool audioInitialised;
-	Tone *toneArray;
-	int numberOfTones;
 
 	//==========================================================
 	//				FUNCTIONS
@@ -160,7 +142,7 @@ public:
 	/**
 	Refreshes the robot's stored sensor values. Is automatically called by {@link #readSensorsThreaded readSensorsThreaded}
 	*/
-	void readSensors(void);
+	virtual void readSensors(void);
 
 	/**
 	 * Returns the elapsed time of the experiment as a double. In a simulation, simulated time should be used in preference of real time
@@ -173,27 +155,27 @@ public:
 	 * so the returned value of this function will be a factor of 100, this can be changed in the worldfile using
 	 * the parameter "interval_sim".
 	 * */
-	double getTime(void);
+	virtual double getTime(void);
 
 //==================== IR methods =========================================
 	/**
 	Gives the IR readings as an array of length returned by {@link #getNumberOfIRs getNumberOfIRs} class.
 	@return The returned ranges for each IR sensor, these are normalised to be given in metres.
 	*/
-	double* getIRReadings(void);
+	virtual double* getIRReadings(void);
 
 	/**
 	Gives the IR reading of a particular IR sensor.
 	@param index The index of the sensor you want to measure. This will be a number between 0 and value returned by {@link #getNumberOfIRs getNumberOfIRs} - 1.
 	@return The range returned by the specified IR sensor, normalised to be given in metres.
 	*/
-	double getIRReading(int index);
+	virtual double getIRReading(int index);
 
 	/**
 	Tells you how many IR sensors there are on the robot.
 	@return The number of IR sensors as an int.
 	*/
-	int getNumberOfIRs(void);
+	virtual int getNumberOfIRs(void);
 
 //==================== Blobfinder methods =====================================
 
@@ -201,26 +183,26 @@ public:
 	 * Returns the width, in pixels, of the camera image. This will only return a value when there is a blob in view (annoyingly).
 	 * @return the width, in pixels, of the camera image. If no blob is detected it will return -1.
 	 * */
-	int getCameraWidth(void);
+	virtual int getCameraWidth(void);
 
 	/**
 	 * Returns the height, in pixels, of the camera image. This will only return a value when there is a blob in view (annoyingly).
 	 * @return the height, in pixels, of the camera image. If no blob is detected it will return -1.
 	 * */
-	int getCameraHeight(void);
+	virtual int getCameraHeight(void);
 
 	/**
 	 * Returns the number of coloured blobs in the image
 	 * @return the number of coloured blobs (of all colours)
 	 * */
-	int getNumberBlobs(void);
+	virtual int getNumberBlobs(void);
 
 	/**
 	 * Returns data about a specific blob, referenced by an ID number
 	 * @return blob information, in the form of a Blob object
 	 * @see Blob
 	 * */
-	Blob getBlob(int index);
+	virtual Blob getBlob(int index);
 
 //==================== motor control methods ================================
 
@@ -231,7 +213,7 @@ public:
 	@param turnrate speed at which the robot turns. Positive to turn left, negative to turn right. Value required in radians/sec.
 	@see MAX_WHEEL_SPEED
 	*/
-	void setMotors(double forward, double turnrate);
+	virtual void setMotors(double forward, double turnrate);
 
 	/**
 	Sets the wheel speeds of the epuck's motors, this function is used to directly set the left and right wheel speed. Values are given in metres per second.
@@ -240,7 +222,7 @@ public:
 	@param left speed of the left wheel
 	@param right speed of the right wheel
 	*/
-	void setDifferentialMotors(double left, double right);
+	virtual void setDifferentialMotors(double left, double right);
 
 //==================== LED methods ==================================
 
@@ -249,19 +231,19 @@ public:
 	 * <br>
 	 * @warning This function may not work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.
 	 * */
-	void setAllLEDsOn(void);
+	virtual void setAllLEDsOn(void);
 
 	/**
 	 * Sets all the robot LEDs into the OFF state
 	 * <br>
 	 * @warning This function may not work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.
 	 * */
-	void setAllLEDsOff(void);
+	virtual void setAllLEDsOff(void);
 
 	/**
 	 * Each time this function is called it will toggle between all the LEDs being on, and all the LEDs being off.
 	 * */
-	void toggleAllLEDs(void);
+	virtual void toggleAllLEDs(void);
 
 	/**
 	 * Sets the specified LED into the specified state.
@@ -270,18 +252,18 @@ public:
 	 * @param index The index of the LED to change.
 	 * @param state the state to set that LED to. 1 indicates on, anything else indicates off.
 	 * */
-	void setLED(int index, int state);
+	virtual void setLED(int index, int state);
 
 	/**
 	 * Flashes the LEDs at the requested frequency.
 	 * @param frequency the frequency in Hz at which the LEDs should flash.
 	 * */
-	void flashLEDs(double frequency);
+	virtual void flashLEDs(double frequency);
 
 	/**
 	 * Stops the LEDs from flashing if they are already flashing.
 	 * */
-	void stopFlashLEDs(void);
+	virtual void stopFlashLEDs(void);
 
 //======================== audio methods =================================
 
@@ -289,7 +271,7 @@ public:
 	 * Initialises the audio drivers so that we can use audio signals in stage.
 	 * @returns success. 0 if audio handler is initialised, -1 if already initialised.
 	 * */
-	int initaliseAudio(void);
+	virtual int initaliseAudio(void);
 
 	/**
 	 * Get this Epuck to play a tone of the desired frequency and duration.
@@ -298,7 +280,7 @@ public:
 	 * @param volume the sound level (volume) to play the tone at. A number between 0 and 10. This does not go up to 11.
 	 * @returns 0 if successful -1 if unsuccessful
 	 */
-	int playTone(int frequency, double duration, double volume);
+	virtual int playTone(int frequency, double duration, double volume);
 
 	/**
 	 * Listens for any sounds in the audio environment and stores them in the EPuck class until the user requests them.
@@ -307,7 +289,7 @@ public:
 	 * and stored in the EPuck object until requested by the user.
 	 * @returns numberOfTones the number of different tones the robot can hear.
 	 * */
-	int listenForTones(void);
+	virtual int listenForTones(void);
 
 	/**
 	 * Will return the requested tone. The EPuck object stores a list of tones, their frequencies, volumes and directions wrt the epuck.
@@ -315,7 +297,7 @@ public:
 	 * @param index the index of the tone you wish to get from the EPuck object
 	 * @returns tone the tone.
 	 * */
-	Tone getTone(int index);
+	virtual Tone getTone(int index);
 
 #if DEBUGGING == 1
 	void printLocation_TEST(void);
@@ -325,46 +307,13 @@ public:
 #endif
 
 protected:
-
-	pthread_t readSensorsThread;
-
-	/**
-	Reads the robot's sensors but is threadable.
-	*/
-	void readSensorsThreaded(void);
-	static void *startReadSensorThread(void *obj)
-	{
-		//All we do here is call the readSensorsThreaded() function
-		reinterpret_cast<EPuck *>(obj)->readSensorsThreaded();
-		return NULL;
-	}
-
-	pthread_t flashLEDsThread;
-
-	/**
-	Flashes the robot's LEDs using a thread to control the timing.
-	*/
-	void flashLEDsThreaded(void);
-	static void *startFlashLEDsThread(void *obj)
-	{
-		//All we do here is call the readSensorsThreaded() function
-		reinterpret_cast<EPuck *>(obj)->flashLEDsThreaded();
-		return NULL;
-	}
-
-
-private:
 	/**
 	 * Because constructors can't call other constructors, this is a common method that the overloaded constructors can call which will initialise the robot.
 	 * @param port the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
 	 * @param name the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
 	 * @param simulationPort the port on which the simulation is running. Get this from the .cfg file of your simulation.
 	 * */
-	void initialise(int robotPort, char* robotName, int simulationPort);
-
-
-
-
+	virtual void initialise(int robotPort, char* robotName, int simulationPort);
 
 };
 
