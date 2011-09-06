@@ -58,13 +58,9 @@ EPuckReal::~EPuckReal(void)
 	//free the items in memory
 	//this is probably unnecessary
 	delete	p2dProxy;		//motors
-	delete	sonarProxy;	//rangers
+	delete	irProxy;	//rangers
 	delete	blobProxy;		//camera
-	delete	simProxy;		//leds
 	delete	epuck;
-	delete	simulation;
-
-	if(audioInitialised) delete[] toneArray;
 
 	return;
 }

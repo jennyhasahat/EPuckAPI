@@ -136,7 +136,7 @@ public:
 	/**
 	Epuck destructor. Closes all threads and stops the robot nicely (ish).
 	*/
-	~EPuck(void);
+	virtual ~EPuck(void);
 
 	/**
 	Refreshes the robot's stored sensor values. Is automatically called by {@link #readSensorsThreaded readSensorsThreaded}
@@ -304,15 +304,6 @@ public:
 	void dumpAudio_TEST(void);
 	void dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize);
 #endif
-
-protected:
-	/**
-	 * Because constructors can't call other constructors, this is a common method that the overloaded constructors can call which will initialise the robot.
-	 * @param port the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
-	 * @param name the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
-	 * @param simulationPort the port on which the simulation is running. Get this from the .cfg file of your simulation.
-	 * */
-	virtual void initialise(int robotPort, char* robotName, int simulationPort);
 
 };
 

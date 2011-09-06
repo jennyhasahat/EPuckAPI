@@ -82,9 +82,8 @@ protected:
 	PlayerCc::PlayerClient		*simulation;
 
 	PlayerCc::Position2dProxy	*p2dProxy;		//motors
-	PlayerCc::SonarProxy		*sonarProxy;	//rangers
+	PlayerCc::IrProxy 			*irProxy;	//rangers
 	PlayerCc::BlobfinderProxy	*blobProxy;		//camera
-	PlayerCc::SimulationProxy	*simProxy;		//leds
 
 	/**array containing the IR readings from the EPuck*/
 	double irReadings[8];
@@ -103,9 +102,7 @@ protected:
 
 public:
 
-	EPuckReal(char* robotName);
-	EPuckReal(int robotPort, char* robotName);
-	EPuckReal(int robotPort, char* robotName, int simulationPort);
+	EPuckReal(void);
 	~EPuckReal(void);
 
 	void readSensors(void);
@@ -169,7 +166,7 @@ protected:
 
 
 private:
-	void initialise(int robotPort, char* robotName, int simulationPort);
+
 
 
 
