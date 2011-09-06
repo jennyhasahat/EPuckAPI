@@ -6,7 +6,7 @@
 #include <time.h>*/
 #include <pthread.h>
 #include "libplayerc++/playerc++.h"
-#include "AudioHandler.h"
+
 
 /**Debugging flag. If set to 1 the debugging functions are compiled and can be accessed.*/
 #define DEBUGGING 1
@@ -73,27 +73,7 @@ public:
 		int bearing;
 	};
 
-
-	//constants
-
-	/**The maximum wheel speed that the epuck can turn its wheels at.*/
-	static const double MAX_WHEEL_SPEED = 0.041;
-	/**The impedance of the robot's microphone*/
-	static const int IMPEDANCE_OF_MIC_OHMS = 300;
-	/**The impedance of the robot's speaker*/
-	static const int IMPEDANCE_OF_SPEAKER_OHMS = 8;
-	/**How much voltage is supplied to the epuck*/
-	static const double MAXIMUM_BATTERY_VOLTAGE = 3.6;
-	/**How much voltage is supplied to the epuck (minimum)*/
-	static const double MINIMUM_BATTERY_VOLTAGE = 0;
-
-
 	//member variables
-
-	/**The Player/Stage port that this robot uses to get simulation information*/
-	int port;
-	/**The name given to this robot in the player/Stage configuration file and world file.*/
-	char name[32];
 
 protected:
 
