@@ -53,7 +53,7 @@
 #include <libplayerxdr/playerxdr.h>
 
 #include "lpuck.h"
-#include "gps_client.h"
+//#include "gps_client.h"
 
 #ifndef V4L2_PIX_FMT_UYVY
 #define V4L2_PIX_FMT_UYVY     v4l2_fourcc('U','Y','V','Y') /* 16 YUV 4:2:2 */
@@ -411,8 +411,6 @@ int LPuck::ProcessMessage(QueuePointer & resp_queue,
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, PLAYER_POSITION2D_REQ_GET_GEOM, position_id))
   {
     player_position2d_geom_t geom;
-    // paul: i think this is describing the robots dimensions.
-    // Assume that it turns about its geometric center
     geom.pose.px = 0.0;
     geom.pose.py = 0.0;
     geom.pose.pz = 0.0;
@@ -441,7 +439,7 @@ int LPuck::ProcessMessage(QueuePointer & resp_queue,
       ir_pose_t pose = ir_pose[i];
       geom.poses[i].px = pose.x ;
       geom.poses[i].py = pose.y ;
-      geom.poses[i].pyaw = DTOR(pose.th);
+      geom.poses[i].pyaw = 3.141*pose.th/180; //DTOR(pose.th);
       printf("pose: %f %f %f\n", geom.poses[i].px, geom.poses[i].py, geom.poses[i].pyaw);
     }
 
@@ -825,7 +823,7 @@ void LPuck::refreshPowerData()
 
 // Update position2d data from VICON gps system
 // accelerometer added in as velocities.
-void LPuck::refreshPosData()
+/*void LPuck::refreshPosData()
 {
   player_position2d_data_t posdata;
 
@@ -852,7 +850,7 @@ void LPuck::refreshPosData()
   posdata.vel.pa = (double)msgRX.acc[2];
 
   this->Publish(this->position_id, PLAYER_MSGTYPE_DATA, PLAYER_POSITION2D_DATA_STATE, (void*)&posdata, sizeof(posdata), NULL);
-}
+}*/
 
 void LPuck::refreshAIOData()
 {

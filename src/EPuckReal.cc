@@ -5,42 +5,10 @@
 			CONSTRUCTOR/DESTRUCTOR
 ====================================================================*/
 
-/**
- * Creates an instance of the EPuck class.
- * Calls {@link EPuck#EPuck(int robotPort, char* robotName, int simulationPort) EPuck(int robotPort, char* robotName, int simulationPort)}
- * using default simulation port 6664 and default robot port 6665.
- * @param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
- * @author Jennifer Owen
- * */
-EPuckReal::EPuckReal(char* robotName)
-{
-	initialise(6665, robotName, 6664);
-}
 
-/**
- * Creates an instance of the EPuck class.
- * Calls {@link EPuck#EPuck(int robotPort, char* robotName, int simulationPort) EPuck(int robotPort, char* robotName, int simulationPort)}
- * using default simulation port 6664.
- * @param robotPort the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
- * @param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
- * @author Jennifer Owen
- * */
-EPuckReal::EPuckReal(int robotPort, char* robotName)
+EPuckReal::EPuckReal(void)
 {
-	initialise(robotPort, robotName, 6664);
-}
-
-/**
-Creates and instance of the EPuck class.
-@param robotPort the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
-@param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
-@param simulationPort the port on which the simulation is running. Get this from the .cfg file of your simulation.
-@author Jennifer Owen
-*/
-EPuckReal::EPuckReal(int robotPort, char* robotName, int simulationPort)
-{	
-	initialise(robotPort, robotName, simulationPort);
-	return;
+	//initialise(6665, robotName, 6664);
 }
 
 

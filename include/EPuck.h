@@ -12,12 +12,16 @@
 
 /**
 Interacts with a simulated e-puck robot using Player commands.
-This is a base class for the more specific SimulatedRobot and RealRobot classes, this class uses virtual functions so that polymorphism can be used.
-<br>
-Upon initialisation this class will create a thread using POSIX which reads in the sensor data from the robot.
-This allows multiple instances of EPuck to function in parallel and read in their sensor data with no effort from the programmer.
-Any interaction with the robot must be done through this class to localise the use of Player syntax.
+This is a base class for the more specific EPuckSim and EPuckReal classes, this class uses virtual functions so that polymorphism can be used.
+
+An example of making an EPuck object to control a simulated EPuck:<br>
+<code>EPuck robot = new EPuckSim("robot1");</code>
+
+An example of making an EPuck object to control a real EPuck:<br>
+<code>EPuck robot = new EPuckReal();</code>
 @author Jennifer Owen
+@see EPuckSim
+@see EPuckReal
  */
 class EPuck
 {
@@ -58,6 +62,7 @@ public:
 	 * This is the information that the robot will be able to detect and is all robot-centric.
 	 * @see EPuck#getTone
 	 * @see EPuck#listenForTones
+	 * @see EPuck#getBlob
 	 * */
 	class Tone
 	{
@@ -88,16 +93,6 @@ public:
 	/**How much voltage is supplied to the epuck (minimum)*/
 	static const double MINIMUM_BATTERY_VOLTAGE = 0;
 
-
-	//==========================================================
-	//				MEMBER VARIABLES
-	//==========================================================
-protected:
-
-	/**The Player/Stage port that this robot uses to get simulation information*/
-	int port;
-	/**The name given to this robot in the player/Stage configuration file and world file.*/
-	char name[32];
 
 	//==========================================================
 	//				FUNCTIONS
@@ -155,6 +150,12 @@ public:
 	 * the parameter "interval_sim".
 	 * */
 	virtual double getTime(void);
+
+	/**
+	 * Gets the amount of volts currently being output by the epuck's battery.
+	 * @returns voltage, the battery should normally be {@link EPuck#MAXIMUM_BATTERY_VOLTAGE}. It will be less if the battery is running low.
+	 * */
+	virtual double getBatteryVolts(void);
 
 //==================== IR methods =========================================
 	/**
@@ -297,13 +298,6 @@ public:
 	 * @returns tone the tone.
 	 * */
 	virtual Tone getTone(int index);
-
-#if DEBUGGING == 1
-	void printLocation_TEST(void);
-	void printTimes_TEST(void);
-	void dumpAudio_TEST(void);
-	void dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize);
-#endif
 
 };
 

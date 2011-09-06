@@ -60,7 +60,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="epuck-side|src/TestEPuck.cc|epuckapi-doxygen|test/testAPI.cc|test/worlds|helpful files|worlds" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/lpuck.cc|epuck-side|src/TestEPuck.cc|epuckapi-doxygen|test/testAPI.cc|test/worlds|helpful files|worlds" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -122,7 +122,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="epuck-side|src/TestEPuck.cc|worlds|test/testAPI.cc|test/worlds|helpful files" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/lpuck.cc|epuck-side|src/TestEPuck.cc|worlds|test/testAPI.cc|test/worlds|helpful files" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

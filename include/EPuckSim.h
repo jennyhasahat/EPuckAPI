@@ -13,65 +13,31 @@
 
 /**
 Interacts with a simulated e-puck robot using Player commands.
-This is a base class for the more specific SimulatedRobot and RealRobot classes, this class uses virtual functions so that polymorphism can be used.
-<br>
+
 Upon initialisation this class will create a thread using POSIX which reads in the sensor data from the robot.
 This allows multiple instances of EPuck to function in parallel and read in their sensor data with no effort from the programmer.
-Any interaction with the robot must be done through this class to localise the use of Player syntax.
+
+In order for this code to work your stage configuration needs to provide a simulation interface
+which can then be shared between all the epucks in the simulation. Without this the code might not work, and the audio
+and LED code definitely won't work. This can easily be done in the .world file, eg:<br>
+<code><pre>
+driver
+(
+  name "stage"
+  provides ["6664:simulation:0"]
+  plugin "stageplugin"
+
+  # load the named file into the simulator
+  worldfile "boids.world"
+)
+</pre></code>
 @author Jennifer Owen
+@see EPuck
+@see EPuckReal
  */
 class EPuckSim
 {
 public:
-
-	/**
-	 * A substitute for the player_blobfinder_blob_t structure. This one has all the variables in nice units (mostly ints),
-	 * instead of sucky ones (mostly uint32_t). Plus it doesn't require and Player headers to be included outside of this API.
-	 * Data is stored as member variables in the class, they are all public so can be accessed using the dot operator (.).
-	 * As in blobobject.variableName eg blobobject.x or blobobject.area
-	 * */
-	class Blob
-	{
-	public:
-		/**Index reference that the blobfinder proxy gave to this blob*/
-		int	id;
-		/**Colour of the blob in hex. Format is 0xaaRRGGBB, aa being the alpha component of the colour*/
-		//TODO fix colours so that it works with the stuff you wrote for stage.
-		uint32_t colour;
-		/**area of the blob*/
-		int area;
-		/**Centre of the blob, coordinates referenced by top left corner of camera image*/
-		int x;
-		/**Centre of the blob, coordinates referenced by top left corner of camera image*/
-		int y;
-		/**Left edge of bounding box for the blob [pixels] referenced by the top left corner of camera image.*/
-		int left;
-		/**right edge of bounding box for the blob [pixels] referenced by the top left corner of camera image.*/
-		int right;
-		/**top edge of bounding box for the blob [pixels] referenced by the top left corner of camera image.*/
-		int top;
-		/**bottom edge of bounding box for the blob [pixels] referenced by the top left corner of camera image.*/
-		int bottom;
-	};
-
-	/**
-	 * Stores information about the tones in a single frequency band that can be heard by the robot.
-	 * This is the information that the robot will be able to detect and is all robot-centric.
-	 * @see EPuck#getTone
-	 * @see EPuck#listenForTones
-	 * */
-	class Tone
-	{
-	public:
-		/**The lower bound on the frequency range this tone could be*/
-		double frequency;
-		/**The volume of the tone. This is some arbitrary number without a real measurement, but they are consistent with each other so can be
-		 * compared to other tones and volumes*/
-		double volume;
-		/**The bearing of the sound source with respect to the EPuck. If it is directly in front of the EPuck this will be 0,
-		 * bearings are then measured in DEGREES anticlockwise from the robot's front.*/
-		int bearing;
-	};
 
 	//member variables
 
@@ -100,7 +66,7 @@ protected:
 	//audio stuff
 	AudioHandler *handler;
 	bool audioInitialised;
-	Tone *toneArray;
+	EPuck::Tone *toneArray;
 	int numberOfTones;
 
 	//robot also supports power, aio and blinkenlight proxies
@@ -130,6 +96,12 @@ public:
 	 * the parameter "interval_sim".
 	 * */
 	double getTime(void);
+
+	/**
+	 * Gets the amount of volts currently being output by the epuck's battery.
+	 * @returns voltage, the battery should normally be {@link EPuck#MAXIMUM_BATTERY_VOLTAGE}. It will be less if the battery is running low.
+	 * */
+	double getBatteryVolts(void);
 
 	//==================== IR methods =========================================
 	/**
@@ -176,7 +148,7 @@ public:
 	 * @return blob information, in the form of a Blob object
 	 * @see Blob
 	 * */
-	Blob getBlob(int index);
+	EPuck::Blob getBlob(int index);
 
 	//==================== motor control methods ================================
 
@@ -271,7 +243,7 @@ public:
 	 * @param index the index of the tone you wish to get from the EPuck object
 	 * @returns tone the tone.
 	 * */
-	Tone getTone(int index);
+	EPuck::Tone getTone(int index);
 
 #if DEBUGGING == 1
 	void printLocation_TEST(void);
