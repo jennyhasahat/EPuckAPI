@@ -44,7 +44,7 @@ all: EPuckAPI
 EPuckAPI: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ `pkg-config --libs playerc++` -o"EPuckAPI" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ `pkg-config --libs playerc++` -o "EPuckAPI" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -20,7 +20,7 @@ This allows multiple instances of EPuck to function in parallel and read in thei
 Any interaction with the robot must be done through this class to localise the use of Player syntax.
 @author Jennifer Owen
  */
-class EPuck
+class EPuckSim
 {
 public:
 
@@ -123,10 +123,10 @@ protected:
 
 public:
 
-	EPuck(char* robotName);
-	EPuck(int robotPort, char* robotName);
-	EPuck(int robotPort, char* robotName, int simulationPort);
-	~EPuck(void);
+	EPuckSim(char* robotName);
+	EPuckSim(int robotPort, char* robotName);
+	EPuckSim(int robotPort, char* robotName, int simulationPort);
+	~EPuckSim(void);
 
 	void readSensors(void);
 	double getSimulationTime(void);
@@ -174,7 +174,7 @@ protected:
 	static void *startReadSensorThread(void *obj)
 	{
 		//All we do here is call the readSensorsThreaded() function
-		reinterpret_cast<EPuck *>(obj)->readSensorsThreaded();
+		reinterpret_cast<EPuckSim *>(obj)->readSensorsThreaded();
 		return NULL;
 	}
 
@@ -183,7 +183,7 @@ protected:
 	static void *startFlashLEDsThread(void *obj)
 	{
 		//All we do here is call the readSensorsThreaded() function
-		reinterpret_cast<EPuck *>(obj)->flashLEDsThreaded();
+		reinterpret_cast<EPuckSim *>(obj)->flashLEDsThreaded();
 		return NULL;
 	}
 
