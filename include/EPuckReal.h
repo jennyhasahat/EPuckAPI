@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <time.h>*/
+#include <stdlib.h>
 #include <pthread.h>
 #include "libplayerc++/playerc++.h"
+#include "EPuck.h"
 
 
 /**Debugging flag. If set to 1 the debugging functions are compiled and can be accessed.*/
@@ -30,7 +32,7 @@ private:
 	PlayerCc::PlayerClient		*epuck;
 
 	PlayerCc::Position2dProxy	*p2dProxy;		//motors
-	PlayerCc::IrProxy 			*irProxy;	//rangers
+	PlayerCc::IrProxy 			*irProxy;		//rangers
 	PlayerCc::BlobfinderProxy	*blobProxy;		//camera
 	PlayerCc::PowerProxy		*powerProxy;	//battery
 
@@ -46,7 +48,14 @@ private:
 
 public:
 
+	/**
+	 * Initialises all device proxies, sets up any useful variables, starts Read sensors thread and seeds the random number generator.
+	 * */
 	EPuckReal(void);
+
+	/**
+	 * Destroys all threads and frees all dynamically allocated memory.
+	 * */
 	~EPuckReal(void);
 
 	/**
@@ -55,15 +64,8 @@ public:
 	void readSensors(void);
 
 	/**
-	 * Returns the elapsed time of the experiment as a double. In a simulation, simulated time should be used in preference of real time
-	 * in case you ever want the simulation to be speeded up. Using real time on a speeded up simulation may mean that
-	 * some processes are running much slower than others and will cause erratic and unexpected behaviour.
-	 * @warning this function requires the development version of Stage to be installed for it to work.
-	 * @warning this function casts from uint64_t to double, which may or may not cause troubles. If your OS is 32-bit it will be fine. It hasn't been tested on a 64-bit OS.
-	 * @returns sim simulated time in milliseconds.
-	 * NOTE that the stage simulator uses a time step of 100ms
-	 * so the returned value of this function will be a factor of 100, this can be changed in the worldfile using
-	 * the parameter "interval_sim".
+	 * Returns the elapsed time that the epuck has been on for as a double.
+	 * @returns sim time in milliseconds.
 	 * */
 	double getTime(void);
 
@@ -219,7 +221,6 @@ public:
 	void printLocation_TEST(void);
 	void printTimes_TEST(void);
 	void dumpAudio_TEST(void);
-	void dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize);
 #endif
 
 protected:

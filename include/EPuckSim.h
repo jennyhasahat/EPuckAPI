@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include "libplayerc++/playerc++.h"
 #include "AudioHandler.h"
+#include "EPuck.h"
 
 /**Debugging flag. If set to 1 the debugging functions are compiled and can be accessed.*/
 #define DEBUGGING 1

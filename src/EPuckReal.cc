@@ -8,14 +8,33 @@
 
 EPuckReal::EPuckReal(void)
 {
-	//initialise(6665, robotName, 6664);
+	//initialise member variables
+	allLEDsOn			= false;
+
+	//make proxies
+	try
+	{
+		epuck 		= new PlayerCc::PlayerClient("localhost");
+
+		p2dProxy 	= new PlayerCc::Position2dProxy(epuck, 0);
+		irProxy 	= new PlayerCc::IrProxy(epuck, 0);
+		blobProxy 	= new PlayerCc::BlobfinderProxy(epuck, 0);
+		powerProxy	= new PlayerCc::PowerProxy(epuck, 0);	//battery
+	}
+	catch (PlayerCc::PlayerError e)
+	{
+		std::cerr << e << std::endl;
+		return;
+	}
+
+	//start threads
+	pthread_create(&readSensorsThread, 0, EPuckSim::startReadSensorThread, this);
+
+	//seed RNG.
+	//srand(value from saved time file);
 }
 
 
-
-/**
-Epuck destructor. Closes threads and stops the robot nicely (ish).
-*/
 EPuckReal::~EPuckReal(void)
 {
 	//close threads
@@ -25,9 +44,10 @@ EPuckReal::~EPuckReal(void)
 
 	//free the items in memory
 	//this is probably unnecessary
-	delete	p2dProxy;		//motors
+	delete	p2dProxy;	//motors
 	delete	irProxy;	//rangers
-	delete	blobProxy;		//camera
+	delete	blobProxy;	//camera
+	delete powerProxy; 	//battery
 	delete	epuck;
 
 	return;
@@ -48,23 +68,14 @@ EPuckReal::~EPuckReal(void)
 	READ SENSORS
 */
 
-/**
-Refreshes the robot's stored sensor values.
-*/
+
 void EPuckReal::readSensors(void)
 {	
 	epuck->Read();
 	return;
 }
 
-/**
- * Returns the simulated time of the experiment as a double. Simulated time should be used in preference of real time
- * in case you ever want the simulation to be speeded up. Using real time on a speeded up simulation may mean that
- * some processes are running much slower than others and will cause erratic and unexpected behaviour.
- * @warning this function requires the development version of Stage to be installed for it to work.
- * @warning this function casts from uint64_t to double, which may or may not cause troubles. If your OS is 32-bit it will be fine. It hasn't been tested on a 64-bit OS.
- * @returns sim simulated time in milliseconds. NOTE that the stage simulator uses a time step of 100ms so the returned value of this function will be a factor of 100.
- * */
+
 double EPuckReal::getTime(void)
 {
 	uint64_t data;
@@ -91,7 +102,7 @@ double* EPuckReal::getIRReadings(void)
 	
 	for(i=0; i<getNumberOfIRs(); i++)
 	{
-		irReadings[i] = sonarProxy->GetScan(i);
+		irReadings[i] = irProxy->GetRange(i);
 	}	
 	
 	return irReadings;
@@ -104,7 +115,7 @@ Gives the IR reading of a particular IR sensor.
 */
 double EPuckReal::getIRReading(int index)
 {
-	return sonarProxy->GetScan(index);
+	return irProxy->GetRange(index);
 }
 
 /**
@@ -498,41 +509,6 @@ void EPuckReal::dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t s
 /*====================================================================
 			PRIVATE FUNCTIONS
 ====================================================================*/
-
-
-/**
- * Because constructors can't call other constructors, this is a common method that the overloaded constructors can call which will initialise the robot.
- * @param port the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
- * @param name the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
- * @param simulationPort the port on which the simulation is running. Get this from the .cfg file of your simulation.
- * */
-void EPuckReal::initialise(int robotPort, char* robotName, int simulationPort)
-{
-	//initialise member variables
-	strcpy(name, robotName);
-	port 				= robotPort;
-	allLEDsOn			= false;
-	audioInitialised 	= false;
-	toneArray 			= NULL;
-
-	try
-	{
-		epuck 		= new PlayerCc::PlayerClient("localhost", port);
-		simulation 	= new PlayerCc::PlayerClient("localhost", simulationPort);
-
-		p2dProxy 	= new PlayerCc::Position2dProxy(epuck, 0);
-		sonarProxy 	= new PlayerCc::SonarProxy(epuck, 0);
-		blobProxy 	= new PlayerCc::BlobfinderProxy(epuck, 0);
-		simProxy 	= new PlayerCc::SimulationProxy(simulation, 0);
-	}
-	catch (PlayerCc::PlayerError e)
-	{
-		std::cerr << e << std::endl;
-		return;
-	}
-
-	pthread_create(&readSensorsThread, 0, EPuckReal::startReadSensorThread, this);
-}
 
 
 /**
