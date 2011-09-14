@@ -1,4 +1,4 @@
-#include "../include/EPuckReal.h"
+#include "EPuckReal.h"
 
 
 /*====================================================================
@@ -28,10 +28,11 @@ EPuckReal::EPuckReal(void)
 	}
 
 	//start threads
-	pthread_create(&readSensorsThread, 0, EPuckSim::startReadSensorThread, this);
+	pthread_create(&readSensorsThread, 0, EPuckReal::startReadSensorThread, this);
 
-	//seed RNG.
-	//srand(value from saved time file);
+	//TODO seed RNG.
+	//startTime = value read in from file
+	//srand(startTime+time(NULL));
 }
 
 
@@ -78,24 +79,12 @@ void EPuckReal::readSensors(void)
 
 double EPuckReal::getTime(void)
 {
-	uint64_t data;
-	double time;
-	char flag[] = "simtime";
-
-	simProxy->GetProperty(name, flag, &data, sizeof(data));
-
-	time = (double)data;
-	time = time / 1000;
-
-	return time;
+	return time(NULL)+startTime;
 }
 
 //************INFRA-RED SENSORS*******************
 
-/**
-Gives the IR readings as an array of length returned by {@link #getNumberOfIRs(void) getNumberOfIRs} class.
-@return The returned ranges for each IR sensor, these are normalised to be given in metres.
-*/
+
 double* EPuckReal::getIRReadings(void)
 {
 	int i;
@@ -108,20 +97,13 @@ double* EPuckReal::getIRReadings(void)
 	return irReadings;
 }
 
-/**
-Gives the IR reading of a particular IR sensor.
-@param index The index of the sensor you want to measure. This will be a number between 0 and value returned by {@link #getNumberOfIRs(void) getNumberOfIRs} - 1.
-@return The range returned by the specified IR sensor, normalised to be given in metres.
-*/
+
 double EPuckReal::getIRReading(int index)
 {
 	return irProxy->GetRange(index);
 }
 
-/**
-Tells you how many IR sensors there are on the robot.
-@return The number of IR sensors as an int.
-*/
+
 int EPuckReal::getNumberOfIRs(void)
 {
 	return 8;
@@ -176,7 +158,7 @@ int EPuckReal::getNumberBlobs(void)
  * @return blob information, in the form of a Blob object
  * @see  EPuck.h#Blob Blob
  * */
-EPuckReal::Blob EPuckReal::getBlob(int index)
+Blob EPuckReal::getBlob(int index)
 {
 	player_blobfinder_blob_t oldBlob;
 	Blob newBlob;
@@ -210,8 +192,8 @@ The maximum speed of the robots is 4cm/s so the wheels are limited to +/- 0.04 m
 */
 void EPuckReal::setMotors(double forward, double turnrate)
 {
-	if(forward > MAX_WHEEL_SPEED) forward = MAX_WHEEL_SPEED;
-	if(forward < (-1)*MAX_WHEEL_SPEED) forward = (-1)*MAX_WHEEL_SPEED;
+	if(forward > EPuck::MAX_WHEEL_SPEED) forward = EPuck::MAX_WHEEL_SPEED;
+	if(forward < (-1)*EPuck::MAX_WHEEL_SPEED) forward = (-1)*EPuck::MAX_WHEEL_SPEED;
 	p2dProxy->SetSpeed(forward, turnrate);
 	return;
 }
@@ -236,10 +218,10 @@ void EPuckReal::setDifferentialMotors(double left, double right)
 	double newspeed, newturnrate;
 	
 	//limit wheel speeds to+/- maximum
-	if(left > MAX_WHEEL_SPEED) left = MAX_WHEEL_SPEED;
-	if(left < (-1)*MAX_WHEEL_SPEED) left = (-1)*MAX_WHEEL_SPEED;
-	if(right > MAX_WHEEL_SPEED) right = MAX_WHEEL_SPEED;
-	if(right < (-1)*MAX_WHEEL_SPEED) right = (-1)*MAX_WHEEL_SPEED;
+	if(left > EPuck::MAX_WHEEL_SPEED) left = EPuck::MAX_WHEEL_SPEED;
+	if(left < (-1)*EPuck::MAX_WHEEL_SPEED) left = (-1)*EPuck::MAX_WHEEL_SPEED;
+	if(right > EPuck::MAX_WHEEL_SPEED) right = EPuck::MAX_WHEEL_SPEED;
+	if(right < (-1)*EPuck::MAX_WHEEL_SPEED) right = (-1)*EPuck::MAX_WHEEL_SPEED;
 
 	/*inside wheel should turn at newspeed/radius radians per sec.
 	  inner(rads) * radius = newspeed
@@ -516,7 +498,7 @@ Reads the robot's sensors but is threadable.
 */
 void EPuckReal::readSensorsThreaded(void)
 {
-	printf("%s is threaded\n", name);
+	printf("threaded\n");
 	while(true)
 	{
 		epuck->Read();

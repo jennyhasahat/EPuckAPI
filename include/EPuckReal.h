@@ -1,17 +1,12 @@
-#ifndef EPUCK_H
-#define EPUCK_H
-/*
-#include <stdio.h>
-#include <stdint.h>
-#include <time.h>*/
+#ifndef EPUCKREAL_H
+#define EPUCKREAL_H
+
 #include <stdlib.h>
 #include <pthread.h>
 #include "libplayerc++/playerc++.h"
 #include "EPuck.h"
+#include "DataStructures.h"
 
-
-/**Debugging flag. If set to 1 the debugging functions are compiled and can be accessed.*/
-#define DEBUGGING 1
 
 /**
 Interacts with a real e-puck robot using Player commands. This assumes that you are using a linux board connected to the epuck and this code is running on the linux board.
@@ -24,7 +19,7 @@ This allows the robot to update its sensor information with no effort from the u
 @see EPuck
 @see EPuckSim
  */
-class EPuckReal
+class EPuckReal : public EPuck
 {
 private:
 	//lpuck supports camera, ir, position2d, power, aio and blobfinder (with cmvision driver)
@@ -36,11 +31,11 @@ private:
 	PlayerCc::BlobfinderProxy	*blobProxy;		//camera
 	PlayerCc::PowerProxy		*powerProxy;	//battery
 
-	/**array containing the IR readings from the EPuck*/
 	double irReadings[8];
 	//LED stuff
 	bool allLEDsOn;
 	double LEDFlashFrequency;
+	double startTime;
 
 
 	//robot also supports power, aio and blinkenlight proxies
@@ -118,9 +113,9 @@ public:
 	/**
 	 * Returns data about a specific blob, referenced by an ID number
 	 * @return blob information, in the form of a Blob object
-	 * @see Blob
+	 * @see EPuck#Blob
 	 * */
-	EPuck::Blob getBlob(int index);
+	Blob getBlob(int index);
 
 	//==================== motor control methods ================================
 
@@ -215,7 +210,7 @@ public:
 	 * @param index the index of the tone you wish to get from the EPuck object
 	 * @returns tone the tone.
 	 * */
-	EPuck::Tone getTone(int index);
+	Tone getTone(int index);
 
 #if DEBUGGING == 1
 	void printLocation_TEST(void);

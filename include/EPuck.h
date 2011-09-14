@@ -1,11 +1,9 @@
 #ifndef EPUCK_H
 #define EPUCK_H
-/*
-#include <stdio.h>
-#include <stdint.h>
-#include <time.h>*/
+
 #include <pthread.h>
 #include "libplayerc++/playerc++.h"
+#include "DataStructures.h"
 
 /**Debugging flag. If set to 1 the debugging functions are compiled and can be accessed.*/
 #define DEBUGGING 1
@@ -25,57 +23,9 @@ An example of making an EPuck object to control a real EPuck:<br>
  */
 class EPuck
 {
+
 public:
 
-	/**
-	 * A substitute for the player_blobfinder_blob_t structure. This one has all the variables in nice units (mostly ints),
-	 * instead of sucky ones (mostly uint32_t). Plus it doesn't require and Player headers to be included outside of this API.
-	 * Data is stored as member variables in the class, they are all public so can be accessed using the dot operator (.).
-	 * As in blobobject.variableName eg blobobject.x or blobobject.area
-	 * */
-	class Blob
-	{
-	public:
-		/**Index reference that the blobfinder proxy gave to this blob*/
-		int	id;
-		/**Colour of the blob in hex. Format is 0xaaRRGGBB, aa being the alpha component of the colour*/
-		//TODO fix colours so that it works with the stuff you wrote for stage.
-		uint32_t colour;
-		/**area of the blob*/
-		int area;
-		/**Centre of the blob, coordinates referenced by top left corner of camera image*/
-		int x;
-		/**Centre of the blob, coordinates referenced by top left corner of camera image*/
-		int y;
-		/**Left edge of bounding box for the blob [pixels] referenced by the top left corner of camera image.*/
-		int left;
-		/**right edge of bounding box for the blob [pixels] referenced by the top left corner of camera image.*/
-		int right;
-		/**top edge of bounding box for the blob [pixels] referenced by the top left corner of camera image.*/
-		int top;
-		/**bottom edge of bounding box for the blob [pixels] referenced by the top left corner of camera image.*/
-		int bottom;
-	};
-
-	/**
-	 * Stores information about the tones in a single frequency band that can be heard by the robot.
-	 * This is the information that the robot will be able to detect and is all robot-centric.
-	 * @see EPuck#getTone
-	 * @see EPuck#listenForTones
-	 * @see EPuck#getBlob
-	 * */
-	class Tone
-	{
-	public:
-		/**The lower bound on the frequency range this tone could be*/
-		double frequency;
-		/**The volume of the tone. This is some arbitrary number without a real measurement, but they are consistent with each other so can be
-		 * compared to other tones and volumes*/
-		double volume;
-		/**The bearing of the sound source with respect to the EPuck. If it is directly in front of the EPuck this will be 0,
-		 * bearings are then measured in DEGREES anticlockwise from the robot's front.*/
-		int bearing;
-	};
 
 	//==========================================================
 	//				CONSTANTS
@@ -125,17 +75,17 @@ public:
 	@param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
 	@param simulationPort the port on which the simulation is running. Get this from the .cfg file of your simulation.
 	@author Jennifer Owen
-	*/
+	 */
 	EPuck(int robotPort, char* robotName, int simulationPort);
 
 	/**
 	Epuck destructor. Closes all threads and stops the robot nicely (ish).
-	*/
+	 */
 	virtual ~EPuck(void);
 
 	/**
 	Refreshes the robot's stored sensor values. Is automatically called by {@link #readSensorsThreaded readSensorsThreaded}
-	*/
+	 */
 	virtual void readSensors(void);
 
 	/**
@@ -157,27 +107,27 @@ public:
 	 * */
 	virtual double getBatteryVolts(void);
 
-//==================== IR methods =========================================
+	//==================== IR methods =========================================
 	/**
 	Gives the IR readings as an array of length returned by {@link #getNumberOfIRs getNumberOfIRs} class.
 	@return The returned ranges for each IR sensor, these are normalised to be given in metres.
-	*/
+	 */
 	virtual double* getIRReadings(void);
 
 	/**
 	Gives the IR reading of a particular IR sensor.
 	@param index The index of the sensor you want to measure. This will be a number between 0 and value returned by {@link #getNumberOfIRs getNumberOfIRs} - 1.
 	@return The range returned by the specified IR sensor, normalised to be given in metres.
-	*/
+	 */
 	virtual double getIRReading(int index);
 
 	/**
 	Tells you how many IR sensors there are on the robot.
 	@return The number of IR sensors as an int.
-	*/
+	 */
 	virtual int getNumberOfIRs(void);
 
-//==================== Blobfinder methods =====================================
+	//==================== Blobfinder methods =====================================
 
 	/**
 	 * Returns the width, in pixels, of the camera image. This will only return a value when there is a blob in view (annoyingly).
@@ -204,7 +154,7 @@ public:
 	 * */
 	virtual Blob getBlob(int index);
 
-//==================== motor control methods ================================
+	//==================== motor control methods ================================
 
 	/**
 	Sets the wheel speeds of the epuck's motors, requires a forward speed and a turnrate. Values are given in metres per second and radians per second.
@@ -212,7 +162,7 @@ public:
 	@param forward speed at which the robot moves forward in metres/sec
 	@param turnrate speed at which the robot turns. Positive to turn left, negative to turn right. Value required in radians/sec.
 	@see MAX_WHEEL_SPEED
-	*/
+	 */
 	virtual void setMotors(double forward, double turnrate);
 
 	/**
@@ -221,10 +171,10 @@ public:
 	@see MAX_WHEEL_SPEED
 	@param left speed of the left wheel
 	@param right speed of the right wheel
-	*/
+	 */
 	virtual void setDifferentialMotors(double left, double right);
 
-//==================== LED methods ==================================
+	//==================== LED methods ==================================
 
 	/**
 	 * Sets all the robot LEDs into the ON state
@@ -265,7 +215,7 @@ public:
 	 * */
 	virtual void stopFlashLEDs(void);
 
-//======================== audio methods =================================
+	//======================== audio methods =================================
 
 	/**
 	 * Initialises the audio drivers so that we can use audio signals in stage.
@@ -298,6 +248,7 @@ public:
 	 * @returns tone the tone.
 	 * */
 	virtual Tone getTone(int index);
+
 
 };
 

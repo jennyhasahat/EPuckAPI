@@ -1,5 +1,5 @@
-#ifndef EPUCK_H
-#define EPUCK_H
+#ifndef EPUCKSIM_H
+#define EPUCKSIM_H
 /*
 #include <stdio.h>
 #include <stdint.h>
@@ -9,8 +9,6 @@
 #include "AudioHandler.h"
 #include "EPuck.h"
 
-/**Debugging flag. If set to 1 the debugging functions are compiled and can be accessed.*/
-#define DEBUGGING 1
 
 /**
 Interacts with a simulated e-puck robot using Player commands.
@@ -36,7 +34,7 @@ driver
 @see EPuck
 @see EPuckReal
  */
-class EPuckSim
+class EPuckSim : public EPuck
 {
 public:
 
@@ -67,7 +65,7 @@ protected:
 	//audio stuff
 	AudioHandler *handler;
 	bool audioInitialised;
-	EPuck::Tone *toneArray;
+	Tone *toneArray;
 	int numberOfTones;
 
 	//robot also supports power, aio and blinkenlight proxies
@@ -149,7 +147,7 @@ public:
 	 * @return blob information, in the form of a Blob object
 	 * @see Blob
 	 * */
-	EPuck::Blob getBlob(int index);
+	Blob getBlob(int index);
 
 	//==================== motor control methods ================================
 
@@ -244,7 +242,7 @@ public:
 	 * @param index the index of the tone you wish to get from the EPuck object
 	 * @returns tone the tone.
 	 * */
-	EPuck::Tone getTone(int index);
+	Tone getTone(int index);
 
 #if DEBUGGING == 1
 	void printLocation_TEST(void);
