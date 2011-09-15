@@ -1,7 +1,6 @@
 #ifndef EPUCKREAL_H
 #define EPUCKREAL_H
 
-#include <stdlib.h>
 #include <pthread.h>
 #include "libplayerc++/playerc++.h"
 #include "EPuck.h"
@@ -221,6 +220,10 @@ public:
 protected:
 
 	pthread_t readSensorsThread;
+
+	/**
+	Reads the robot's sensors but is threadable.
+	*/
 	void readSensorsThreaded(void);
 	static void *startReadSensorThread(void *obj)
 	{
@@ -230,6 +233,9 @@ protected:
 	}
 
 	pthread_t flashLEDsThread;
+	/**
+	Reads the robot's sensors but is threadable.
+	*/
 	void flashLEDsThreaded(void);
 	static void *startFlashLEDsThread(void *obj)
 	{

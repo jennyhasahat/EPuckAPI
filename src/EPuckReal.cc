@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "EPuckReal.h"
 
 
@@ -31,7 +34,14 @@ EPuckReal::EPuckReal(void)
 	pthread_create(&readSensorsThread, 0, EPuckReal::startReadSensorThread, this);
 
 	//TODO seed RNG.
-	//startTime = value read in from file
+
+	//open file with system time in it
+	FILE *fp = fopen("/home/utils/systemtime.data", "r");
+	//read first line of file
+	char readBuffer[32];
+	gets(readBuffer);
+	printf("file says %s", readBuffer);
+	//startTime = value read in from file as a double
 	//srand(startTime+time(NULL));
 }
 
@@ -112,10 +122,7 @@ int EPuckReal::getNumberOfIRs(void)
 
 //************BLOBFINDER SENSORS*******************
 
-/**
- * Returns the width, in pixels, of the camera image. This will only return a value when there is a blob in view (annoyingly).
- * @return the width, in pixels, of the camera image. If no blob is detected it will return -1.
- * */
+
 int EPuckReal::getCameraWidth(void)
 {
 	uint32_t w;
@@ -127,10 +134,7 @@ int EPuckReal::getCameraWidth(void)
 	else return width;
 }
 
-/**
- * Returns the height, in pixels, of the camera image. This will only return a value when there is a blob in view (annoyingly).
- * @return the height, in pixels, of the camera image. If no blob is detected it will return -1.
- * */
+
 int EPuckReal::getCameraHeight(void)
 {
 	uint32_t h;
@@ -184,12 +188,7 @@ Blob EPuckReal::getBlob(int index)
 
 //*************************** MOTORS *****************************
 
-/**
-Sets the wheel speeds of the epuck's motors, requires a forward speed and a turnrate. Values are given in metres per second and radians per second.
-The maximum speed of the robots is 4cm/s so the wheels are limited to +/- 0.04 metres per second.
-@param forward speed at which the robot moves forward in metres/sec
-@param turnrate speed at which the robot turns. Positive to turn left, negative to turn right. Value required in radians/sec.
-*/
+
 void EPuckReal::setMotors(double forward, double turnrate)
 {
 	if(forward > EPuck::MAX_WHEEL_SPEED) forward = EPuck::MAX_WHEEL_SPEED;
@@ -270,39 +269,27 @@ void EPuckReal::setDifferentialMotors(double left, double right)
 
 //******************************* LED FLASHING *************************************
 
-/**
- * Sets all the robot LEDs into the ON state
- * <br>
- * @warning This function may not work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.
- * */
+
 void EPuckReal::setAllLEDsOn(void)
 {
 	float red[]={1, 0, 0, 1};
 	char colour[]="color";
 
-	simProxy->SetProperty(name, colour, &red, sizeof(red));
 	allLEDsOn = true;
 	return;
 }
 
-/**
- * Sets all the robot LEDs into the OFF state
- * <br>
- * @warning This function may not work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.
- * */
+
 void EPuckReal::setAllLEDsOff(void)
 {
 	float darkGreen[]={0.67, 0.88, 0.43, 1};
 	char colour[]="colour";
 
-	simProxy->SetProperty(name, colour, &darkGreen, sizeof(darkGreen));
 	allLEDsOn = false;
 	return;
 }
 
-/**
- * Each time this function is called it will toggle between all the LEDs being on, and all the LEDs being off.
- * */
+
 void EPuckReal::toggleAllLEDs(void)
 {
 	if(allLEDsOn) setAllLEDsOff();
@@ -310,13 +297,7 @@ void EPuckReal::toggleAllLEDs(void)
 	return;
 }
 
-/**
- * Sets the specified LED into the specified state.
- *  * <br>
- * <b>WARNING: This function doesn't actually work in simulation. The entire robot can be either on or off.</b>
- * @param index The index of the LED to change.
- * @param state the state to set that LED to. 1 indicates on, anything else indicates off.
- * */
+
 void EPuckReal::setLED(int index, int state)
 {
 	if(state == 1) setAllLEDsOn();
@@ -324,10 +305,7 @@ void EPuckReal::setLED(int index, int state)
 	return;
 }
 
-/**
- * Flashes the LEDs at the requested frequency.
- * @param frequency the frequency in Hz at which the LEDs should flash.
- * */
+
 void EPuckReal::flashLEDs(double frequency)
 {
 	//user can also stop flashing LEDs with this function.
@@ -342,9 +320,7 @@ void EPuckReal::flashLEDs(double frequency)
 	return;
 }
 
-/**
- * Stops the LEDs from flashing if they are already flashing.
- * */
+
 void EPuckReal::stopFlashLEDs(void)
 {
 //	if(LEDFlashFrequency != 0)
@@ -357,51 +333,35 @@ void EPuckReal::stopFlashLEDs(void)
 
 //******************************* AUDIO *************************************
 
-/**
- * Initialises the audio drivers so that we can use audio signals in stage.
- * @returns success. 0 if audio handler is initialised, -1 if already initialised.
- * */
+
 int EPuckReal::initaliseAudio(void)
 {
-	if(!audioInitialised)
+/*	if(!audioInitialised)
 	{
 		handler = AudioHandler::GetAudioHandler(simulation, simProxy, name);
 		audioInitialised = TRUE;
 		return 0;
 	}
-
+*/
 	return -1;
 }
 
-/**
- * Get this Epuck to play a tone of the desired frequency and duration.
- * @param frequency frequency of tone to play in Hz
- * @param duration duration of the tone in milliseconds
- * @param volume the sound level (volume) to play the tone at. A number between 0 and 10. This does not go up to 11.
- * @returns 0 if successful -1 if unsuccessful
- */
+
 int EPuckReal::playTone(int frequency, double duration, double volume)
-{
+{/*
 	if(audioInitialised)
 	{
 		handler->playTone(frequency, duration, volume, name);
 		return 0;
 	}
 
-	printf("Unsuccessful epuck %s playTone() request. Audio not initialised.\n", name);
+	printf("Unsuccessful epuck %s playTone() request. Audio not initialised.\n", name);*/
 	return -1;
 }
 
-/**
- * Listens for any sounds in the audio environment and stores them in the EPuck class until the user requests them.
- * Tones of similar frequency are grouped together because a Fourier transform is performed on the signal from the microphones,
- * the resulting information is combined in a way that is physically plausible (because this is a simulation after all...)
- * and stored in the EPuck object until requested by the user.
- * @returns numberOfTones the number of different tones the robot can hear.
- * */
 int EPuckReal::listenForTones(void)
 {
-	int i;
+/*	int i;
 	AudioHandler::audio_message_t *message;
 
 	if(audioInitialised)
@@ -425,19 +385,14 @@ int EPuckReal::listenForTones(void)
 		return numberOfTones;
 	}
 
-	printf("Unsuccessful epuck %s listenToTones() request. Audio not initialised.\n", name);
+	printf("Unsuccessful epuck %s listenToTones() request. Audio not initialised.\n", name);*/
 	return -1;
 }
 
-/**
- * Will return the requested tone. The EPuck object stores a list of tones, their frequencies, volumes and directions wrt the epuck.
- * This list of tones is updated when {@link EPuck#listenForTones} is called. This function allows you to request a tone from this array.
- * @param index the index of the tone you wish to get from the EPuck object
- * @returns tone the tone.
- * */
-EPuckReal::Tone EPuckReal::getTone(int index)
+
+Tone EPuckReal::getTone(int index)
 {
-	if(index < numberOfTones && index > -1)
+/*	if(index < numberOfTones && index > -1)
 	{
 		return toneArray[index];
 	}
@@ -449,9 +404,11 @@ EPuckReal::Tone EPuckReal::getTone(int index)
 		t.frequency = 0;
 		t.volume = 0;
 		return t;
-	}
+	}*/
+	Tone t;
+	return t;
 }
-
+/*
 void EPuckReal::printLocation_TEST(void)
 {
 	double x, y, yaw;
@@ -486,16 +443,12 @@ void EPuckReal::dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t s
 		printf("\tbin number %d\n", i);
 		printf("\tfrequency %f\n\tvolume %f\n\tdirection %d\n", store[i].frequency, store[i].volume, store[i].direction);
 	}
-}
+}*/
 
 /*====================================================================
 			PRIVATE FUNCTIONS
 ====================================================================*/
 
-
-/**
-Reads the robot's sensors but is threadable.
-*/
 void EPuckReal::readSensorsThreaded(void)
 {
 	printf("threaded\n");
@@ -508,9 +461,6 @@ void EPuckReal::readSensorsThreaded(void)
 	return;
 }
 
-/**
-Reads the robot's sensors but is threadable.
-*/
 void EPuckReal::flashLEDsThreaded(void)
 {
 	double period = 1/LEDFlashFrequency; //flash period in seconds

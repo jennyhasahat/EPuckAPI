@@ -56,7 +56,7 @@ public:
 	 * using default simulation port 6664 and default robot port 6665.
 	 * @param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
 	 * @author Jennifer Owen
-	 * */
+	 * *
 	EPuck(char* robotName);
 
 	/**
@@ -66,7 +66,7 @@ public:
 	 * @param robotPort the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
 	 * @param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
 	 * @author Jennifer Owen
-	 * */
+	 * *
 	EPuck(int robotPort, char* robotName);
 
 	/**
@@ -75,7 +75,7 @@ public:
 	@param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
 	@param simulationPort the port on which the simulation is running. Get this from the .cfg file of your simulation.
 	@author Jennifer Owen
-	 */
+	 *
 	EPuck(int robotPort, char* robotName, int simulationPort);
 
 	/**
