@@ -81,12 +81,12 @@ public:
 	/**
 	Epuck destructor. Closes all threads and stops the robot nicely (ish).
 	 */
-	virtual ~EPuck(void);
+	virtual ~EPuck(void){};
 
 	/**
 	Refreshes the robot's stored sensor values. Is automatically called by {@link #readSensorsThreaded readSensorsThreaded}
 	 */
-	virtual void readSensors(void);
+	virtual void readSensors(void) = 0;
 
 	/**
 	 * Returns the elapsed time of the experiment as a double. In a simulation, simulated time should be used in preference of real time
@@ -99,33 +99,33 @@ public:
 	 * so the returned value of this function will be a factor of 100, this can be changed in the worldfile using
 	 * the parameter "interval_sim".
 	 * */
-	virtual double getTime(void);
+	virtual double getTime(void) = 0;
 
 	/**
 	 * Gets the amount of volts currently being output by the epuck's battery.
 	 * @returns voltage, the battery should normally be {@link EPuck#MAXIMUM_BATTERY_VOLTAGE}. It will be less if the battery is running low.
 	 * */
-	virtual double getBatteryVolts(void);
+	virtual double getBatteryVolts(void) = 0;
 
 	//==================== IR methods =========================================
 	/**
 	Gives the IR readings as an array of length returned by {@link #getNumberOfIRs getNumberOfIRs} class.
 	@return The returned ranges for each IR sensor, these are normalised to be given in metres.
 	 */
-	virtual double* getIRReadings(void);
+	virtual double* getIRReadings(void) = 0;
 
 	/**
 	Gives the IR reading of a particular IR sensor.
 	@param index The index of the sensor you want to measure. This will be a number between 0 and value returned by {@link #getNumberOfIRs getNumberOfIRs} - 1.
 	@return The range returned by the specified IR sensor, normalised to be given in metres.
 	 */
-	virtual double getIRReading(int index);
+	virtual double getIRReading(int index) = 0;
 
 	/**
 	Tells you how many IR sensors there are on the robot.
 	@return The number of IR sensors as an int.
 	 */
-	virtual int getNumberOfIRs(void);
+	virtual int getNumberOfIRs(void) = 0;
 
 	//==================== Blobfinder methods =====================================
 
@@ -133,26 +133,26 @@ public:
 	 * Returns the width, in pixels, of the camera image. This will only return a value when there is a blob in view (annoyingly).
 	 * @return the width, in pixels, of the camera image. If no blob is detected it will return -1.
 	 * */
-	virtual int getCameraWidth(void);
+	virtual int getCameraWidth(void) = 0;
 
 	/**
 	 * Returns the height, in pixels, of the camera image. This will only return a value when there is a blob in view (annoyingly).
 	 * @return the height, in pixels, of the camera image. If no blob is detected it will return -1.
 	 * */
-	virtual int getCameraHeight(void);
+	virtual int getCameraHeight(void) = 0;
 
 	/**
 	 * Returns the number of coloured blobs in the image
 	 * @return the number of coloured blobs (of all colours)
 	 * */
-	virtual int getNumberBlobs(void);
+	virtual int getNumberBlobs(void) = 0;
 
 	/**
 	 * Returns data about a specific blob, referenced by an ID number
 	 * @return blob information, in the form of a Blob object
 	 * @see Blob
 	 * */
-	virtual Blob getBlob(int index);
+	virtual Blob getBlob(int index) = 0;
 
 	//==================== motor control methods ================================
 
@@ -163,7 +163,7 @@ public:
 	@param turnrate speed at which the robot turns. Positive to turn left, negative to turn right. Value required in radians/sec.
 	@see MAX_WHEEL_SPEED
 	 */
-	virtual void setMotors(double forward, double turnrate);
+	virtual void setMotors(double forward, double turnrate) = 0;
 
 	/**
 	Sets the wheel speeds of the epuck's motors, this function is used to directly set the left and right wheel speed. Values are given in metres per second.
@@ -172,7 +172,7 @@ public:
 	@param left speed of the left wheel
 	@param right speed of the right wheel
 	 */
-	virtual void setDifferentialMotors(double left, double right);
+	virtual void setDifferentialMotors(double left, double right) = 0;
 
 	//==================== LED methods ==================================
 
@@ -181,19 +181,19 @@ public:
 	 * <br>
 	 * @warning This function may not work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.
 	 * */
-	virtual void setAllLEDsOn(void);
+	virtual void setAllLEDsOn(void) = 0;
 
 	/**
 	 * Sets all the robot LEDs into the OFF state
 	 * <br>
 	 * @warning This function may not work in simulation due to a Player/Stage bug. Must use Player 3.0.2 or higher and Stage 3.2.3 or higher.
 	 * */
-	virtual void setAllLEDsOff(void);
+	virtual void setAllLEDsOff(void) = 0;
 
 	/**
 	 * Each time this function is called it will toggle between all the LEDs being on, and all the LEDs being off.
 	 * */
-	virtual void toggleAllLEDs(void);
+	virtual void toggleAllLEDs(void) = 0;
 
 	/**
 	 * Sets the specified LED into the specified state.
@@ -202,18 +202,18 @@ public:
 	 * @param index The index of the LED to change.
 	 * @param state the state to set that LED to. 1 indicates on, anything else indicates off.
 	 * */
-	virtual void setLED(int index, int state);
+	virtual void setLED(int index, int state) = 0;
 
 	/**
 	 * Flashes the LEDs at the requested frequency.
 	 * @param frequency the frequency in Hz at which the LEDs should flash.
 	 * */
-	virtual void flashLEDs(double frequency);
+	virtual void flashLEDs(double frequency) = 0;
 
 	/**
 	 * Stops the LEDs from flashing if they are already flashing.
 	 * */
-	virtual void stopFlashLEDs(void);
+	virtual void stopFlashLEDs(void) = 0;
 
 	//======================== audio methods =================================
 
@@ -221,7 +221,7 @@ public:
 	 * Initialises the audio drivers so that we can use audio signals in stage.
 	 * @returns success. 0 if audio handler is initialised, -1 if already initialised.
 	 * */
-	virtual int initaliseAudio(void);
+	virtual int initaliseAudio(void) = 0;
 
 	/**
 	 * Get this Epuck to play a tone of the desired frequency and duration.
@@ -230,7 +230,7 @@ public:
 	 * @param volume the sound level (volume) to play the tone at. A number between 0 and 10. This does not go up to 11.
 	 * @returns 0 if successful -1 if unsuccessful
 	 */
-	virtual int playTone(int frequency, double duration, double volume);
+	virtual int playTone(int frequency, double duration, double volume) = 0;
 
 	/**
 	 * Listens for any sounds in the audio environment and stores them in the EPuck class until the user requests them.
@@ -239,7 +239,7 @@ public:
 	 * and stored in the EPuck object until requested by the user.
 	 * @returns numberOfTones the number of different tones the robot can hear.
 	 * */
-	virtual int listenForTones(void);
+	virtual int listenForTones(void) = 0;
 
 	/**
 	 * Will return the requested tone. The EPuck object stores a list of tones, their frequencies, volumes and directions wrt the epuck.
@@ -247,7 +247,7 @@ public:
 	 * @param index the index of the tone you wish to get from the EPuck object
 	 * @returns tone the tone.
 	 * */
-	virtual Tone getTone(int index);
+	virtual Tone getTone(int index) = 0;
 
 
 };

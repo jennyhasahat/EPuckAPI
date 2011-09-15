@@ -39,7 +39,7 @@ EPuckReal::EPuckReal(void)
 	FILE *fp = fopen("/home/utils/systemtime.data", "r");
 	//read first line of file
 	char readBuffer[32];
-	gets(readBuffer);
+	fgets(readBuffer, 32, fp);
 	printf("file says %s", readBuffer);
 	//startTime = value read in from file as a double
 	//srand(startTime+time(NULL));
@@ -90,6 +90,12 @@ void EPuckReal::readSensors(void)
 double EPuckReal::getTime(void)
 {
 	return time(NULL)+startTime;
+}
+
+double EPuckReal::getBatteryVolts(void)
+{
+	//TODO fix
+	return EPuck::MAXIMUM_BATTERY_VOLTAGE;
 }
 
 //************INFRA-RED SENSORS*******************

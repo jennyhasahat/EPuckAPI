@@ -10,6 +10,7 @@
 #include <math.h>
 #include <unistd.h>	//for usleep
 #include "EPuck.h"
+#include "EPuckReal.h"
 
 /**
  * Checks the given robot for nearby obstacles and generates motor speeds to avoid them.
@@ -136,7 +137,7 @@ void phonotaxis(EPuck *bot, double *leftWheel, double *rightWheel)
 	if(numberTones > 0)
 	{
 		double rads;
-		EPuck::Tone t;
+		Tone t;
 
 		t = bot->getTone(0);
 
@@ -197,7 +198,7 @@ void *flashAndSound(void *bot)
 	{
 		printf("playing tone\n");
 		robot->playTone(500, 5000, 10);
-		robot->dumpAudio_TEST();
+		//robot->dumpAudio_TEST();
 		usleep(5000000);
 	}
 	pthread_exit(NULL);
@@ -207,10 +208,12 @@ void *flashAndSound(void *bot)
 
 int main(void)
 {
-	EPuck* robots[4];
+//	EPuck* robots[4];
 	pthread_t noisyBotThread1;
 
-	char testbot1Name[] = "robot1";
+	EPuckReal *robot = new EPuckReal();
+
+/*	char testbot1Name[] = "robot1";
 	robots[0] = new EPuck(6665, testbot1Name);
 	robots[0]->initaliseAudio();
 
@@ -255,6 +258,6 @@ int main(void)
 	//	printf("left: %f. right %f\n", left, right);
 		usleep(50000);
 	}
-
+*/
 	return 0;
 }
