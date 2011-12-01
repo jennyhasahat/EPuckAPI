@@ -14,21 +14,6 @@
 //I hope this statement doesn't have global scope... I don't think it does.
 AudioHandler* AudioHandler::_instance = 0;
 
-/**
- * Function that allows AudioHandler to be a singleton. Use this to construct the AudioHandler object.
- * @param simulationClient the PlayerClient object which handles the simulation.
- * @param sim the simulationProxy attached to the playerclient handling this simulation.
- * @param name the name of the robot that initialises the AudioHandler.
- * This is used for accessing data from the simulation proxy, as you need the name of a model to get simulation time information.
- * */
-AudioHandler* AudioHandler::GetAudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::SimulationProxy *sim, char* name)
-{
-	if(_instance == 0)
-	{
-		_instance = new AudioHandler(simulationClient, sim, name);
-	}
-	return _instance;
-}
 
 /**
  * Creates the audiohandler object and builds an array to store the sound data for each robot.
@@ -57,6 +42,22 @@ AudioHandler::AudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::S
 
 	printf("AudioHandler initialised\n");
 	return;
+}
+
+/**
+ * Function that allows AudioHandler to be a singleton. Use this to construct the AudioHandler object.
+ * @param simulationClient the PlayerClient object which handles the simulation.
+ * @param sim the simulationProxy attached to the playerclient handling this simulation.
+ * @param name the name of the robot that initialises the AudioHandler.
+ * This is used for accessing data from the simulation proxy, as you need the name of a model to get simulation time information.
+ * */
+AudioHandler* AudioHandler::GetAudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::SimulationProxy *sim, char* name)
+{
+	if(_instance == 0)
+	{
+		_instance = new AudioHandler(simulationClient, sim, name);
+	}
+	return _instance;
 }
 
 AudioHandler::~AudioHandler()

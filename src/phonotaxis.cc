@@ -11,6 +11,7 @@
 #include <unistd.h>	//for usleep
 #include "EPuck.h"
 #include "EPuckReal.h"
+#include "EPuckSim.h"
 
 /**
  * Checks the given robot for nearby obstacles and generates motor speeds to avoid them.
@@ -208,25 +209,25 @@ void *flashAndSound(void *bot)
 
 int main(void)
 {
-//	EPuck* robots[4];
+	EPuckSim* robots[4];
 	pthread_t noisyBotThread1;
 
-	EPuckReal *robot = new EPuckReal();
+//	EPuckReal *robot = new EPuckReal();
 
-/*	char testbot1Name[] = "robot1";
-	robots[0] = new EPuck(6665, testbot1Name);
+	char testbot1Name[] = "robot1";
+	robots[0] = new EPuckSim(6665, testbot1Name);
 	robots[0]->initaliseAudio();
 
 	char testbot2Name[] = "robot2";
-	robots[1] = new EPuck(6666, testbot2Name);
+	robots[1] = new EPuckSim(6666, testbot2Name);
 	robots[1]->initaliseAudio();
 
 	char testbot3Name[] = "robot3";
-	robots[2] = new EPuck(6667, testbot3Name);
+	robots[2] = new EPuckSim(6667, testbot3Name);
 	robots[2]->initaliseAudio();
 
 	char testbot4Name[] = "robot4";
-	robots[3] = new EPuck(6668, testbot4Name);
+	robots[3] = new EPuckSim(6668, testbot4Name);
 	robots[3]->initaliseAudio();
 
 	int bot1;
@@ -258,6 +259,6 @@ int main(void)
 	//	printf("left: %f. right %f\n", left, right);
 		usleep(50000);
 	}
-*/
+
 	return 0;
 }

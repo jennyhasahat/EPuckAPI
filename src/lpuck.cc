@@ -810,7 +810,7 @@ void LPuck::refreshPowerData()
   player_power_data_t power_data;
   power_data.valid = 1;
   //FIXME: find  correct  coefficients for the voltage conversion
-  power_data.volts = this->batt_factor * 3.3 * (msgRX.batt * 1.0) / 4096;
+  //power_data.volts = this->batt_factor * 3.3 * (msgRX.batt * 1.0) / 4096;
   power_data.percent = 0;
   power_data.joules = msgRX.batt * 1.0;
   power_data.watts = 0;

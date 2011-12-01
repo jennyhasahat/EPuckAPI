@@ -22,6 +22,7 @@ EPuckReal::EPuckReal(void)
 		p2dProxy 	= new PlayerCc::Position2dProxy(epuck, 0);
 		irProxy 	= new PlayerCc::IrProxy(epuck, 0);
 		blobProxy 	= new PlayerCc::BlobfinderProxy(epuck, 0);
+		camProxy 	= new PlayerCc::CameraProxy(epuck, 0);
 		powerProxy	= new PlayerCc::PowerProxy(epuck, 0);	//battery
 	}
 	catch (PlayerCc::PlayerError e)
@@ -33,16 +34,15 @@ EPuckReal::EPuckReal(void)
 	//start threads
 	pthread_create(&readSensorsThread, 0, EPuckReal::startReadSensorThread, this);
 
-	//TODO seed RNG.
-
 	//open file with system time in it
-	FILE *fp = fopen("/home/utils/systemtime.data", "r");
+	//TODO in real robots change line below to
+	//FILE *fp = fopen("/home/utils/systemtime.data", "r");
+	FILE *fp = fopen("./helpful-files/systemtime.data", "r");
 	//read first line of file
 	char readBuffer[32];
 	fgets(readBuffer, 32, fp);
-	printf("file says %s", readBuffer);
-	//startTime = value read in from file as a double
-	//srand(startTime+time(NULL));
+	startTime = atof(readBuffer) + time(NULL);
+	srand(startTime);
 }
 
 
@@ -57,6 +57,7 @@ EPuckReal::~EPuckReal(void)
 	//this is probably unnecessary
 	delete	p2dProxy;	//motors
 	delete	irProxy;	//rangers
+	delete	camProxy;	//camera
 	delete	blobProxy;	//camera
 	delete powerProxy; 	//battery
 	delete	epuck;
@@ -94,8 +95,7 @@ double EPuckReal::getTime(void)
 
 double EPuckReal::getBatteryVolts(void)
 {
-	//TODO fix
-	return EPuck::MAXIMUM_BATTERY_VOLTAGE;
+	return (double)powerProxy->GetJoules();
 }
 
 //************INFRA-RED SENSORS*******************
@@ -133,7 +133,7 @@ int EPuckReal::getCameraWidth(void)
 {
 	uint32_t w;
 	int width;
-	w = blobProxy->GetWidth();
+	w = camProxy->GetWidth();
 	width = (int)w;
 
 	if(width <= 0) return -1;
@@ -145,7 +145,7 @@ int EPuckReal::getCameraHeight(void)
 {
 	uint32_t h;
 	int height;
-	h = blobProxy->GetHeight();
+	h = camProxy->GetHeight();
 	height = (int)h;
 
 	if(height <= 0) return -1;

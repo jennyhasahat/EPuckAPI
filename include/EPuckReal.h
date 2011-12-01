@@ -27,6 +27,7 @@ private:
 
 	PlayerCc::Position2dProxy	*p2dProxy;		//motors
 	PlayerCc::IrProxy 			*irProxy;		//rangers
+	PlayerCc::CameraProxy		*camProxy;		//camera
 	PlayerCc::BlobfinderProxy	*blobProxy;		//camera
 	PlayerCc::PowerProxy		*powerProxy;	//battery
 
