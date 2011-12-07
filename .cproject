@@ -27,7 +27,6 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1616988424" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.other.other.164698950" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 `pkg-config --cflags playerc++`" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.956779464" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/usr/local/include/player-3.0"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/EPuckAPI/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1262584357" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -46,9 +45,10 @@
 								<option id="gnu.cpp.link.option.flags.99596291" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`pkg-config --libs playerc++`" valueType="string"/>
 								<option id="gnu.cpp.link.option.libs.298072416" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="pthread"/>
+									<listOptionValue builtIn="false" value="stage"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.569108165" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="/usr/lib64"/>
+									<listOptionValue builtIn="false" value="/usr/local/lib64"/>
 								</option>
 								<option id="gnu.cpp.link.option.implname.1557078977" name="Import Library name (-Wl,--out-implib=)" superClass="gnu.cpp.link.option.implname" value="" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1036503695" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
@@ -69,18 +69,6 @@
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
-			<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
-				<buildTargets>
-					<target name="epuckAPI" path="src" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-						<buildCommand>make</buildCommand>
-						<buildArguments/>
-						<buildTarget>epuckAPI</buildTarget>
-						<stopOnError>true</stopOnError>
-						<useDefaultCommand>true</useDefaultCommand>
-						<runAllBuilders>true</runAllBuilders>
-					</target>
-				</buildTargets>
-			</storageModule>
 		</cconfiguration>
 		<cconfiguration id="cdt.managedbuild.config.gnu.exe.release.470312029">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.release.470312029" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -131,18 +119,6 @@
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
-			<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
-				<buildTargets>
-					<target name="epuckAPI" path="src" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-						<buildCommand>make</buildCommand>
-						<buildArguments/>
-						<buildTarget>epuckAPI</buildTarget>
-						<stopOnError>true</stopOnError>
-						<useDefaultCommand>true</useDefaultCommand>
-						<runAllBuilders>true</runAllBuilders>
-					</target>
-				</buildTargets>
-			</storageModule>
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -189,5 +165,17 @@
 				</scannerInfoProvider>
 			</profile>
 		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+		<buildTargets>
+			<target name="epuckAPI" path="src" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>epuckAPI</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+		</buildTargets>
 	</storageModule>
 </cproject>
