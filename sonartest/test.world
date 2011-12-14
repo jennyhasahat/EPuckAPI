@@ -1,10 +1,18 @@
 include "map.inc"
 
+window
+(
+	size [500 500]
+	scale 250
+	show_data 1
+)
+
+
 floorplan
 (
-	bitmap "bitmaps/rink2.png"
-	size [4 4 0.5]	
-	name "cave"
+	bitmap "./rink2.png"
+	size [2 2 0.5]	
+	name "map"
 	
 	obstacle_return 1
 	ranger_return 1
@@ -13,20 +21,29 @@ floorplan
 )
 
 #ranger sensors
-define epuck_IR ranger
+
+define epuck_IR sensor
 (
-	# number of sonars
-	scount 2
-
-	# define the pose of each transducer [xpos ypos heading]
-	spose[0] [0.030	-0.010	-15]	#fr right
-	spose[1] [0.03	0.01 	 15]	#fr left
-	
 	# define the field of view of each transducer [range_min range_max view_angle]
-	sview [0.0064 0.1 10]
-
+	range [0.0064 01]
+	
 	# define the size of each transducer [xsize ysize] in meters
-	ssize [0.007 0.002]
+	size [0.007 0.002 0.004]
+	#size [7 2 4]
+	
+	#field of view
+	fov 10
+	
+	#number of readings from range sensor
+	samples 1
+	color_rgba [ 0 0 1 0.2 ] 
+)
+
+define epuck_IRs ranger
+(
+	# define the pose of each ranger
+	epuck_IR(pose [0.030	-0.010	-0.015	-15]) #fr right
+	epuck_IR(pose [0.03	0.01 	-0.015	15])  #fr left	
 )
 
 # epuck base
@@ -35,8 +52,7 @@ define epuck position
 	obstacle_return 1
 	ranger_return 1
 	blob_return 1
-	gui_outline 1
-	gui_nose 1
+	gui_outline 0
     
 	# actual size
 	size [0.1 0.1 0.05]
@@ -55,10 +71,10 @@ define epuck position
 	)
 
 	# differential steering model
-	drive "diff"
+	#drive "diff"
 
 	# sensors attached to epuck
-	epuck_IR()
+	epuck_IRs()
 ) 
 
 epuck
@@ -66,3 +82,10 @@ epuck
 	pose [0 0 0 -45]
 	name "robot1"
 )
+
+epuck
+(
+	pose [0.25 -0.5 0 -45]
+	name "robot2"
+)
+

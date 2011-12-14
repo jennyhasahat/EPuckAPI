@@ -1,5 +1,5 @@
 include "map.inc"
-include "epuck-mine.inc"
+include "epuck-stage4.inc"
 
 # size of the whole simulation
 

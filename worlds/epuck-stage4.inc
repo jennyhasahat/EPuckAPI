@@ -2,31 +2,35 @@
 # rough model of the epuck robots
 
 #ranger sensors
-define epuck_IR ranger
+define epuck_IR sensor
 (
-	# number of sonars
-	scount 8
+	# define the field of view of each transducer [range_min range_max view_angle]
+	range [0.0064 0.1]
+	
+	# define the size of each transducer [xsize ysize] in meters
+	size [0.007 0.002 0.004]
+	
+	#field of view
+	fov 10
+	
+	#number of readings from range sensor
+	#samples 1
+	color_rgba [ 0 0 1 0.2 ] 
+)
 
+define epuck_IRs ranger
+(
 	# define the pose of each transducer [xpos ypos heading]
-	spose[0] [0.030	-0.010	-15]	#fr right
-	spose[1] [0.022	-0.025	-45]	#fr right 2
-	spose[2] [0.0	-0.031	-90]	# right	
-	spose[3] [-0.03   -0.015	-150]	#back right
-	spose[4] [-0.03	0.015		150]	#back left
-	spose[5] [0.0  	0.031		90]	#left
-	spose[6] [0.022	0.025		45]	#fr left 2
-	spose[7] [0.03	0.01		15]	#fr left
+	epuck_IR ( pose [0.030	-0.010	-0.015	-15] )	#fr right		
+	epuck_IR ( pose [0.022	-0.025	-0.015	-45] )	#fr right 2
+	epuck_IR ( pose [0.0	-0.031	-0.015	-90] )	# right	
+	epuck_IR ( pose [-0.03  -0.015	-0.015	-150] )	#back right
+	epuck_IR ( pose [-0.03	0.015	-0.015	150] )	#back left
+	epuck_IR ( pose [0.0  	0.031	-0.015	90] )	#left
+	epuck_IR ( pose [0.022	0.025	-0.015	45] )	#fr left 2
+	epuck_IR ( pose [0.03	0.01	-0.015	15] )	#fr left
 	
 		#angles got from the placement diagram on epuck website.
-
-		
-	# define the field of view of each transducer [range_min range_max view_angle]
-	sview [0.0064 0.1 10]
-		# range min and max are from the epuck website prox sensor graphs.
-
-	# define the size of each transducer [xsize ysize] in meters
-	#ssize [0.007 0.002]
-	#from IR data sheet
 )
 
 # epuck blobfinder
@@ -132,7 +136,7 @@ define epuck position
 	drive "diff"
 
 	# sensors attached to epuck
-	epuck_IR()  
+	epuck_IRs()  
 	epuck_cam()
 ) 
 

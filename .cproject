@@ -28,6 +28,7 @@
 								<option id="gnu.cpp.compiler.option.other.other.164698950" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 `pkg-config --cflags playerc++`" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.956779464" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/EPuckAPI/include}&quot;"/>
+									<listOptionValue builtIn="false" value="/usr/local/include/player-3.0"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1262584357" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -46,11 +47,14 @@
 								<option id="gnu.cpp.link.option.libs.298072416" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="pthread"/>
 									<listOptionValue builtIn="false" value="stage"/>
+									<listOptionValue builtIn="false" value="playerc++"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.569108165" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/usr/local/lib64"/>
 								</option>
 								<option id="gnu.cpp.link.option.implname.1557078977" name="Import Library name (-Wl,--out-implib=)" superClass="gnu.cpp.link.option.implname" value="" valueType="string"/>
+								<option id="gnu.cpp.link.option.shared.1563433031" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" value="false" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.soname.9690958" name="Shared object name (-Wl,-soname=)" superClass="gnu.cpp.link.option.soname" value="" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1036503695" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -62,7 +66,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="helpful-files|epuck-side|test/testAPI.cc|epuckapi-doxygen|worlds|helpful files|src/TestEPuck.cc|test/worlds|src/lpuck.cc" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="sonartest|helpful-files|epuck-side|test/testAPI.cc|epuckapi-doxygen|worlds|helpful files|src/TestEPuck.cc|test/worlds|src/lpuck.cc" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -112,7 +116,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="helpful-files|epuck-side|test/testAPI.cc|worlds|helpful files|src/TestEPuck.cc|test/worlds|src/lpuck.cc" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="sonartest|helpful-files|epuck-side|test/testAPI.cc|worlds|helpful files|src/TestEPuck.cc|test/worlds|src/lpuck.cc" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
