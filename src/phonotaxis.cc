@@ -197,7 +197,7 @@ void *flashAndSound(void *bot)
 	robot->setAllLEDsOn();
 	while(true)
 	{
-		printf("playing tone\n");
+		printf("playing tone. Time is %f.\n", robot->getTime());
 		robot->playTone(500, 5000, 10);
 		//robot->dumpAudio_TEST();
 		usleep(5000000);

@@ -1,7 +1,7 @@
 include "map.inc"
 include "epuck-stage4.inc"
 
-# size of the whole simulation
+# properties of the whole simulation
 
 # configure the GUI window
 window
@@ -9,6 +9,7 @@ window
 	size [ 700.000 700.000 ] 
 	scale 200
 	show_blocks 1
+	show_clock 1
 )
 
 

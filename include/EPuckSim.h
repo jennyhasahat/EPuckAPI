@@ -52,7 +52,7 @@ protected:
 	PlayerCc::PlayerClient		*simulation;
 
 	PlayerCc::Position2dProxy	*p2dProxy;		//motors
-	PlayerCc::SonarProxy		*sonarProxy;	//rangers
+	PlayerCc::RangerProxy		*rangerProxy;	//rangers
 	PlayerCc::BlobfinderProxy	*blobProxy;		//camera
 	PlayerCc::SimulationProxy	*simProxy;		//leds
 

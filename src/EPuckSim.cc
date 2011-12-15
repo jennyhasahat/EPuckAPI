@@ -58,7 +58,7 @@ EPuckSim::~EPuckSim(void)
 	//free the items in memory
 	//this is probably unnecessary
 	delete	p2dProxy;		//motors
-	delete	sonarProxy;	//rangers
+	delete	rangerProxy;	//rangers
 	delete	blobProxy;		//camera
 	delete	simProxy;		//leds
 	delete	epuck;
@@ -93,12 +93,12 @@ double EPuckSim::getTime(void)
 {
 	uint64_t data;
 	double time;
-	char flag[] = "simtime";
+	char flag[] = "time";
 
 	simProxy->GetProperty(name, flag, &data, sizeof(data));
-
+printf("read value %f\n", (double)data);
 	time = (double)data;
-	time = time / 1000;
+	time = time / 1000000;
 
 	return time;
 }
@@ -117,7 +117,7 @@ double* EPuckSim::getIRReadings(void)
 	
 	for(i=0; i<getNumberOfIRs(); i++)
 	{
-		irReadings[i] = sonarProxy->GetScan(i);
+		irReadings[i] = rangerProxy->GetRange(i);
 	}	
 	
 	return irReadings;
@@ -126,7 +126,7 @@ double* EPuckSim::getIRReadings(void)
 
 double EPuckSim::getIRReading(int index)
 {
-	return sonarProxy->GetScan(index);
+	return rangerProxy->GetRange(index);
 }
 
 /**
@@ -291,7 +291,7 @@ void EPuckSim::setAllLEDsOn(void)
 void EPuckSim::setAllLEDsOff(void)
 {
 	float darkGreen[]={0.67, 0.88, 0.43, 1};
-	char colour[]="colour";
+	char colour[]="color";
 
 	simProxy->SetProperty(name, colour, &darkGreen, sizeof(darkGreen));
 	allLEDsOn = false;
@@ -474,7 +474,7 @@ void EPuckSim::initialise(int robotPort, char* robotName, int simulationPort)
 		simulation 	= new PlayerCc::PlayerClient("localhost", simulationPort);
 
 		p2dProxy 	= new PlayerCc::Position2dProxy(epuck, 0);
-		sonarProxy 	= new PlayerCc::SonarProxy(epuck, 0);
+		rangerProxy 	= new PlayerCc::RangerProxy(epuck, 0);
 		blobProxy 	= new PlayerCc::BlobfinderProxy(epuck, 0);
 		simProxy 	= new PlayerCc::SimulationProxy(simulation, 0);
 	}
