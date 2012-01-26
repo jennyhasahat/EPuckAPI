@@ -90,7 +90,7 @@ AudioHandler::~AudioHandler()
 void AudioHandler::playTone(int freq, double duration, double volume, char* robotName)
 {
 	int whichbin;
-	char timeflag[] = "sim_time";
+	char timeflag[] = "time";
 	const int maxVoltage = EPuck::MAXIMUM_BATTERY_VOLTAGE;
 	const int minVoltage = 0; //EPuck::MINIMUM_BATTERY_VOLTAGE;
 
@@ -137,8 +137,8 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 	simProxy->GetPose2d(robotName, x, y, yaw);
 
 	//todo fix the next lines when clock stuff is sorted.
-	//simProxy->GetProperty(name, timeflag, &currenttime, sizeof(currenttime));
-	currenttime = (double)time(NULL);
+	simProxy->GetProperty(robotName, timeflag, &currenttime, sizeof(currenttime));
+	//currenttime = (double)time(NULL);
 
 	//limit voltage to be between the max and min voltages.
 
@@ -295,7 +295,7 @@ void AudioHandler::updateAudioBinListThreaded(void)
 {
 	printf("AudioHandler is threaded\n");
 	AudioBin *ptr = environment;
-	char simproxFlag[] = "sim_time";
+	char simproxFlag[] = "time";
 
 	while(true)
 	{
@@ -303,8 +303,8 @@ void AudioHandler::updateAudioBinListThreaded(void)
 		double currentTime;
 
 		//todo fix next lines when stage is updated
-		//simProxy->GetProperty(aRobotName, simproxFlag, currentTime, sizeof(currenttime));
-		currentTime = (double)time(NULL);
+		simProxy->GetProperty(aRobotName, simproxFlag, &currentTime, sizeof(currentTime));
+		//currentTime = (double)time(NULL);
 		while(ptr != NULL)
 		{
 			//updateList(currentTime) returns 1 if list is now empty

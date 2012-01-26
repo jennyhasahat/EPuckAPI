@@ -25,7 +25,7 @@ EPuckSim::EPuckSim(char* robotName)
  * @param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
  * @author Jennifer Owen
  * */
-EPuckSim::EPuckSim(int robotPort, char* robotName)
+EPuckSim::EPuckSim(char* robotName, int robotPort)
 {
 	initialise(robotPort, robotName, 6664);
 }
@@ -37,7 +37,7 @@ Creates and instance of the EPuck class.
 @param simulationPort the port on which the simulation is running. Get this from the .cfg file of your simulation.
 @author Jennifer Owen
 */
-EPuckSim::EPuckSim(int robotPort, char* robotName, int simulationPort)
+EPuckSim::EPuckSim(char* robotName, int robotPort, int simulationPort)
 {	
 	initialise(robotPort, robotName, simulationPort);
 	return;

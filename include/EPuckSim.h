@@ -74,8 +74,8 @@ protected:
 public:
 
 	EPuckSim(char* robotName);
-	EPuckSim(int robotPort, char* robotName);
-	EPuckSim(int robotPort, char* robotName, int simulationPort);
+	EPuckSim(char* robotName, int robotPort);
+	EPuckSim(char* robotName, int robotPort, int simulationPort);
 	~EPuckSim(void);
 
 	/**

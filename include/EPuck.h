@@ -59,7 +59,7 @@ public:
 	 * *
 	EPuck(char* robotName);
 
-	/**
+	**
 	 * Creates an instance of the EPuck class.
 	 * Calls {@link EPuck#EPuck(int robotPort, char* robotName, int simulationPort) EPuck(int robotPort, char* robotName, int simulationPort)}
 	 * using default simulation port 6664.
@@ -69,7 +69,7 @@ public:
 	 * *
 	EPuck(int robotPort, char* robotName);
 
-	/**
+	**
 	Creates and instance of the EPuck class.
 	@param robotPort the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
 	@param robotName the name of the robot model in the simulation eg robot1, robot2 etc. Maximum 64 chars.
@@ -77,6 +77,7 @@ public:
 	@author Jennifer Owen
 	 *
 	EPuck(int robotPort, char* robotName, int simulationPort);
+	*/
 
 	/**
 	Epuck destructor. Closes all threads and stops the robot nicely (ish).
