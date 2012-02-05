@@ -33,9 +33,9 @@ AudioHandler::AudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::S
 	numberOfBins = 0;
 
 	//make array of frequency bins depending on FFT settings.
-	for(i=0; i<FFT_BLOCK_SIZE/2; i++)
+	for(i=0; i<fftBlockSize/2; i++)
 	{
-		lowerFFTBounds[i] = (i*SAMPLE_RATE)/FFT_BLOCK_SIZE;
+		lowerFFTBounds[i] = (i*sampleRate)/fftBlockSize;
 	}
 
 	pthread_create(&updateAudioBinListThread, 0, AudioHandler::startupdateAudioBinListThread, this);
@@ -99,7 +99,7 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 	AudioBin *last;
 
 	//find FFT lower frequency bound for freq
-	for(whichbin=(FFT_BLOCK_SIZE/2)-1; whichbin>-1; whichbin--)
+	for(whichbin=(fftBlockSize/2)-1; whichbin>-1; whichbin--)
 	{
 		if(lowerFFTBounds[whichbin] <= freq) break;
 	}
@@ -136,7 +136,7 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 	//get xy coords.
 	simProxy->GetPose2d(robotName, x, y, yaw);
 
-	//todo fix the next lines when clock stuff is sorted.
+	//get simulation time
 	simProxy->GetProperty(robotName, timeflag, &currenttime, sizeof(currenttime));
 	//currenttime = (double)time(NULL);
 

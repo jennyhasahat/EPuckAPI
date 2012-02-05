@@ -229,27 +229,28 @@ int AudioHandler::AudioBin::removeTone(audio_tone_t *del)
 }
 
 /**
- * Function to convert a distance in metres into a volume for the robots.
+ * Function to convert a distance in metres into a sound level measure for the robots.
  * @param levelAtSource the number of watts produced at by the speaker at the tone source.
  * @param distance the distance in metres
  * @returns intensity the sound intensity of the tone in W/m^2.
  * */
 double AudioHandler::AudioBin::getSoundIntensity(double levelAtSource, double distance)
 {
-	static double minIntensityHeard = 0;
+	const double pi = 3.141592;
+	static double minIntensityHearable = 0;
 	double area;
 	double intensity;
 
 	//if we haven't done this already, calculate what the maximum detectable sound intensity is
-	if(minIntensityHeard == 0)
+	if(minIntensityHearable == 0)
 	{
-		//in best conditions the epuck can only hear 10cm
+		//in best conditions the epuck can only hear 10cm, so it's when the sending robot is at max volume
 		const double hearingRange = 0.5;
 		double maxSourceIntensity;
 
 		maxSourceIntensity = (EPuck::MAXIMUM_BATTERY_VOLTAGE * EPuck::MAXIMUM_BATTERY_VOLTAGE)/EPuck::IMPEDANCE_OF_SPEAKER_OHMS;
-		minIntensityHeard = maxSourceIntensity /(1+(2 * PI * hearingRange * hearingRange));
-		printf("max intensity is %f, min detectable intensity is %f\n", maxSourceIntensity, minIntensityHeard);
+		minIntensityHearable = maxSourceIntensity /(1+(2 * pi * hearingRange * hearingRange));
+		printf("max intensity is %f, min detectable intensity is %f\n", maxSourceIntensity, minIntensityHearable);
 	}
 
 	//if distance = 0 then this is the robot making the noise
@@ -261,13 +262,13 @@ double AudioHandler::AudioBin::getSoundIntensity(double levelAtSource, double di
 	//(add 1 to hemisphere area to get rid of innaccuracies when area < 1.)
 
 	//area of a hemisphere = 2 pi r^2
-	area = 2 * PI * distance * distance;
+	area = 2 * pi * distance * distance;
 
 	//calculate intensity
 	intensity = levelAtSource/(1+area);
 
 	//If this intensity is less than the minimum detectable then return 0
-	if(intensity < minIntensityHeard) return 0;
+	if(intensity < minIntensityHearable) return 0;
 
 	return intensity;
 }
@@ -311,7 +312,7 @@ int AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff, d
 	bearingWRTrobot = 360 - yaw + bearingWRTx;
 	bearingWRTrobot = bearingWRTrobot%360;
 
-	return (int)roundToNearest(bearingWRTrobot, 5);
+	return (int)roundToNearest(bearingWRTrobot, 45);
 }
 
 
@@ -324,7 +325,7 @@ int AudioHandler::AudioBin::radiansToDegrees(double rads)
 	double degs;
 
 	degs = 180*rads;
-	degs = degs/PI;
+	degs = degs/3.141592;
 
 	//printf("%f radians is %d degrees\n", rads, (int)degs);
 
@@ -338,7 +339,7 @@ double AudioHandler::AudioBin::degreesToRadians(int degs)
 {
 	double rads;
 
-	rads = PI*degs;
+	rads = degs*3.141592;
 	rads = rads/180;
 
 	//printf("%d degrees is %f radians\n", degs, rads);
@@ -352,7 +353,7 @@ double AudioHandler::AudioBin::degreesToRadians(int degs)
  * e.g. if input is 23.720954 and resolution is 0.5 this will return 23.5.
  * @param input the number to round
  * @param resolution the resolution to round to
- * @returns out the answer.
+ * @returns the rounded number
  * */
 double AudioHandler::AudioBin::roundToNearest(double input, double resolution)
 {

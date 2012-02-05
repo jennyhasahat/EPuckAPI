@@ -73,13 +73,14 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/phonotaxis.cc|sonartest|helpful-files|epuck-side|test/testAPI.cc|epuckapi-doxygen|worlds|helpful files|src/TestEPuck.cc|test/worlds|src/lpuck.cc" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/lpuck.cc|src/phonotaxis.cc|sonartest|helpful-files|epuck-side|test/testAPI.cc|epuckapi-doxygen|worlds|helpful files|src/TestEPuck.cc|test/worlds" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+			<storageModule moduleId="scannerConfiguration"/>
 		</cconfiguration>
 		<cconfiguration id="cdt.managedbuild.config.gnu.exe.release.470312029">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.release.470312029" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -123,13 +124,14 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/phonotaxis.cc|sonartest|helpful-files|epuck-side|test/testAPI.cc|worlds|helpful files|src/TestEPuck.cc|test/worlds|src/lpuck.cc" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/lpuck.cc|src/phonotaxis.cc|sonartest|helpful-files|epuck-side|test/testAPI.cc|worlds|helpful files|src/TestEPuck.cc|test/worlds" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+			<storageModule moduleId="scannerConfiguration"/>
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">

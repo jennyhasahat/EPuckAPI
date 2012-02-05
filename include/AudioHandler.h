@@ -29,11 +29,6 @@
 #include <pthread.h>
 #include "libplayerc++/playerc++.h"
 
-#define SAMPLE_RATE					16000
-#define FFT_BLOCK_SIZE				128
-#define PI							3.141592654
-
-
 
 
 /**
@@ -44,6 +39,9 @@
 class AudioHandler
 {
 public:
+
+	static const int sampleRate	=	16000;
+	static const int fftBlockSize =	128;
 
 	/**
 	 * This data structure is used to send audio data from the AudioHandler to the EPuck API
@@ -140,7 +138,7 @@ private:
 	//member variables
 	//linked list of AudioBins for the frequencies currently being played.
 	AudioBin *environment;
-	double lowerFFTBounds[FFT_BLOCK_SIZE/2];
+	double lowerFFTBounds[fftBlockSize/2];
 	int numberOfBins;
 	pthread_t updateAudioBinListThread;
 
