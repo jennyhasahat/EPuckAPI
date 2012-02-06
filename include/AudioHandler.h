@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include <pthread.h>
 #include "libplayerc++/playerc++.h"
 
 
@@ -140,7 +139,7 @@ private:
 	AudioBin *environment;
 	double lowerFFTBounds[fftBlockSize/2];
 	int numberOfBins;
-	pthread_t updateAudioBinListThread;
+	boost::thread updateAudioBinListThread;
 
 	//player stuff
 	PlayerCc::SimulationProxy	*simProxy;
@@ -155,16 +154,6 @@ private:
 	int removeBin(AudioBin *del);
 
 	void updateAudioBinListThreaded(void);
-
-	/**
-	 * Fancy function for kickstarting the thread that checks the AudioBins.
-	 * */
-	static void *startupdateAudioBinListThread(void *obj)
-	{
-		//All we do here is call the readSensorsThreaded() function
-		reinterpret_cast<AudioHandler *>(obj)->updateAudioBinListThreaded();
-		return NULL;
-	}
 };
 
 

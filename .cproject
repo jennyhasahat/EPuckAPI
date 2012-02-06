@@ -53,7 +53,6 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.353867641" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.flags.99596291" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="`pkg-config --libs playerc++`" valueType="string"/>
 								<option id="gnu.cpp.link.option.libs.298072416" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="pthread"/>
 									<listOptionValue builtIn="false" value="boost_thread"/>
 									<listOptionValue builtIn="false" value="stage"/>
 									<listOptionValue builtIn="false" value="playerc++"/>

@@ -38,7 +38,8 @@ AudioHandler::AudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::S
 		lowerFFTBounds[i] = (i*sampleRate)/fftBlockSize;
 	}
 
-	pthread_create(&updateAudioBinListThread, 0, AudioHandler::startupdateAudioBinListThread, this);
+	updateAudioBinListThread = boost::thread(&AudioHandler::updateAudioBinListThreaded, this);
+	//pthread_create(&updateAudioBinListThread, 0, AudioHandler::startupdateAudioBinListThread, this);
 
 	printf("AudioHandler initialised\n");
 	return;
@@ -63,7 +64,8 @@ AudioHandler* AudioHandler::GetAudioHandler(PlayerCc::PlayerClient *simulationCl
 AudioHandler::~AudioHandler()
 {
 	//close thread
-	pthread_cancel(updateAudioBinListThread);
+	updateAudioBinListThread.interrupt();
+	updateAudioBinListThread.join();
 
 	//remove all bins in Linked list
 	AudioBin *ptr = environment;
@@ -294,6 +296,7 @@ int AudioHandler::removeBin(AudioBin *del)
 void AudioHandler::updateAudioBinListThreaded(void)
 {
 	printf("AudioHandler is threaded\n");
+	boost::posix_time::milliseconds wait(50);
 	AudioBin *ptr = environment;
 	char simproxFlag[] = "time";
 
@@ -327,9 +330,9 @@ void AudioHandler::updateAudioBinListThreaded(void)
 			ptr = ptr->next;
 		}
 		//sleep for 50ms. This is a lot but the sim only goes to a resolution of 100ms
-		usleep(50000);
+		boost::this_thread::sleep(wait);
 	}
-	pthread_exit(NULL);
+
 	return;
 }
 
