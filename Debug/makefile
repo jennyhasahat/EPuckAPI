@@ -8,8 +8,8 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include subdir.mk
 -include src/subdir.mk
+-include subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -38,19 +38,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: libEPuckAPI.a
+all: EPuckAPI
 
 # Tool invocations
-libEPuckAPI.a: $(OBJS) $(USER_OBJS)
+EPuckAPI: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
-	@echo 'Invoking: GCC Archiver'
-	ar -r "libEPuckAPI.a" $(OBJS) $(USER_OBJS) $(LIBS)
+	@echo 'Invoking: GCC C++ Linker'
+	g++ -L/usr/local/lib64 -L/usr/lib `pkg-config --libs playerc++` -o "EPuckAPI" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(ARCHIVES)$(CPP_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS) libEPuckAPI.a
+	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) EPuckAPI
 	-@echo ' '
 
 .PHONY: all clean dependents

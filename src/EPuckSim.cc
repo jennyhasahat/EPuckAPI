@@ -51,7 +51,9 @@ Epuck destructor. Closes threads and stops the robot nicely (ish).
 EPuckSim::~EPuckSim(void)
 {
 	//close threads
-	pthread_cancel(readSensorsThread);
+	readSensorsThread.interrupt();
+	readSensorsThread.join();
+
 	stopFlashLEDs();	//stops the flashing LEDs and closes the thread
 
 
@@ -69,6 +71,13 @@ EPuckSim::~EPuckSim(void)
 	return;
 }
 
+
+bool EPuckSim::operator==(const EPuckSim& other)
+{
+	int comparison = strcmp(other.name, name);
+	if(comparison == 0) return true;
+	else return false;
+}
 
 
 /*====================================================================
@@ -96,7 +105,7 @@ double EPuckSim::getTime(void)
 	char flag[] = "time";
 
 	simProxy->GetProperty(name, flag, &data, sizeof(data));
-printf("read value %f\n", (double)data);
+//printf("read value %f\n", (double)data);
 	time = (double)data;
 	time = time / 1000000;
 
@@ -106,6 +115,12 @@ printf("read value %f\n", (double)data);
 double EPuckSim::getBatteryVolts(void)
 {
 	return EPuck::MAXIMUM_BATTERY_VOLTAGE;
+}
+
+void EPuckSim::getPosition(double& x, double& y, double& yaw)
+{
+	simProxy->GetPose2d(name, x, y, yaw);
+	return;
 }
 
 //************INFRA-RED SENSORS*******************
@@ -324,19 +339,17 @@ void EPuckSim::flashLEDs(double frequency)
 		return;
 	}
 
-	LEDFlashFrequency = frequency;
-	pthread_create(&flashLEDsThread, 0, EPuckSim::startFlashLEDsThread, this);
+	flashLEDsThread = boost::thread(&EPuckSim::flashLEDsThreaded, this, frequency);
+	//pthread_create(&flashLEDsThread, 0, EPuckSim::startFlashLEDsThread, this);
 	return;
 }
 
 
 void EPuckSim::stopFlashLEDs(void)
 {
-//	if(LEDFlashFrequency != 0)
-//	{
-//		pthread_cancel(flashLEDsThread);
-		LEDFlashFrequency = 0;
-//	}
+	flashLEDsThread.interrupt();
+	flashLEDsThread.join();
+
 	return;
 }
 
@@ -417,41 +430,43 @@ Tone EPuckSim::getTone(int index)
 	}
 }
 
-void EPuckSim::printLocation_TEST(void)
-{
-	double x, y, yaw;
-	simProxy->GetPose2d(name, x, y, yaw);
-	printf("%s is at location: (%f, %f) and yaw %f radians\n", name, x, y, yaw);
-
-	return;
-}
-
-void EPuckSim::printTimes_TEST(void)
-{
-	printf("current time(NULL) is %f\n", (double)time(NULL));
-	printf("current data time is %f\n", simProxy->GetDataTime());
-
-	return;
-}
-
-void EPuckSim::dumpAudio_TEST(void)
-{
-	handler->dumpData_TEST();
-	return;
-}
-
-void EPuckSim::dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize)
-{
-	int i;
-	int numberAllocatedSlots = storesize/sizeof(AudioHandler::audio_message_t);
-
-	printf("Dumping tone data as recieved from AudioHandler:\n");
-	for(i=0; i<numberAllocatedSlots; i++)
+#if DEBUGGING == 1
+	void EPuckSim::printLocation_TEST(void)
 	{
-		printf("\tbin number %d\n", i);
-		printf("\tfrequency %f\n\tvolume %f\n\tdirection %d\n", store[i].frequency, store[i].volume, store[i].direction);
+		double x, y, yaw;
+		simProxy->GetPose2d(name, x, y, yaw);
+		printf("%s is at location: (%f, %f) and yaw %f radians\n", name, x, y, yaw);
+
+		return;
 	}
-}
+
+	void EPuckSim::printTimes_TEST(void)
+	{
+		printf("current time(NULL) is %f\n", (double)time(NULL));
+		printf("current data time is %f\n", simProxy->GetDataTime());
+
+		return;
+	}
+
+	void EPuckSim::dumpAudio_TEST(void)
+	{
+		handler->dumpData_TEST();
+		return;
+	}
+
+	void EPuckSim::dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize)
+	{
+		int i;
+		int numberAllocatedSlots = storesize/sizeof(AudioHandler::audio_message_t);
+
+		printf("Dumping tone data as recieved from AudioHandler:\n");
+		for(i=0; i<numberAllocatedSlots; i++)
+		{
+			printf("\tbin number %d\n", i);
+			printf("\tfrequency %f\n\tvolume %f\n\tdirection %d\n", store[i].frequency, store[i].volume, store[i].direction);
+		}
+	}
+#endif
 
 /*====================================================================
 			PRIVATE FUNCTIONS
@@ -484,35 +499,39 @@ void EPuckSim::initialise(int robotPort, char* robotName, int simulationPort)
 		return;
 	}
 
-	pthread_create(&readSensorsThread, 0, EPuckSim::startReadSensorThread, this);
+	readSensorsThread = boost::thread(&EPuckSim::readSensorsThreaded, this);
+//	pthread_create(&readSensorsThread, 0, EPuckSim::startReadSensorThread, this);
 }
 
 
 void EPuckSim::readSensorsThreaded(void)
 {
 	printf("%s is threaded\n", name);
+	boost::posix_time::milliseconds wait(10);
+
 	while(true)
 	{
 		epuck->Read();
-		usleep(10);
+		boost::this_thread::sleep(wait);
 	}
-	pthread_exit(NULL);
+
 	return;
 }
 
 
-void EPuckSim::flashLEDsThreaded(void)
+void EPuckSim::flashLEDsThreaded(int ledFlashFrequency)
 {
-	double period = 1/LEDFlashFrequency; //flash period in seconds
-	period = period*1000000; //now in micro-seconds
+	double period = 1/ledFlashFrequency; //flash period in seconds
+	period = period*1000; //now in milliseconds
 	period = period/2;	//will toggle LEDs each half period
+	boost::posix_time::milliseconds wait(period);
 
-	while(LEDFlashFrequency > 0)
+	while(true)
 	{
 		toggleAllLEDs();
-		usleep(period);
+		boost::this_thread::sleep(wait);
 	}
-	pthread_exit(NULL);
+
 	return;
 }
 

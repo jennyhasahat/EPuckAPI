@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <time.h>*/
-#include <pthread.h>
+#include <boost/thread/thread.hpp>
+
 #include "libplayerc++/playerc++.h"
 #include "AudioHandler.h"
 #include "EPuck.h"
@@ -60,7 +61,7 @@ protected:
 	double irReadings[8];
 	//LED stuff
 	bool allLEDsOn;
-	double LEDFlashFrequency;
+	//double LEDFlashFrequency;
 
 	//audio stuff
 	AudioHandler *handler;
@@ -77,6 +78,11 @@ public:
 	EPuckSim(char* robotName, int robotPort);
 	EPuckSim(char* robotName, int robotPort, int simulationPort);
 	~EPuckSim(void);
+
+	/**
+	 * Allows two simulated epucks to be compared to each other.
+	 * */
+	bool operator==(const EPuckSim& other);
 
 	/**
 		Refreshes the robot's stored sensor values. Is automatically called by {@link #readSensorsThreaded readSensorsThreaded}
@@ -101,6 +107,16 @@ public:
 	 * @returns voltage, the battery should normally be {@link EPuck#MAXIMUM_BATTERY_VOLTAGE}. It will be less if the battery is running low.
 	 * */
 	double getBatteryVolts(void);
+
+	/**
+	 * Returns the position of the epuck in the environment.
+	 * Loads the pose data into the provided doubles.
+	 * @param x where the x coordinate will be stored.
+	 * @param y where the y coordinate will be stored.
+	 * @param yaw where the yaw angle will be stored.
+	 * */
+	void getPosition(double& x, double& y, double& yaw);
+
 
 	//==================== IR methods =========================================
 	/**
@@ -251,7 +267,7 @@ public:
 	void dumpToneData_TEST(AudioHandler::audio_message_t *store, size_t storesize);
 #endif
 
-private:
+protected:
 	/**
 	 * Because constructors can't call other constructors, this is a common method that the overloaded constructors can call which will initialise the robot.
 	 * @param port the number of the EPuck in the simulation. Eg 6665, 6666, 6667 etc.
@@ -262,23 +278,11 @@ private:
 
 
 
-	pthread_t readSensorsThread;
+	boost::thread readSensorsThread;
 	void readSensorsThreaded(void);
-	static void *startReadSensorThread(void *obj)
-	{
-		//All we do here is call the readSensorsThreaded() function
-		reinterpret_cast<EPuckSim *>(obj)->readSensorsThreaded();
-		return NULL;
-	}
 
-	pthread_t flashLEDsThread;
-	void flashLEDsThreaded(void);
-	static void *startFlashLEDsThread(void *obj)
-	{
-		//All we do here is call the readSensorsThreaded() function
-		reinterpret_cast<EPuckSim *>(obj)->flashLEDsThreaded();
-		return NULL;
-	}
+	boost::thread flashLEDsThread;
+	void flashLEDsThreaded(int ledFlashFrequency);
 
 
 

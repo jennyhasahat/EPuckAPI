@@ -1,12 +1,11 @@
 #ifndef EPUCK_H
 #define EPUCK_H
 
-#include <pthread.h>
 #include "libplayerc++/playerc++.h"
 #include "DataStructures.h"
 
 /**Debugging flag. If set to 1 the debugging functions are compiled and can be accessed.*/
-#define DEBUGGING 1
+#define DEBUGGING 0
 
 /**
 Interacts with a simulated e-puck robot using Player commands.
@@ -83,6 +82,11 @@ public:
 	Epuck destructor. Closes all threads and stops the robot nicely (ish).
 	 */
 	virtual ~EPuck(void){};
+
+	/**
+	 * Allows two epucks to be compared to each other.
+	 * */
+	//virtual bool operator==(const EPuck& other);
 
 	/**
 	Refreshes the robot's stored sensor values. Is automatically called by {@link #readSensorsThreaded readSensorsThreaded}

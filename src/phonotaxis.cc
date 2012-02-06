@@ -215,19 +215,19 @@ int main(void)
 //	EPuckReal *robot = new EPuckReal();
 
 	char testbot1Name[] = "robot1";
-	robots[0] = new EPuckSim(6665, testbot1Name);
+	robots[0] = new EPuckSim(testbot1Name, 6665);
 	robots[0]->initaliseAudio();
 
 	char testbot2Name[] = "robot2";
-	robots[1] = new EPuckSim(6666, testbot2Name);
+	robots[1] = new EPuckSim(testbot2Name, 6666);
 	robots[1]->initaliseAudio();
 
 	char testbot3Name[] = "robot3";
-	robots[2] = new EPuckSim(6667, testbot3Name);
+	robots[2] = new EPuckSim(testbot3Name, 6667);
 	robots[2]->initaliseAudio();
 
 	char testbot4Name[] = "robot4";
-	robots[3] = new EPuckSim(6668, testbot4Name);
+	robots[3] = new EPuckSim(testbot4Name, 6668);
 	robots[3]->initaliseAudio();
 
 	int bot1;
