@@ -234,6 +234,11 @@ public:
 	 * */
 	int initaliseAudio(void);
 
+	/**Returns the audio handler that deals with all the audio in the environment
+	 * @returns the AudioHandler
+	 * */
+	AudioHandler* getAudioHandler(void);
+
 	/**
 	 * Get this Epuck to play a tone of the desired frequency and duration.
 	 * @param frequency frequency of tone to play in Hz

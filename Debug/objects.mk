@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lboost_thread -lstage -lplayerc++
+LIBS :=
 

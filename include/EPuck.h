@@ -243,6 +243,7 @@ public:
 	 * the resulting information is combined in a way that is physically plausible (because this is a simulation after all...)
 	 * and stored in the EPuck object until requested by the user.
 	 * @returns numberOfTones the number of different tones the robot can hear.
+	 * @see #getTone
 	 * */
 	virtual int listenForTones(void) = 0;
 

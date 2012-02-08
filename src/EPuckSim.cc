@@ -368,6 +368,11 @@ int EPuckSim::initaliseAudio(void)
 	return -1;
 }
 
+AudioHandler* EPuckSim::getAudioHandler(void)
+{
+	return handler;
+}
+
 
 int EPuckSim::playTone(int frequency, double duration, double volume)
 {

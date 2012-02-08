@@ -1,10 +1,3 @@
-/*
- * AudioBin.cc
- *
- *  Created on: 27 Sep 2010
- *      Author: Jennifer Owen
- */
-
 #include "EPuck.h"
 #include "AudioHandler.h"
 

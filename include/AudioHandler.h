@@ -31,17 +31,25 @@
 
 
 /**
- * takes care of all audio processing and collection, stores audio data and takes care of returning it to the calling object.
- * Audio in the simulation is global so AudioHandler is handled as a singleton and there can be only one AudioHandler,
+ * takes care of all audio processing and collection, stores audio data and
+ * takes care of returning it to the calling object.
+ * Audio in the simulation is global so AudioHandler is handled as a singleton
+ * and there can be only one AudioHandler,
  * which contains all the audio data in the environment.
  **/
 class AudioHandler
 {
 public:
 
-	static const int sampleRate	=	16000;
+	static const int sampleRate	=	45000;
 	static const int fftBlockSize =	128;
 
+	/**The quantisation lower boudaries for the frequency spectrum.
+	 * The Fourier transform performed on the audio data quantises it into blocks.
+	 * These values indicate the lower frequency range of each block.
+	 * This is calculated by:<p>
+	 * block number * sampleRate/fftBlockSize */
+	double lowerFFTBounds[fftBlockSize/2];
 	/**
 	 * This data structure is used to send audio data from the AudioHandler to the EPuck API
 	 * */
@@ -137,7 +145,7 @@ private:
 	//member variables
 	//linked list of AudioBins for the frequencies currently being played.
 	AudioBin *environment;
-	double lowerFFTBounds[fftBlockSize/2];
+
 	int numberOfBins;
 	boost::thread updateAudioBinListThread;
 
