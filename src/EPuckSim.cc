@@ -189,10 +189,10 @@ int EPuckSim::getNumberBlobs(void)
 }
 
 
-Blob EPuckSim::getBlob(int index)
+EPuck::Blob EPuckSim::getBlob(int index)
 {
 	player_blobfinder_blob_t oldBlob;
-	Blob newBlob;
+	EPuck::Blob newBlob;
 
 	oldBlob = blobProxy->GetBlob(index);
 	newBlob.id = (int)oldBlob.id;
@@ -418,7 +418,7 @@ int EPuckSim::listenForTones(void)
 }
 
 
-Tone EPuckSim::getTone(int index)
+EPuck::Tone EPuckSim::getTone(int index)
 {
 	if(index < numberOfTones && index > -1)
 	{
@@ -427,7 +427,7 @@ Tone EPuckSim::getTone(int index)
 	else
 	{
 		printf("In EPuckSim::getTone, index %d does not exist.\n", index);
-		Tone t;
+		EPuck::Tone t;
 		t.bearing = 0;
 		t.frequency = 0;
 		t.volume = 0;

@@ -168,10 +168,10 @@ int EPuckReal::getNumberBlobs(void)
  * @return blob information, in the form of a Blob object
  * @see  EPuck.h#Blob Blob
  * */
-Blob EPuckReal::getBlob(int index)
+EPuck::Blob EPuckReal::getBlob(int index)
 {
 	player_blobfinder_blob_t oldBlob;
-	Blob newBlob;
+	EPuck::Blob newBlob;
 
 	oldBlob = blobProxy->GetBlob(index);
 	newBlob.id = (int)oldBlob.id;
@@ -396,8 +396,9 @@ int EPuckReal::listenForTones(void)
 }
 
 
-Tone EPuckReal::getTone(int index)
+EPuck::Tone EPuckReal::getTone(int index)
 {
+	//TODO this is not yet coded
 /*	if(index < numberOfTones && index > -1)
 	{
 		return toneArray[index];
@@ -411,7 +412,7 @@ Tone EPuckReal::getTone(int index)
 		t.volume = 0;
 		return t;
 	}*/
-	Tone t;
+	EPuck::Tone t;
 	return t;
 }
 /*

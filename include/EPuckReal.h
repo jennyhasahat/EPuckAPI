@@ -115,7 +115,7 @@ public:
 	 * @return blob information, in the form of a Blob object
 	 * @see EPuck#Blob
 	 * */
-	Blob getBlob(int index);
+	EPuck::Blob getBlob(int index);
 
 	//==================== motor control methods ================================
 
@@ -209,8 +209,9 @@ public:
 	 * This list of tones is updated when {@link EPuck#listenForTones} is called. This function allows you to request a tone from this array.
 	 * @param index the index of the tone you wish to get from the EPuck object
 	 * @returns tone the tone.
+	 * @see EPuck#Tone
 	 * */
-	Tone getTone(int index);
+	EPuck::Tone getTone(int index);
 
 #if DEBUGGING == 1
 	void printLocation_TEST(void);

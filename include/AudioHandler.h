@@ -128,9 +128,13 @@ public:
 	virtual ~AudioHandler();
 
 	//methods.
+	/**Returns the number of blocks in the fourier transform we run.*/
+	int getFFTBlockSize(void);
 	void playTone(int freq, double duration, double volume, char* name);
 	int getNumberOfTones(void);
 	int getTones(char* robotName, audio_message_t *store, size_t storesize);
+
+
 
 	/** Test function to print all of the sound environment data to stdout.
 	 * */

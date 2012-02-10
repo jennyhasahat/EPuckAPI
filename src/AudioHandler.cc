@@ -82,6 +82,11 @@ AudioHandler::~AudioHandler()
 	return;
 }
 
+int AudioHandler::getFFTBlockSize(void)
+{
+	return fftBlockSize;
+}
+
 /**
  * Puts a tone of the desired frequency and duration into the audio environment.
  * @param freq the frequency of the tone in Hz

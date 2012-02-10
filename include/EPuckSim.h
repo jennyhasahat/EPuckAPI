@@ -161,9 +161,9 @@ public:
 	/**
 	 * Returns data about a specific blob, referenced by an ID number
 	 * @return blob information, in the form of a Blob object
-	 * @see Blob
+	 * @see EPuck#Blob
 	 * */
-	Blob getBlob(int index);
+	EPuck::Blob getBlob(int index);
 
 	//==================== motor control methods ================================
 
@@ -254,6 +254,7 @@ public:
 	 * the resulting information is combined in a way that is physically plausible (because this is a simulation after all...)
 	 * and stored in the EPuck object until requested by the user.
 	 * @returns numberOfTones the number of different tones the robot can hear.
+	 * @see #getTone
 	 * */
 	int listenForTones(void);
 
@@ -262,8 +263,10 @@ public:
 	 * This list of tones is updated when {@link EPuck#listenForTones} is called. This function allows you to request a tone from this array.
 	 * @param index the index of the tone you wish to get from the EPuck object
 	 * @returns tone the tone.
+	 * @see #listenForTones
+	 * @see EPuck#Tone
 	 * */
-	Tone getTone(int index);
+	EPuck::Tone getTone(int index);
 
 #if DEBUGGING == 1
 	void printLocation_TEST(void);
