@@ -101,7 +101,8 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 	const int maxVoltage = EPuck::MAXIMUM_BATTERY_VOLTAGE;
 	const int minVoltage = 0; //EPuck::MINIMUM_BATTERY_VOLTAGE;
 
-	double x, y, yaw, currenttime, voltage;
+	double x, y, yaw, voltage, currenttime;
+	uint64_t timeData;
 	AudioBin *current = environment;
 	AudioBin *last;
 
@@ -144,8 +145,9 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 	simProxy->GetPose2d(robotName, x, y, yaw);
 
 	//get simulation time
-	simProxy->GetProperty(robotName, timeflag, &currenttime, sizeof(currenttime));
-	//currenttime = (double)time(NULL);
+	simProxy->GetProperty(robotName, timeflag, &timeData, sizeof(uint64_t));
+	currenttime = (double)timeData;
+	currenttime = currenttime/1000000;
 
 	//limit voltage to be between the max and min voltages.
 
@@ -158,6 +160,7 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 	//incase the requested volume is less than 0 or more than 10
 	if(voltage > maxVoltage) voltage = maxVoltage;
 	else if(voltage < minVoltage) voltage = minVoltage;
+
 
 	current->addTone(x, y, voltage, currenttime+(duration/1000));
 
@@ -301,22 +304,25 @@ int AudioHandler::removeBin(AudioBin *del)
 void AudioHandler::updateAudioBinListThreaded(void)
 {
 	printf("AudioHandler is threaded\n");
-	boost::posix_time::milliseconds wait(50);
+	boost::posix_time::milliseconds wait(10);
 	AudioBin *ptr = environment;
 	char simproxFlag[] = "time";
 
 	while(true)
 	{
 		ptr = environment;
+		uint64_t timeData;
 		double currentTime;
 
-		//todo fix next lines when stage is updated
-		simProxy->GetProperty(aRobotName, simproxFlag, &currentTime, sizeof(currentTime));
+		simProxy->GetProperty(aRobotName, simproxFlag, &timeData, sizeof(uint64_t));
+		currentTime = (double)timeData;
+		currentTime = currentTime/1000000;
+
 		//currentTime = (double)time(NULL);
 		while(ptr != NULL)
 		{
 			//updateList(currentTime) returns 1 if list is now empty
-			if(ptr->updateList(currentTime))
+			if(ptr->updateList((double)currentTime))
 			{
 				//delete current bin
 				AudioBin *del = ptr;

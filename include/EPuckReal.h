@@ -4,7 +4,6 @@
 #include <pthread.h>
 #include "libplayerc++/playerc++.h"
 #include "EPuck.h"
-#include "DataStructures.h"
 
 
 /**

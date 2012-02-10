@@ -95,12 +95,13 @@ public:
 	 * some processes are running much slower than others and will cause erratic and unexpected behaviour.
 	 * @warning this function requires the development version of Stage to be installed for it to work.
 	 * @warning this function casts from uint64_t to double, which may or may not cause troubles. If your OS is 32-bit it will be fine. It hasn't been tested on a 64-bit OS.
-	 * @returns sim simulated time in milliseconds.
+	 * @returns sim simulated time in seconds.
 	 * NOTE that the stage simulator uses a time step of 100ms
 	 * so the returned value of this function will be a factor of 100, this can be changed in the worldfile using
 	 * the parameter "interval_sim".
 	 * */
 	double getTime(void);
+
 
 	/**
 	 * Gets the amount of volts currently being output by the epuck's battery.

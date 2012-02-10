@@ -112,6 +112,7 @@ double EPuckSim::getTime(void)
 	return time;
 }
 
+
 double EPuckSim::getBatteryVolts(void)
 {
 	return EPuck::MAXIMUM_BATTERY_VOLTAGE;

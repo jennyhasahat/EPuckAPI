@@ -243,7 +243,7 @@ double AudioHandler::AudioBin::getSoundIntensity(double levelAtSource, double di
 
 		maxSourceIntensity = (EPuck::MAXIMUM_BATTERY_VOLTAGE * EPuck::MAXIMUM_BATTERY_VOLTAGE)/EPuck::IMPEDANCE_OF_SPEAKER_OHMS;
 		minIntensityHearable = maxSourceIntensity /(1+(2 * pi * hearingRange * hearingRange));
-		printf("max intensity is %f, min detectable intensity is %f\n", maxSourceIntensity, minIntensityHearable);
+		//printf("max intensity is %f, min detectable intensity is %f\n", maxSourceIntensity, minIntensityHearable);
 	}
 
 	//if distance = 0 then this is the robot making the noise
