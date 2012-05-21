@@ -60,8 +60,8 @@ public:
 		/**The direction, with respect to the robot's current heading, that the sound came from.
 		 * In degrees, in front of the robot being 0 and anti-clockwise from there increasing.*/
 		int direction;
-		/**Some volume level given to the tone. Can indicate how far away the tone is possibly.*/
-		double volume;
+		/**The distance from the listening robot that the tone originated.*/
+		double distance;
 
 	}audio_message_t;
 
@@ -82,7 +82,7 @@ public:
 			double ty;
 			/**The sound intensity level of the tone at source. Watts are used instead of volts (which is what the user gives) because this
 			 * takes into account the impedance of the speaker and the microphones.*/
-			double wattsAtSource;
+			//double wattsAtSource;
 			/**Time that the tone will stop playing*/
 			double end;
 			/**Audio tones are stored as a linked list in an audio bin, previous and next are ways of navigating the linked list*/
@@ -96,6 +96,9 @@ public:
 		/**Linked list of tones currently in this bin*/
 		audio_tone_t *tones;
 
+		/**The number of tones stored in this bin*/
+		int numberTones;
+
 		/**AudioBins are stored as a linked list by the handler so need to be able to navigate LL.*/
 		AudioBin *next;
 		/**AudioBins are stored as a linked list by the handler so need to be able to navigate LL.*/
@@ -104,8 +107,10 @@ public:
 		AudioBin(double lowerFreq, AudioBin *prev, AudioBin *nxt);
 		virtual ~AudioBin();
 
+		int getNumberTones(void);
 		int updateList(double currentTime);
-		void addTone(double x, double y, double voltage, double endtime);
+		void addTone(double x, double y, double endtime);
+		int calculateRawToneDataForPosition(double x, double y, double yaw, audio_message_t* output, int numMsgs);
 		int calculateCumulativeDataForPosition(double x, double y, double yaw, audio_message_t* output);
 
 	private:
@@ -130,7 +135,7 @@ public:
 	//methods.
 	/**Returns the number of blocks in the fourier transform we run.*/
 	int getFFTBlockSize(void);
-	void playTone(int freq, double duration, double volume, char* name);
+	void playTone(int freq, double duration, char* name);
 	int getNumberOfTones(void);
 	int getTones(char* robotName, audio_message_t *store, size_t storesize);
 

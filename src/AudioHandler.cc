@@ -91,16 +91,12 @@ int AudioHandler::getFFTBlockSize(void)
  * Puts a tone of the desired frequency and duration into the audio environment.
  * @param freq the frequency of the tone in Hz
  * @param duration the length of the tone in milliseconds
- * @param volume how loud to play the tone at. A number between 0 and 10. This does not go up to 11.
  * @param robotName string containing the name of the robot playing the tone.
  * */
-void AudioHandler::playTone(int freq, double duration, double volume, char* robotName)
+void AudioHandler::playTone(int freq, double duration, char* robotName)
 {
 	int whichbin;
 	char timeflag[] = "time";
-	const int maxVoltage = EPuck::MAXIMUM_BATTERY_VOLTAGE;
-	const int minVoltage = 0; //EPuck::MINIMUM_BATTERY_VOLTAGE;
-
 	double x, y, yaw, voltage, currenttime;
 	uint64_t timeData;
 	AudioBin *current = environment;
@@ -151,18 +147,7 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
 
 	//limit voltage to be between the max and min voltages.
 
-	//find how much voltage is represented by each "volume" unit.
-	voltage = maxVoltage - minVoltage;	//what's our working voltage range
-	voltage = voltage/10;	//there are 10 units so divide by 10 to get volts per unit
-	voltage *= volume;		//scale volts per unit by number of "volume units"
-	voltage += minVoltage;	//in case minVoltage is non-zero
-
-	//incase the requested volume is less than 0 or more than 10
-	if(voltage > maxVoltage) voltage = maxVoltage;
-	else if(voltage < minVoltage) voltage = minVoltage;
-
-
-	current->addTone(x, y, voltage, currenttime+(duration/1000));
+	current->addTone(x, y, currenttime+(duration/1000));
 
 	return;
 }
@@ -173,7 +158,16 @@ void AudioHandler::playTone(int freq, double duration, double volume, char* robo
  * */
 int AudioHandler::getNumberOfTones(void)
 {
-	return numberOfBins;
+	AudioBin *binptr = environment;
+	int numTones = 0;
+
+	while(binptr != NULL)
+	{
+		numTones += binptr->getNumberTones();
+		binptr = binptr->next;
+	}
+
+	return numTones;
 }
 
 /**
@@ -191,15 +185,16 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 {
 	int numberAllocatedSlots;
 	double x, y, yaw;
-	int i = 0;
+	int i;
+	int slotsFilled = 0;
 	AudioBin *binptr = environment;
 
 	//find how many audio_message_t slots have been allocated and see if it is enough
 	numberAllocatedSlots = storesize/sizeof(audio_message_t);
 
-	if(numberOfBins > numberAllocatedSlots)
+	if(getNumberOfTones() > numberAllocatedSlots)
 	{
-		printf("There are %d tones in the environment, but you have only reserved enough space for %d. Try again.\n", numberOfBins, numberAllocatedSlots);
+		printf("There are %d tones in the environment, but you have only reserved enough space for %d. Try again.\n", getNumberOfTones(), numberAllocatedSlots);
 		return -1;
 	}
 
@@ -207,12 +202,16 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 	simProxy->GetPose2d(robotName, x, y, yaw);
 
 	//for each bin get the full tone information for it.
-	while(binptr != NULL && i < numberAllocatedSlots)
+	while(binptr != NULL && slotsFilled < numberAllocatedSlots)
 	{
 		//printf("looking at bin %f, ", binptr->lowerFrequencyBound);
 		//printf("putting this data in index %d\n", i);
-		binptr->calculateCumulativeDataForPosition(x, y, yaw, &store[i]);
-		i++;
+		for(i=0; i<binptr->getNumberTones(); i++)
+		{
+			binptr->calculateCumulativeDataForPosition(x, y, yaw, &store[i], binptr->getNumberTones());
+			slotsFilled++;
+		}
+
 		binptr = binptr->next;
 	}
 
@@ -244,7 +243,7 @@ void AudioHandler::dumpData_TEST(void)
 		toneptr = binptr->tones;
 		while(toneptr != NULL)
 		{
-			printf("\t\tx: %f, y: %f, wattage: %f, end: %f\n", toneptr->tx, toneptr->ty, toneptr->wattsAtSource, (double)toneptr->end);
+			printf("\t\tx: %f, y: %f, end: %f\n", toneptr->tx, toneptr->ty, (double)toneptr->end);
 			toneptr = toneptr->next;
 		}
 		binptr = binptr->next;
@@ -322,7 +321,7 @@ void AudioHandler::updateAudioBinListThreaded(void)
 		while(ptr != NULL)
 		{
 			//updateList(currentTime) returns 1 if list is now empty
-			if(ptr->updateList((double)currentTime))
+			if(ptr->updateList(currentTime))
 			{
 				//delete current bin
 				AudioBin *del = ptr;

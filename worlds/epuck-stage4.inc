@@ -43,7 +43,7 @@ define epuck_cam blobfinder
 		colors ["red"]
 	
 		# camera parameters
-		image [640 480]		#resolution
+		image [80 30]		#resolution
 		
 		size [0.01 0.01 0.01]
 )
@@ -109,7 +109,7 @@ define epuck position
 	gravity_return 1
     
 	# actual size
-	size [0.07 0.07 0.045]
+	size [0.07 0.07 0.055]
 	color "DarkGreen"
 	
 	# estimated mass in KG

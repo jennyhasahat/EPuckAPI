@@ -14,6 +14,8 @@ AudioHandler::AudioBin::AudioBin(double lowerFreq, AudioBin *prev, AudioBin *nxt
 	next = nxt;
 	previous = prev;
 	tones = NULL;
+	numberTones = 0;
+
 	return;
 }
 
@@ -31,6 +33,12 @@ AudioHandler::AudioBin::~AudioBin()
 	}
 
 	return;
+}
+
+/**Returns the number of tones currently stored in this audio bin*/
+int AudioHandler::AudioBin::getNumberTones(void)
+{
+	return numberTones;
 }
 
 /**Updates list of tones in the bin so that ones which have finished playing are removed.
@@ -67,14 +75,14 @@ int AudioHandler::AudioBin::updateList(double currentTime)
  * So if you set this as 3, the speaker will play a sine wave at 3 volts (peak to peak).
  * @param endtime the simulated time at which the tone will end.
  * */
-void AudioHandler::AudioBin::addTone(double x, double y, double voltage, double endtime)
+void AudioHandler::AudioBin::addTone(double x, double y, double endtime)
 {
 	//construct new audiotone from the supplied data
 	audio_tone_t* newtone = new audio_tone_t;
 
 	newtone->tx = x;
 	newtone->ty = y;
-	newtone->wattsAtSource = (voltage * voltage)/(EPuck::IMPEDANCE_OF_SPEAKER_OHMS);
+	//newtone->wattsAtSource = (voltage * voltage)/(EPuck::IMPEDANCE_OF_SPEAKER_OHMS);
 	newtone->end = endtime;
 	newtone->next = NULL;
 
@@ -98,20 +106,22 @@ void AudioHandler::AudioBin::addTone(double x, double y, double voltage, double 
 		newtone->previous = toneptr;
 		toneptr->next = newtone;
 	}
+	numberTones++;
 
 	return;
 }
 
 /**
- * Given the position and yaw of the robot this function calculates the cumulative level and direction of the tones in this frequency bin.
+ * Given the position and yaw of the listening robot this function calculates the cumulative level and direction of the tones in this frequency bin.
  * This is written to an audio_message_t data structure, the pointer to which the calling function must supply.
  * @param xr the x position of the robot
  * @param yr the y position of the robot
  * @param yaw the yaw of the robot. In radians because that's the measure used by playerstage
  * @param output the audio_message_t pointer where the data should be stored.
+ * @param numMsgs the number of audio messages to save into the output array
  * @returns 1 if no tones are within range of the robot, 0 if there was useful information.
  * */
-int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double yr, double yaw, audio_message_t* output)
+int AudioHandler::AudioBin::calculateRawToneDataForPosition(double x, double y, double yaw, audio_message_t* output, int numMsgs)
 {
 	audio_tone_t *ptr =  tones;
 	double meanPolarX = 0;
@@ -120,7 +130,7 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double
 
 	//reset any values in the memory
 	output->direction 	= 0;
-	output->volume 		= 0;
+	output->distance	= 0;
 	output->frequency 	= lowerFrequencyBound;
 
 	//for each tone in this bin.
@@ -177,6 +187,81 @@ int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double
 	return 0;
 }
 
+/**
+ * Given the position and yaw of the listening robot this function calculates the cumulative level and direction of the tones in this frequency bin.
+ * This is written to an audio_message_t data structure, the pointer to which the calling function must supply.
+ * @param xr the x position of the robot
+ * @param yr the y position of the robot
+ * @param yaw the yaw of the robot. In radians because that's the measure used by playerstage
+ * @param output the audio_message_t pointer where the data should be stored.
+ * @returns 1 if no tones are within range of the robot, 0 if there was useful information.
+ * */
+int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double yr, double yaw, audio_message_t* output)
+{
+	audio_tone_t *ptr =  tones;
+	double meanPolarX = 0;
+	double meanPolarY = 0;
+	int numDetectableTones = 0;
+
+	//reset any values in the memory
+	output->direction 	= 0;
+	output->distance	= 0;
+	output->frequency 	= lowerFrequencyBound;
+
+	//for each tone in this bin.
+	while(ptr != NULL)
+	{
+		//calculate the level and direction of the tone
+
+		double xdiff, ydiff, dist;
+		double toneVol;
+		int toneDirection;
+
+		//first work out the distance from the source to the robot
+		xdiff 	= ptr->tx - xr;
+		ydiff 	= ptr->ty - yr;
+		dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
+
+		toneVol = getSoundIntensity(ptr->wattsAtSource, dist);
+
+		// can this tone be heard? If so then add it to the other tones.
+		if(toneVol != 0)
+		{
+			toneDirection = convertDifferentialCoordsIntoBearing(xdiff, ydiff, yaw);
+
+			//if tone is louder it has more of an effect on the tone direction than if it does not.
+			//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
+			//using the average of ALL polar coordinates that we worked out.
+
+			meanPolarX += toneVol * cos( degreesToRadians(toneDirection) );
+			meanPolarY += toneVol * sin( degreesToRadians(toneDirection) );
+			numDetectableTones++;
+		}
+
+		ptr = ptr->next;
+	}
+
+	//if it turns out that no tones are within range of the robot then return nothing
+	if(numDetectableTones == 0)
+	{
+		return 1;
+	}
+
+	//now we have the total x and y contributions of each tone we find the average
+	meanPolarX = meanPolarX / numDetectableTones;
+	meanPolarY = meanPolarY / numDetectableTones;
+
+	//and convert back to polar coords.
+	output->distance = sqrt( (meanPolarX * meanPolarX) + (meanPolarY * meanPolarY) );
+	output->direction = convertDifferentialCoordsIntoBearing(meanPolarX, meanPolarY, 0);
+
+	//printf("\tbin direction is %d, volume is %f\n", output->direction, output->volume);
+
+
+
+	return 0;
+}
+
 
 
 //==================================================================================================
@@ -216,55 +301,13 @@ int AudioHandler::AudioBin::removeTone(audio_tone_t *del)
 			return 1;
 		}
 	}
-
 	delete del;
+	numberTones--;
+
 	return 0;
 }
 
-/**
- * Function to convert a distance in metres into a sound level measure for the robots.
- * @param levelAtSource the number of watts produced at by the speaker at the tone source.
- * @param distance the distance in metres
- * @returns intensity the sound intensity of the tone in W/m^2.
- * */
-double AudioHandler::AudioBin::getSoundIntensity(double levelAtSource, double distance)
-{
-	const double pi = 3.141592;
-	static double minIntensityHearable = 0;
-	double area;
-	double intensity;
 
-	//if we haven't done this already, calculate what the maximum detectable sound intensity is
-	if(minIntensityHearable == 0)
-	{
-		//in best conditions the epuck can only hear 10cm, so it's when the sending robot is at max volume
-		const double hearingRange = 0.5;
-		double maxSourceIntensity;
-
-		maxSourceIntensity = (EPuck::MAXIMUM_BATTERY_VOLTAGE * EPuck::MAXIMUM_BATTERY_VOLTAGE)/EPuck::IMPEDANCE_OF_SPEAKER_OHMS;
-		minIntensityHearable = maxSourceIntensity /(1+(2 * pi * hearingRange * hearingRange));
-		//printf("max intensity is %f, min detectable intensity is %f\n", maxSourceIntensity, minIntensityHearable);
-	}
-
-	//if distance = 0 then this is the robot making the noise
-	if(distance <= 0) return levelAtSource;
-
-	//the sound makes a hemisphere of radius r (where r is distance from source to destination)
-	//the sound is spread evenly over the surface of this hemisphere
-	//so divide original sound level by surface area of hemisphere
-	//(add 1 to hemisphere area to get rid of innaccuracies when area < 1.)
-
-	//area of a hemisphere = 2 pi r^2
-	area = 2 * pi * distance * distance;
-
-	//calculate intensity
-	intensity = levelAtSource/(1+area);
-
-	//If this intensity is less than the minimum detectable then return 0
-	if(intensity < minIntensityHearable) return 0;
-
-	return intensity;
-}
 
 
 /**
@@ -305,7 +348,8 @@ int AudioHandler::AudioBin::convertDifferentialCoordsIntoBearing(double xdiff, d
 	bearingWRTrobot = 360 - yaw + bearingWRTx;
 	bearingWRTrobot = bearingWRTrobot%360;
 
-	return (int)roundToNearest(bearingWRTrobot, 45);
+	//return (int)roundToNearest(bearingWRTrobot, 45);
+	return (int)bearingWRTrobot;
 }
 
 
