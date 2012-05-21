@@ -185,7 +185,6 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 {
 	int numberAllocatedSlots;
 	double x, y, yaw;
-	int i;
 	int slotsFilled = 0;
 	AudioBin *binptr = environment;
 
@@ -204,19 +203,11 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 	//for each bin get the full tone information for it.
 	while(binptr != NULL && slotsFilled < numberAllocatedSlots)
 	{
-		//printf("looking at bin %f, ", binptr->lowerFrequencyBound);
-		//printf("putting this data in index %d\n", i);
-		for(i=0; i<binptr->getNumberTones(); i++)
-		{
-			binptr->calculateCumulativeDataForPosition(x, y, yaw, &store[i], binptr->getNumberTones());
-			slotsFilled++;
-		}
-
+		int numTonesSaved;
+		numTonesSaved = binptr->calculateRawToneDataForPosition(x, y, yaw, &store[slotsFilled], binptr->getNumberTones());
+		slotsFilled += numTonesSaved;
 		binptr = binptr->next;
 	}
-
-	// the epucks have a hearing range of AT MOST 10cm on a good day.
-	//deal with this here
 
 	return 0;
 }

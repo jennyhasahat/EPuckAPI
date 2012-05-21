@@ -112,155 +112,44 @@ void AudioHandler::AudioBin::addTone(double x, double y, double endtime)
 }
 
 /**
- * Given the position and yaw of the listening robot this function calculates the cumulative level and direction of the tones in this frequency bin.
- * This is written to an audio_message_t data structure, the pointer to which the calling function must supply.
+ * Given the position and yaw of the listening robot this function calculates the distance and direction
+ * of each tone in this frequency bin and saves it to the provided audio_message_t array.
+ * The user must allocate the memory for the audio message array in a higher function.
  * @param xr the x position of the robot
  * @param yr the y position of the robot
  * @param yaw the yaw of the robot. In radians because that's the measure used by playerstage
  * @param output the audio_message_t pointer where the data should be stored.
- * @param numMsgs the number of audio messages to save into the output array
- * @returns 1 if no tones are within range of the robot, 0 if there was useful information.
+ * @param noMsgs the number of audio messages to retrieve from the bin
+ * @returns the number of tones actually saved by this function, so 0 if there were none.
  * */
-int AudioHandler::AudioBin::calculateRawToneDataForPosition(double x, double y, double yaw, audio_message_t* output, int numMsgs)
+int AudioHandler::AudioBin::calculateRawToneDataForPosition(double xr, double yr, double yaw, audio_message_t* output, int noMsgs)
 {
 	audio_tone_t *ptr =  tones;
-	double meanPolarX = 0;
-	double meanPolarY = 0;
-	int numTones = 0;
-
-	//reset any values in the memory
-	output->direction 	= 0;
-	output->distance	= 0;
-	output->frequency 	= lowerFrequencyBound;
+	int currentTone = 0;
 
 	//for each tone in this bin.
-	while(ptr != NULL)
+	for(currentTone=0; currentTone<noMsgs; currentTone++)
 	{
-		//calculate the level and direction of the tone
+		double xdiff, ydiff;
 
-		double xdiff, ydiff, dist;
-		double toneVol;
-		int toneDirection;
-
-		//first work out the distance from the source to the robot
+		//calculate the x y distances to the tone from the listening robot
 		xdiff 	= ptr->tx - xr;
 		ydiff 	= ptr->ty - yr;
-		dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
 
-		toneVol = getSoundIntensity(ptr->wattsAtSource, dist);
+		output[currentTone].distance	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
+		output[currentTone].direction	= convertDifferentialCoordsIntoBearing(xdiff, ydiff, yaw);
+		output[currentTone].frequency 	= lowerFrequencyBound;
 
-		// can this tone be heard? If so then add it to the other tones.
-		if(toneVol != 0)
-		{
-			toneDirection = convertDifferentialCoordsIntoBearing(xdiff, ydiff, yaw);
-
-			//if tone is louder it has more of an effect on the tone direction than if it does not.
-			//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
-			//using the average of ALL polar coordinates that we worked out.
-
-			meanPolarX += toneVol * cos( degreesToRadians(toneDirection) );
-			meanPolarY += toneVol * sin( degreesToRadians(toneDirection) );
-			numTones++;
-		}
-
+		//advance place in linked list
 		ptr = ptr->next;
+		//if we reach the end of the linked list before running out of storage space then break the loop
+		if(ptr == NULL) break;
 	}
 
-	//if it turns out that no tones are within range of the robot then return nothing
-	if(numTones == 0)
-	{
-		return 1;
-	}
-
-	//now we have the total x and y contributions of each tone we find the average
-	meanPolarX = meanPolarX / numTones;
-	meanPolarY = meanPolarY / numTones;
-
-	//and convert back to polar coords.
-	output->volume = sqrt( (meanPolarX * meanPolarX) + (meanPolarY * meanPolarY) );
-	output->direction = convertDifferentialCoordsIntoBearing(meanPolarX, meanPolarY, 0);
-
-	//printf("\tbin direction is %d, volume is %f\n", output->direction, output->volume);
-
-
-
-	return 0;
+	return currentTone+1;
 }
 
-/**
- * Given the position and yaw of the listening robot this function calculates the cumulative level and direction of the tones in this frequency bin.
- * This is written to an audio_message_t data structure, the pointer to which the calling function must supply.
- * @param xr the x position of the robot
- * @param yr the y position of the robot
- * @param yaw the yaw of the robot. In radians because that's the measure used by playerstage
- * @param output the audio_message_t pointer where the data should be stored.
- * @returns 1 if no tones are within range of the robot, 0 if there was useful information.
- * */
-int AudioHandler::AudioBin::calculateCumulativeDataForPosition(double xr, double yr, double yaw, audio_message_t* output)
-{
-	audio_tone_t *ptr =  tones;
-	double meanPolarX = 0;
-	double meanPolarY = 0;
-	int numDetectableTones = 0;
 
-	//reset any values in the memory
-	output->direction 	= 0;
-	output->distance	= 0;
-	output->frequency 	= lowerFrequencyBound;
-
-	//for each tone in this bin.
-	while(ptr != NULL)
-	{
-		//calculate the level and direction of the tone
-
-		double xdiff, ydiff, dist;
-		double toneVol;
-		int toneDirection;
-
-		//first work out the distance from the source to the robot
-		xdiff 	= ptr->tx - xr;
-		ydiff 	= ptr->ty - yr;
-		dist 	= sqrt( (xdiff * xdiff) + (ydiff * ydiff) );
-
-		toneVol = getSoundIntensity(ptr->wattsAtSource, dist);
-
-		// can this tone be heard? If so then add it to the other tones.
-		if(toneVol != 0)
-		{
-			toneDirection = convertDifferentialCoordsIntoBearing(xdiff, ydiff, yaw);
-
-			//if tone is louder it has more of an effect on the tone direction than if it does not.
-			//the direction and the volume create a set of polar coordinates which we need to average to get the most accurate direction.
-			//using the average of ALL polar coordinates that we worked out.
-
-			meanPolarX += toneVol * cos( degreesToRadians(toneDirection) );
-			meanPolarY += toneVol * sin( degreesToRadians(toneDirection) );
-			numDetectableTones++;
-		}
-
-		ptr = ptr->next;
-	}
-
-	//if it turns out that no tones are within range of the robot then return nothing
-	if(numDetectableTones == 0)
-	{
-		return 1;
-	}
-
-	//now we have the total x and y contributions of each tone we find the average
-	meanPolarX = meanPolarX / numDetectableTones;
-	meanPolarY = meanPolarY / numDetectableTones;
-
-	//and convert back to polar coords.
-	output->distance = sqrt( (meanPolarX * meanPolarX) + (meanPolarY * meanPolarY) );
-	output->direction = convertDifferentialCoordsIntoBearing(meanPolarX, meanPolarY, 0);
-
-	//printf("\tbin direction is %d, volume is %f\n", output->direction, output->volume);
-
-
-
-	return 0;
-}
 
 
 
