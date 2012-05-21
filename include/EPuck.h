@@ -66,9 +66,8 @@ public:
 	public:
 		/**The lower bound on the frequency range this tone could be*/
 		double frequency;
-		/**The volume of the tone. This is some arbitrary number without a real measurement, but they are consistent with each other so can be
-		 * compared to other tones and volumes*/
-		double volume;
+		/**The distance to the tone source, in metres*/
+		double distance;
 		/**The bearing of the sound source with respect to the EPuck. If it is directly in front of the EPuck this will be 0,
 		 * bearings are then measured in DEGREES anticlockwise from the robot's front.*/
 		int bearing;
@@ -281,10 +280,9 @@ public:
 	 * Get this Epuck to play a tone of the desired frequency and duration.
 	 * @param frequency frequency of tone to play in Hz
 	 * @param duration duration of the tone in milliseconds
-	 * @param volume the sound level (volume) to play the tone at. A number between 0 and 10. This does not go up to 11.
 	 * @returns 0 if successful -1 if unsuccessful
 	 */
-	virtual int playTone(int frequency, double duration, double volume) = 0;
+	virtual int playTone(int frequency, double duration) = 0;
 
 	/**
 	 * Listens for any sounds in the audio environment and stores them in the EPuck class until the user requests them.

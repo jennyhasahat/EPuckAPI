@@ -244,18 +244,15 @@ public:
 	 * Get this Epuck to play a tone of the desired frequency and duration.
 	 * @param frequency frequency of tone to play in Hz
 	 * @param duration duration of the tone in milliseconds
-	 * @param volume the sound level (volume) to play the tone at. A number between 0 and 10. This does not go up to 11.
 	 * @returns 0 if successful -1 if unsuccessful
 	 */
-	int playTone(int frequency, double duration, double volume);
+	int playTone(int frequency, double duration);
 
 	/**
 	 * Listens for any sounds in the audio environment and stores them in the EPuck class until the user requests them.
-	 * Tones of similar frequency are grouped together because a Fourier transform is performed on the signal from the microphones,
-	 * the resulting information is combined in a way that is physically plausible (because this is a simulation after all...)
-	 * and stored in the EPuck object until requested by the user.
 	 * @returns numberOfTones the number of different tones the robot can hear.
 	 * @see #getTone
+	 * @see #getAllTones
 	 * */
 	int listenForTones(void);
 
@@ -268,6 +265,15 @@ public:
 	 * @see EPuck#Tone
 	 * */
 	EPuck::Tone getTone(int index);
+
+	/**Gives the pointer to the array of heard tones.
+	 * Use this function after a recent call of the listenForTones function.
+	 * The storage array may move around after different calls to listenForTones,
+	 * so this function must be called freshly each time.
+	 * The length of this array is returned by a call to listenForTones.
+	 * @see #listenForTones
+	 * */
+	EPuck::Tone* getAllTones(void);
 
 #if DEBUGGING == 1
 	void printLocation_TEST(void);

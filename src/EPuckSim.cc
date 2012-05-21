@@ -375,11 +375,11 @@ AudioHandler* EPuckSim::getAudioHandler(void)
 }
 
 
-int EPuckSim::playTone(int frequency, double duration, double volume)
+int EPuckSim::playTone(int frequency, double duration)
 {
 	if(audioInitialised)
 	{
-		handler->playTone(frequency, duration, volume, name);
+		handler->playTone(frequency, duration, name);
 		return 0;
 	}
 
@@ -406,7 +406,7 @@ int EPuckSim::listenForTones(void)
 
 		for(i=0; i<numberOfTones; i++)
 		{
-			toneArray[i].volume 	= message[i].volume;
+			toneArray[i].distance 	= message[i].distance;
 			toneArray[i].bearing 	= message[i].direction;
 			toneArray[i].frequency 	= message[i].frequency;
 		}
@@ -431,9 +431,14 @@ EPuck::Tone EPuckSim::getTone(int index)
 		EPuck::Tone t;
 		t.bearing = 0;
 		t.frequency = 0;
-		t.volume = 0;
+		t.distance = 0;
 		return t;
 	}
+}
+
+EPuck::Tone* EPuckSim::getAllTones(void)
+{
+	return toneArray;
 }
 
 #if DEBUGGING == 1
