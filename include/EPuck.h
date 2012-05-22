@@ -71,6 +71,11 @@ public:
 		/**The bearing of the sound source with respect to the EPuck. If it is directly in front of the EPuck this will be 0,
 		 * bearings are then measured in DEGREES anticlockwise from the robot's front.*/
 		int bearing;
+
+		bool operator<(const Tone& other)
+		{
+			return (frequency < other.frequency);
+		}
 	};
 
 

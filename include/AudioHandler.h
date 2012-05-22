@@ -41,7 +41,7 @@ class AudioHandler
 {
 public:
 
-	static const int sampleRate	=	45000;
+	static const int sampleRate	=	8000;
 	static const int fftBlockSize =	128;
 
 	/**The quantisation lower boudaries for the frequency spectrum.

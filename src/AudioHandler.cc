@@ -32,10 +32,12 @@ AudioHandler::AudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::S
 	strncpy(aRobotName, name, 32);
 	numberOfBins = 0;
 
+	//printf("audio handler constructor making bins at freqs:\n");
 	//make array of frequency bins depending on FFT settings.
 	for(i=0; i<fftBlockSize/2; i++)
 	{
 		lowerFFTBounds[i] = (i*sampleRate)/fftBlockSize;
+		//printf("%f, ", lowerFFTBounds[i]);
 	}
 
 	updateAudioBinListThread = boost::thread(&AudioHandler::updateAudioBinListThreaded, this);
