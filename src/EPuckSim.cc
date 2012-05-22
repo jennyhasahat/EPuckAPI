@@ -395,14 +395,18 @@ int EPuckSim::listenForTones(void)
 
 	if(audioInitialised)
 	{
-		//need to remember how many tones were allocated last time and free that memory
-		delete[] toneArray;
-
-		//reserve space for new tone data
-		numberOfTones 	= handler->getNumberOfTones();
-		toneArray 		= new Tone[numberOfTones];
-		message 		= new AudioHandler::audio_message_t[numberOfTones];
-		handler->getTones(name, message, sizeof(AudioHandler::audio_message_t)*numberOfTones);
+		int success;
+		do
+		{
+			//need to remember how many tones were allocated last time and free that memory
+			delete[] toneArray;
+			//reserve space for new tone data
+			numberOfTones 	= handler->getNumberOfTones();
+			toneArray 		= new Tone[numberOfTones];
+			message 		= new AudioHandler::audio_message_t[numberOfTones];
+			success = handler->getTones(name, message, sizeof(AudioHandler::audio_message_t)*numberOfTones);
+			if(success == -1) delete[] message;
+		}while(success == -1);
 
 		for(i=0; i<numberOfTones; i++)
 		{
@@ -410,7 +414,6 @@ int EPuckSim::listenForTones(void)
 			toneArray[i].bearing 	= message[i].direction;
 			toneArray[i].frequency 	= message[i].frequency;
 		}
-
 		return numberOfTones;
 	}
 

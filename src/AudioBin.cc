@@ -38,6 +38,7 @@ AudioHandler::AudioBin::~AudioBin()
 /**Returns the number of tones currently stored in this audio bin*/
 int AudioHandler::AudioBin::getNumberTones(void)
 {
+	//printf("there are %d tones in this bin\n", numberTones);
 	return numberTones;
 }
 
@@ -51,6 +52,7 @@ int AudioHandler::AudioBin::updateList(double currentTime)
 	audio_tone_t *ptr;
 
 	ptr = tones;
+
 	while(ptr != NULL)
 	{
 		audio_tone_t *del = ptr;
@@ -122,13 +124,13 @@ void AudioHandler::AudioBin::addTone(double x, double y, double endtime)
  * @param noMsgs the number of audio messages to retrieve from the bin
  * @returns the number of tones actually saved by this function, so 0 if there were none.
  * */
-int AudioHandler::AudioBin::calculateRawToneDataForPosition(double xr, double yr, double yaw, audio_message_t* output, int noMsgs)
+int AudioHandler::AudioBin::calculateRawToneDataForPosition(double xr, double yr, double yaw, audio_message_t* output, int maxToFill)
 {
 	audio_tone_t *ptr =  tones;
 	int currentTone = 0;
 
 	//for each tone in this bin.
-	for(currentTone=0; currentTone<noMsgs; currentTone++)
+	for(currentTone=0; (currentTone<numberTones) && (currentTone<maxToFill); currentTone++)
 	{
 		double xdiff, ydiff;
 

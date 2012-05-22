@@ -27,7 +27,8 @@
 #include <time.h>
 #include <math.h>
 #include "libplayerc++/playerc++.h"
-
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 
 
 /**
@@ -110,7 +111,7 @@ public:
 		int getNumberTones(void);
 		int updateList(double currentTime);
 		void addTone(double x, double y, double endtime);
-		int calculateRawToneDataForPosition(double x, double y, double yaw, audio_message_t* output, int numMsgs);
+		int calculateRawToneDataForPosition(double x, double y, double yaw, audio_message_t* output, int maxToFill);
 
 
 	private:
@@ -146,10 +147,12 @@ public:
 	void dumpData_TEST(void);
 
 protected:
-	//protected so it can be a singleton
+	boost::mutex toneIOMutex;
 
+	//protected so it can be a singleton
 	AudioHandler(PlayerCc::PlayerClient *simulationClient, PlayerCc::SimulationProxy *sim, char* name);
 
+	//boost::mutex getIOMutex(void){return toneIOMutex;}
 private:
 	//member variables
 	//linked list of AudioBins for the frequencies currently being played.
@@ -157,6 +160,7 @@ private:
 
 	int numberOfBins;
 	boost::thread updateAudioBinListThread;
+
 
 	//player stuff
 	PlayerCc::SimulationProxy	*simProxy;

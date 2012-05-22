@@ -99,9 +99,9 @@ void AudioHandler::playTone(int freq, double duration, char* robotName)
 {
 	int whichbin;
 	char timeflag[] = "time";
-	double x, y, yaw, voltage, currenttime;
+	double x, y, yaw, currenttime;
 	uint64_t timeData;
-	AudioBin *current = environment;
+	AudioBin *current;
 	AudioBin *last;
 
 	//find FFT lower frequency bound for freq
@@ -110,8 +110,13 @@ void AudioHandler::playTone(int freq, double duration, char* robotName)
 		if(lowerFFTBounds[whichbin] <= freq) break;
 	}
 
+	//Code is about to read information from the environment and the write to it
+	// putting mutex lock here so that while it is in scope read and write
+	//from other threads can't happen.
+	boost::mutex::scoped_lock lock(toneIOMutex);
 
 	//check linked list to see if there is an audio bin for this sound
+	current = environment;
 	while(current != NULL)
 	{
 		if(current->lowerFrequencyBound == lowerFFTBounds[whichbin])
@@ -147,8 +152,7 @@ void AudioHandler::playTone(int freq, double duration, char* robotName)
 	currenttime = (double)timeData;
 	currenttime = currenttime/1000000;
 
-	//limit voltage to be between the max and min voltages.
-
+	//write tone to environment
 	current->addTone(x, y, currenttime+(duration/1000));
 
 	return;
@@ -160,6 +164,10 @@ void AudioHandler::playTone(int freq, double duration, char* robotName)
  * */
 int AudioHandler::getNumberOfTones(void)
 {
+	//code is about to read audio data, so lock it down so that any writes to
+	//environment don't mess stuff up
+	boost::mutex::scoped_lock lock(toneIOMutex);
+
 	AudioBin *binptr = environment;
 	int numTones = 0;
 
@@ -188,7 +196,7 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 	int numberAllocatedSlots;
 	double x, y, yaw;
 	int slotsFilled = 0;
-	AudioBin *binptr = environment;
+	AudioBin *binptr;
 
 	//find how many audio_message_t slots have been allocated and see if it is enough
 	numberAllocatedSlots = storesize/sizeof(audio_message_t);
@@ -202,11 +210,16 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 	//get positional info about the robot calling this function
 	simProxy->GetPose2d(robotName, x, y, yaw);
 
+	//code is about to read audio data, so lock it down so that any writes to
+	//environment don't mess stuff up
+	boost::mutex::scoped_lock lock(toneIOMutex);
+
+	binptr = environment;
 	//for each bin get the full tone information for it.
 	while(binptr != NULL && slotsFilled < numberAllocatedSlots)
 	{
 		int numTonesSaved;
-		numTonesSaved = binptr->calculateRawToneDataForPosition(x, y, yaw, &store[slotsFilled], binptr->getNumberTones());
+		numTonesSaved = binptr->calculateRawToneDataForPosition(x, y, yaw, &store[slotsFilled], numberAllocatedSlots-slotsFilled);
 		slotsFilled += numTonesSaved;
 		binptr = binptr->next;
 	}
@@ -219,6 +232,8 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t store
 
 void AudioHandler::dumpData_TEST(void)
 {
+	boost::mutex::scoped_lock lock(toneIOMutex);
+
 	AudioBin *binptr = environment;
 	AudioBin::audio_tone_t *toneptr;
 
@@ -297,19 +312,26 @@ void AudioHandler::updateAudioBinListThreaded(void)
 {
 	printf("AudioHandler is threaded\n");
 	boost::posix_time::milliseconds wait(10);
-	AudioBin *ptr = environment;
+	AudioBin *ptr;
 	char simproxFlag[] = "time";
 
 	while(true)
 	{
-		ptr = environment;
 		uint64_t timeData;
 		double currentTime;
+
+		//sleep for 50ms. This is a lot but the sim only goes to a resolution of 100ms
+		boost::this_thread::sleep(wait);
+
+		//code is about to read/write audio data, so lock it down so that any writes to
+		//environment don't mess stuff up
+		boost::mutex::scoped_lock lock(toneIOMutex);
 
 		simProxy->GetProperty(aRobotName, simproxFlag, &timeData, sizeof(uint64_t));
 		currentTime = (double)timeData;
 		currentTime = currentTime/1000000;
 
+		ptr = environment;
 		//currentTime = (double)time(NULL);
 		while(ptr != NULL)
 		{
@@ -332,8 +354,6 @@ void AudioHandler::updateAudioBinListThreaded(void)
 			}
 			ptr = ptr->next;
 		}
-		//sleep for 50ms. This is a lot but the sim only goes to a resolution of 100ms
-		boost::this_thread::sleep(wait);
 	}
 
 	return;

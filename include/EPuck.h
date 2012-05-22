@@ -72,7 +72,8 @@ public:
 		 * bearings are then measured in DEGREES anticlockwise from the robot's front.*/
 		int bearing;
 
-		bool operator<(const Tone& other)
+		//bool operator<(Point const& rhs) const { ... }
+		bool operator<(Tone const& other) const
 		{
 			return (frequency < other.frequency);
 		}
