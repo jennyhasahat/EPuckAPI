@@ -124,6 +124,12 @@ void EPuckSim::getPosition(double& x, double& y, double& yaw)
 	return;
 }
 
+void EPuckSim::setPosition(double x, double y, double yaw)
+{
+	simProxy->SetPose2d(name, x, y, yaw);
+	return;
+}
+
 //************INFRA-RED SENSORS*******************
 
 
@@ -362,6 +368,8 @@ int EPuckSim::initaliseAudio(void)
 	if(!audioInitialised)
 	{
 		handler = AudioHandler::GetAudioHandler(simulation, simProxy, name);
+		//allocate space so that the first time the robot must listen there is somethign to delete.
+		toneArray = new Tone[1];
 		audioInitialised = TRUE;
 		return 0;
 	}
@@ -399,7 +407,8 @@ int EPuckSim::listenForTones(void)
 		do
 		{
 			//need to remember how many tones were allocated last time and free that memory
-			delete[] toneArray;
+			//TODO below might cause memory leak?
+			if(numberOfTones > 0) delete[] toneArray;
 			//reserve space for new tone data
 			numberOfTones 	= handler->getNumberOfTones();
 			toneArray 		= new Tone[numberOfTones];

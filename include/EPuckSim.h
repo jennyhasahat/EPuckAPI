@@ -118,6 +118,15 @@ public:
 	 * */
 	void getPosition(double& x, double& y, double& yaw);
 
+	/**
+	 * Returns the position of the epuck in the environment.
+	 * Loads the pose data into the provided doubles.
+	 * @param x x coordinate to put robot at.
+	 * @param y y coordinate to put robot at.
+	 * @param yaw yaw angle to give robot.
+	 * */
+	void setPosition(double x, double y, double yaw);
+
 
 	//==================== IR methods =========================================
 	/**
