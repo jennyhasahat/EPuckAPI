@@ -512,8 +512,8 @@ void EPuckSim::initialise(int robotPort, char* robotName, int simulationPort)
 		simulation 	= new PlayerCc::PlayerClient("localhost", simulationPort);
 
 		p2dProxy 	= new PlayerCc::Position2dProxy(epuck, 0);
-		rangerProxy 	= new PlayerCc::RangerProxy(epuck, 0);
-		blobProxy 	= new PlayerCc::BlobfinderProxy(epuck, 0);
+	//	rangerProxy = new PlayerCc::RangerProxy(epuck, 0);
+	//	blobProxy 	= new PlayerCc::BlobfinderProxy(epuck, 0);
 		simProxy 	= new PlayerCc::SimulationProxy(simulation, 0);
 	}
 	catch (PlayerCc::PlayerError e)
@@ -522,7 +522,7 @@ void EPuckSim::initialise(int robotPort, char* robotName, int simulationPort)
 		return;
 	}
 
-	readSensorsThread = boost::thread(&EPuckSim::readSensorsThreaded, this);
+//	readSensorsThread = boost::thread(&EPuckSim::readSensorsThreaded, this);
 //	pthread_create(&readSensorsThread, 0, EPuckSim::startReadSensorThread, this);
 }
 

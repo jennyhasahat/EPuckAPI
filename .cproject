@@ -32,8 +32,8 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1616988424" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.other.other.164698950" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 `pkg-config --cflags playerc++`" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.956779464" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/local/d0p6/jowen/playerstage/include/player-3.0"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/EPuckAPI/include}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/local/include/player-3.0"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1262584357" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -41,9 +41,7 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.exe.debug.option.optimization.level.1210148137" name="Optimization Level" superClass="gnu.c.compiler.exe.debug.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.exe.debug.option.debugging.level.1345653607" name="Debug Level" superClass="gnu.c.compiler.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.misc.other.2005930499" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 `pkg-config --cflags playerc`" valueType="string"/>
-								<option id="gnu.c.compiler.option.include.paths.1283182239" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/usr/local/include/player-3.0"/>
-								</option>
+								<option id="gnu.c.compiler.option.include.paths.1283182239" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.732677511" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1672459161" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug">

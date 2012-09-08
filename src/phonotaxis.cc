@@ -138,12 +138,12 @@ void phonotaxis(EPuck *bot, double *leftWheel, double *rightWheel)
 	if(numberTones > 0)
 	{
 		double rads;
-		Tone t;
+		EPuck::Tone t;
 
 		t = bot->getTone(0);
 
 		//if the robot can actually hear the tone
-		if(t.volume > 0)
+		if(t.distance > 0)
 		{
 			printf("sound heard!\n");
 			//bearing is in range 0 to 360
@@ -198,7 +198,7 @@ void *flashAndSound(void *bot)
 	while(true)
 	{
 		printf("playing tone. Time is %f.\n", robot->getTime());
-		robot->playTone(500, 5000, 10);
+		robot->playTone(500, 5000);
 		//robot->dumpAudio_TEST();
 		usleep(5000000);
 	}
