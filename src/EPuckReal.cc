@@ -365,7 +365,7 @@ int EPuckReal::playTone(int frequency, double duration, double volume)
 	return -1;
 }
 
-int EPuckReal::listenForTones(void)
+std::vector<EPuck::Tone> EPuckReal::listenForTones(void)
 {
 /*	int i;
 	AudioHandler::audio_message_t *message;
@@ -392,29 +392,13 @@ int EPuckReal::listenForTones(void)
 	}
 
 	printf("Unsuccessful epuck %s listenToTones() request. Audio not initialised.\n", name);*/
-	return -1;
-}
-
-
-EPuck::Tone EPuckReal::getTone(int index)
-{
-	//TODO this is not yet coded
-/*	if(index < numberOfTones && index > -1)
-	{
-		return toneArray[index];
-	}
-	else
-	{
-		printf("In EPuckReal::getTone, index %d does not exist.\n", index);
-		EPuckReal::Tone t;
-		t.bearing = 0;
-		t.frequency = 0;
-		t.volume = 0;
-		return t;
-	}*/
-	EPuck::Tone t;
+	std::vector<EPuck::Tone> t;
+	t.clear();
 	return t;
 }
+
+
+
 /*
 void EPuckReal::printLocation_TEST(void)
 {

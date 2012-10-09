@@ -66,7 +66,7 @@ EPuckSim::~EPuckSim(void)
 	delete	epuck;
 	delete	simulation;
 
-	if(audioInitialised) delete[] toneArray;
+	//if(audioInitialised) delete[] toneArray;
 
 	return;
 }
@@ -369,7 +369,7 @@ int EPuckSim::initaliseAudio(void)
 	{
 		handler = AudioHandler::GetAudioHandler(simulation, simProxy, name);
 		//allocate space so that the first time the robot must listen there is somethign to delete.
-		toneArray = new Tone[1];
+		//toneArray = new Tone[1];
 		audioInitialised = TRUE;
 		return 0;
 	}
@@ -396,6 +396,48 @@ int EPuckSim::playTone(int frequency, double duration)
 }
 
 
+std::vector<EPuck::Tone> EPuckSim::listenForTones(void)
+{
+	std::vector<EPuck::Tone> out;
+	out.clear();
+
+	if(audioInitialised)
+	{
+		int success;
+		int numberOfTones;
+		AudioHandler::audio_message_t *message;
+		//lock this function so that deleting and creating these arrays doesn't cause
+		//memory leaks and segfaults.
+		boost::mutex::scoped_lock lock(listeningMutex);
+		do
+		{
+			//reserve space for new tone data
+			numberOfTones 	= handler->getNumberOfTones();
+			message 		= new AudioHandler::audio_message_t[numberOfTones];
+			success = handler->getTones(name, message, numberOfTones);
+			if(success == -1) delete[] message;
+		}while(success == -1); //if unsuccessful try again
+
+		for(int i=0; i<numberOfTones; i++)
+		{
+			EPuck::Tone t;
+			t.distance 	= message[i].distance;
+			t.bearing 	= message[i].direction;
+			t.frequency = message[i].frequency;
+			out.push_back(t);
+		}
+
+		delete[] message;
+	}
+	else
+		printf("Unsuccessful epuck %s listenToTones() request. Audio not initialised.\n", name);
+
+	return out;
+}
+
+
+
+/*
 int EPuckSim::listenForTones(void)
 {
 	int i;
@@ -404,10 +446,12 @@ int EPuckSim::listenForTones(void)
 	if(audioInitialised)
 	{
 		int success;
+		//lock this function so that deleting and creating these arrays doesn't cause
+		//memory leaks and segfaults.
+		boost::mutex::scoped_lock lock(listeningMutex);
 		do
 		{
 			//need to remember how many tones were allocated last time and free that memory
-			//TODO below might cause memory leak?
 			if(numberOfTones > 0) delete[] toneArray;
 			//reserve space for new tone data
 			numberOfTones 	= handler->getNumberOfTones();
@@ -428,30 +472,9 @@ int EPuckSim::listenForTones(void)
 
 	printf("Unsuccessful epuck %s listenToTones() request. Audio not initialised.\n", name);
 	return -1;
-}
+}*/
 
 
-EPuck::Tone EPuckSim::getTone(int index)
-{
-	if(index < numberOfTones && index > -1)
-	{
-		return toneArray[index];
-	}
-	else
-	{
-		printf("In EPuckSim::getTone, index %d does not exist.\n", index);
-		EPuck::Tone t;
-		t.bearing = 0;
-		t.frequency = 0;
-		t.distance = 0;
-		return t;
-	}
-}
-
-EPuck::Tone* EPuckSim::getAllTones(void)
-{
-	return toneArray;
-}
 
 #if DEBUGGING == 1
 	void EPuckSim::printLocation_TEST(void)
@@ -504,7 +527,7 @@ void EPuckSim::initialise(int robotPort, char* robotName, int simulationPort)
 	port 				= robotPort;
 	allLEDsOn			= false;
 	audioInitialised 	= false;
-	toneArray 			= NULL;
+	//toneArray 			= NULL;
 
 	try
 	{

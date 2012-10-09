@@ -186,20 +186,16 @@ int AudioHandler::getNumberOfTones(void)
  * This function will then copy the environmental audio data into the provided memory using the audio_message_t structure.
  * @param robotName	the name of the robot which is requesting the data (this is given in the worldfile)
  * @param store		link to where the audio data memory has been allocated.
- * @param storesize	the number of audio_message_t objects allocated to the audio data.
+ * @param numberAllocatedSlots	the number of audio_message_t items in the store array
  * @returns the number of tones in the environment that this robot can detect, -1 if unsuccessful (like say if new data has been added between allocating memory and trying to copy it over).
  * @see AudioHandler#getNumberOfTones()
  *
  * */
-int AudioHandler::getTones(char* robotName, audio_message_t *store, size_t storesize)
+int AudioHandler::getTones(char* robotName, audio_message_t *store, int numberAllocatedSlots)
 {
-	int numberAllocatedSlots;
 	double x, y, yaw;
 	int slotsFilled = 0;
 	AudioBin *binptr;
-
-	//find how many audio_message_t slots have been allocated and see if it is enough
-	numberAllocatedSlots = storesize/sizeof(audio_message_t);
 
 	if(getNumberOfTones() > numberAllocatedSlots)
 	{

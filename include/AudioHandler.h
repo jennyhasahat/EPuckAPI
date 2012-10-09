@@ -1,3 +1,13 @@
+#ifndef AUDIOHANDLER_H_
+#define AUDIOHANDLER_H_
+
+#include <stdio.h>
+#include <time.h>
+#include <math.h>
+#include "libplayerc++/playerc++.h"
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+
 /**
  * AudioHandler stores the audio environment data in the simulation.
  * It provides interfaces for storing audio information and for accessing audio information.
@@ -19,25 +29,6 @@
  * @date 26/07/2010
  * @author Jennifer Owen
  */
-
-#ifndef AUDIOHANDLER_H_
-#define AUDIOHANDLER_H_
-
-#include <stdio.h>
-#include <time.h>
-#include <math.h>
-#include "libplayerc++/playerc++.h"
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-
-
-/**
- * takes care of all audio processing and collection, stores audio data and
- * takes care of returning it to the calling object.
- * Audio in the simulation is global so AudioHandler is handled as a singleton
- * and there can be only one AudioHandler,
- * which contains all the audio data in the environment.
- **/
 class AudioHandler
 {
 public:
@@ -138,7 +129,7 @@ public:
 	int getFFTBlockSize(void);
 	void playTone(int freq, double duration, char* name);
 	int getNumberOfTones(void);
-	int getTones(char* robotName, audio_message_t *store, size_t storesize);
+	int getTones(char* robotName, audio_message_t *store, int numberAllocatedSlots);
 
 
 

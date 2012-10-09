@@ -1,6 +1,7 @@
 #ifndef EPUCK_H
 #define EPUCK_H
 
+#include <vector>
 #include "libplayerc++/playerc++.h"
 //#include "DataStructures.h"
 
@@ -298,15 +299,7 @@ public:
 	 * @returns numberOfTones the number of different tones the robot can hear.
 	 * @see #getTone
 	 * */
-	virtual int listenForTones(void) = 0;
-
-	/**
-	 * Will return the requested tone. The EPuck object stores a list of tones, their frequencies, volumes and directions wrt the epuck.
-	 * This list of tones is updated when {@link EPuck#listenForTones} is called. This function allows you to request a tone from this array.
-	 * @param index the index of the tone you wish to get from the EPuck object
-	 * @returns tone the tone.
-	 * */
-	virtual Tone getTone(int index) = 0;
+	virtual std::vector<Tone> listenForTones(void) = 0;
 
 
 };

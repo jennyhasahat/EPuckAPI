@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <time.h>*/
 #include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "libplayerc++/playerc++.h"
 #include "AudioHandler.h"
@@ -66,8 +67,9 @@ protected:
 	//audio stuff
 	AudioHandler *handler;
 	bool audioInitialised;
-	Tone *toneArray;
-	int numberOfTones;
+	//Tone *toneArray;
+	//int numberOfTones;
+	boost::mutex listeningMutex;	//listening deletes toneArray and if 2 funcs access it at once segfaults happen.
 
 	//robot also supports power, aio and blinkenlight proxies
 	//as far as I can tell, stage does not support these
@@ -263,26 +265,8 @@ public:
 	 * @see #getTone
 	 * @see #getAllTones
 	 * */
-	int listenForTones(void);
+	std::vector<Tone> listenForTones(void);
 
-	/**
-	 * Will return the requested tone. The EPuck object stores a list of tones, their frequencies, volumes and directions wrt the epuck.
-	 * This list of tones is updated when {@link EPuck#listenForTones} is called. This function allows you to request a tone from this array.
-	 * @param index the index of the tone you wish to get from the EPuck object
-	 * @returns tone the tone.
-	 * @see #listenForTones
-	 * @see EPuck#Tone
-	 * */
-	EPuck::Tone getTone(int index);
-
-	/**Gives the pointer to the array of heard tones.
-	 * Use this function after a recent call of the listenForTones function.
-	 * The storage array may move around after different calls to listenForTones,
-	 * so this function must be called freshly each time.
-	 * The length of this array is returned by a call to listenForTones.
-	 * @see #listenForTones
-	 * */
-	EPuck::Tone* getAllTones(void);
 
 #if DEBUGGING == 1
 	void printLocation_TEST(void);

@@ -199,18 +199,10 @@ public:
 	 * Tones of similar frequency are grouped together because a Fourier transform is performed on the signal from the microphones,
 	 * the resulting information is combined in a way that is physically plausible (because this is a simulation after all...)
 	 * and stored in the EPuck object until requested by the user.
-	 * @returns numberOfTones the number of different tones the robot can hear.
+	 * @returns vector of the tones in the environment
 	 * */
-	int listenForTones(void);
+	std::vector<Tone> listenForTones(void);
 
-	/**
-	 * Will return the requested tone. The EPuck object stores a list of tones, their frequencies, volumes and directions wrt the epuck.
-	 * This list of tones is updated when {@link EPuck#listenForTones} is called. This function allows you to request a tone from this array.
-	 * @param index the index of the tone you wish to get from the EPuck object
-	 * @returns tone the tone.
-	 * @see EPuck#Tone
-	 * */
-	EPuck::Tone getTone(int index);
 
 #if DEBUGGING == 1
 	void printLocation_TEST(void);
