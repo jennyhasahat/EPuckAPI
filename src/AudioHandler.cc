@@ -98,9 +98,7 @@ int AudioHandler::getFFTBlockSize(void)
 void AudioHandler::playTone(int freq, double duration, char* robotName)
 {
 	int whichbin;
-	char timeflag[] = "time";
 	double x, y, yaw, currenttime;
-	uint64_t timeData;
 	AudioBin *current;
 	AudioBin *last;
 
@@ -148,9 +146,7 @@ void AudioHandler::playTone(int freq, double duration, char* robotName)
 	simProxy->GetPose2d(robotName, x, y, yaw);
 
 	//get simulation time
-	simProxy->GetProperty(robotName, timeflag, &timeData, sizeof(uint64_t));
-	currenttime = (double)timeData;
-	currenttime = currenttime/1000000;
+	currenttime = getCurrentTime();
 
 	//write tone to environment
 	current->addTone(x, y, currenttime+(duration/1000));
@@ -199,7 +195,7 @@ int AudioHandler::getTones(char* robotName, audio_message_t *store, int numberAl
 
 	if(getNumberOfTones() > numberAllocatedSlots)
 	{
-		printf("There are %d tones in the environment, but you have only reserved enough space for %d. Try again.\n", getNumberOfTones(), numberAllocatedSlots);
+		//printf("There are %d tones in the environment, but you have only reserved enough space for %d. Try again.\n", getNumberOfTones(), numberAllocatedSlots);
 		return -1;
 	}
 
@@ -313,9 +309,6 @@ void AudioHandler::updateAudioBinListThreaded(void)
 
 	while(true)
 	{
-		uint64_t timeData;
-		double currentTime;
-
 		//sleep for 50ms. This is a lot but the sim only goes to a resolution of 100ms
 		boost::this_thread::sleep(wait);
 
@@ -323,10 +316,7 @@ void AudioHandler::updateAudioBinListThreaded(void)
 		//environment don't mess stuff up
 		boost::mutex::scoped_lock lock(toneIOMutex);
 
-		simProxy->GetProperty(aRobotName, simproxFlag, &timeData, sizeof(uint64_t));
-		currentTime = (double)timeData;
-		currentTime = currentTime/1000000;
-
+		double currentTime = getCurrentTime();
 		ptr = environment;
 		//currentTime = (double)time(NULL);
 		while(ptr != NULL)
@@ -355,5 +345,17 @@ void AudioHandler::updateAudioBinListThreaded(void)
 	return;
 }
 
+double AudioHandler::getCurrentTime(void)
+{
+	uint64_t timeData;
+	double currentTime;
+	char simproxFlag[] = "time";
+
+	simProxy->GetProperty(aRobotName, simproxFlag, &timeData, sizeof(uint64_t));
+	currentTime = (double)timeData;
+	currentTime = currentTime/1000000;
+
+	return currentTime;
+}
 
 

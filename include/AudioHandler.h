@@ -4,9 +4,12 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
+#include <list>
 #include "libplayerc++/playerc++.h"
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
+
+class EPuck;
 
 /**
  * AudioHandler stores the audio environment data in the simulation.
@@ -166,6 +169,8 @@ private:
 	int removeBin(AudioBin *del);
 
 	void updateAudioBinListThreaded(void);
+
+	double getCurrentTime(void);
 };
 
 

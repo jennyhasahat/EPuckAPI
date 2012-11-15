@@ -76,7 +76,9 @@ public:
 		//bool operator<(Point const& rhs) const { ... }
 		bool operator<(Tone const& other) const
 		{
-			return (frequency < other.frequency);
+			if(frequency == other.frequency)
+				return (distance < other.distance);
+			else return (frequency < other.frequency);
 		}
 	};
 

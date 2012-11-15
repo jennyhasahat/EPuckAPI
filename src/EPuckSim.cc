@@ -66,7 +66,7 @@ EPuckSim::~EPuckSim(void)
 	delete	epuck;
 	delete	simulation;
 
-	//if(audioInitialised) delete[] toneArray;
+	if(audioInitialised) delete handler;
 
 	return;
 }
@@ -75,8 +75,7 @@ EPuckSim::~EPuckSim(void)
 bool EPuckSim::operator==(const EPuckSim& other)
 {
 	int comparison = strcmp(other.name, name);
-	if(comparison == 0) return true;
-	else return false;
+	return (comparison == 0);
 }
 
 
@@ -110,6 +109,18 @@ double EPuckSim::getTime(void)
 	time = time / 1000000;
 
 	return time;
+}
+
+void EPuckSim::waitMilliseconds(int timeMs)
+{
+	boost::posix_time::milliseconds wait(10);
+	double endTime = getTime() + (double)timeMs/1000;
+
+	while(getTime() < endTime)
+	{
+		boost::this_thread::sleep(wait);
+	}
+	return;
 }
 
 

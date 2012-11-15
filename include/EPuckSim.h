@@ -104,6 +104,9 @@ public:
 	 * */
 	double getTime(void);
 
+	/**Waits the provided number of milliseconds and BLOCKS while doing so*/
+	void waitMilliseconds(int timeMs);
+
 
 	/**
 	 * Gets the amount of volts currently being output by the epuck's battery.
